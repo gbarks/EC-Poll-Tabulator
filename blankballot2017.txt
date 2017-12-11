@@ -55,12 +55,12 @@
 * NORTH AMERICA *
 * Canada * 
 0, Coaster-PNE Playland-CANDA, CoasterPNE
-0, Ghoster Coaster-Canadas Wonderland-CANDA, GhosterCoa
-0, Mighty Canadian Minebuster-Canadas Wonderland-CANDA, MightyCana
-0, Wild Beast-Canadas Wonderland-CANDA, WildBeast
+0, Ghoster Coaster-Canadas Wonderland-CANDA, GhostrCoCW
+0, Mighty Canadian Minebuster-Canadas Wonderland-CANDA, MightyCaCW
+0, Wild Beast-Canadas Wonderland-CANDA, WildBeasCW
 0, Roller Coaster-Upper Clements Park-CANDA, RCClements
-0, Monstre (left)-LaRonde-CANDA, MonstreL
-0, Monstre (right)-LaRonde-CANDA, MonstreR
+0, Monstre (left)-LaRonde-CANDA, LeMonstreL
+0, Monstre (right)-LaRonde-CANDA, LeMonstreR
 
 * MEXICO *
 0, Montana Rusa (Left)-La Feria Chapultepec Magico-MEXCO, MontanaRuL
@@ -69,7 +69,7 @@
 * UNITED STATES *		
 * Alabama *
 0, Cannonball-Waterville USA-USAAL, CannonbaAL
-0, Rampage-Alabama Splash Adventure-USAAL, Rampage
+0, Rampage-Alabama Splash Adventure-USAAL, RampageAL
 		
 * ARKANSAS *
 0, Arkansas Twister-Magic Springs-USAAR, ArkTwister
@@ -87,24 +87,24 @@
 0, Twister II-Elitch Gardens-USACO, TwisterII
 
 * CONNECTICUT *
-0, Boulder Dash-Lake Compounce-USACT, BoulderDas
+0, Boulder Dash-Lake Compounce-USACT, BoulderDLC
 0, Wildcat-Lake Compounce-USACT, WildcatLC
-0, Wooden Warrior-Quassy-USACT, WoodWarrio
+0, Wooden Warrior-Quassy-USACT, WoodWarrQs
 
 * FLORIDA *
-0, Coastersaurus-Legoland Florida-USAFL, Coastersau
+0, Coastersaurus-Legoland Florida-USAFL, CsaurLegoF
 0, Mine Blower-Fun Spot America-USAFL, MineBlower
 0, White Lightning-Fun Spot America-USAFL, WhiLightni
 
 * GEORGIA *
-0, Georgia Cyclone-SF Over Georgia-USAGA, GeorgiaCy
-0, Great American Scream Machine-SF Over Georgia-USAGA, GASMSFOG
+0, Georgia Cyclone-SF Over Georgia-USAGA, GACyclSFOG
+0, Great American Scream Machine-SF Over Georgia-USAGA, GrAmSMSFOG
 0, Cannon Ball-Lake Winnepesaukah-USAGA, CannonbaGA
 0, Cheetah-Wild Adventures-USAGA, CheetahGA
 
 * IDAHO *
-0, Timber Terror-Silverwood-USAID, TimberTerr
-0, Tremors-Silverwood-USAID, Tremors
+0, Timber Terror-Silverwood-USAID, TimbTerrSW
+0, Tremors-Silverwood-USAID, TremorsSW
 
 * ILLINOIS *	
 0, American Eagle (Red)-SF Great America-USAIL, AERedSFGAm
