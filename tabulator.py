@@ -21,27 +21,15 @@ startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 blankBallot = "blankballot2017.txt"
 # name of blank ballot file
 
-ballotFolder = "ballots2017"
-# folder where ballots are contained
+ballotFolder = "ballots2017" # folder where ballots are contained
 
-coasterList = []
-# list of every coaster on the ballot
+coasterList = [] # list of every coaster on the ballot
 
-totalCoasters = 0
-# total number of coasters on the ballot
-
-ballotList = []
-# list of ballot filenames
-
-numBallots = 0
-# number of ballots received
+ballotList = [] # list of ballot filenames
 
 coasterDict = {}
 # dict that assigns a number to each coaster on the ballot
 # potentially useful for chart printouts, using an int rather than the whole name of coaster
-
-coasterNumber = 0
-# in the coasterDict, the number assigned to the coaster
 
 winLossMatrix = {}
 # for each pair of coasters, a string containing w, l, or t representing every contest between that pair
@@ -101,15 +89,13 @@ def getCoasterList(blankBallot):
     print("Creating list of every coaster on the ballot")
 
     global coasterList
-    global totalCoasters
     global riders
     # initialize list to contain words in the ballot lines
     words = []
 
     #open the blank ballot file
     with open(blankBallot) as f:
-        # make sure totalCoasters and lineNum are starting from 0
-        totalCoasters = 0
+        # make sure lineNum is starting from 0
         lineNum = 0
         startProcessing = False
 
@@ -145,8 +131,6 @@ def getCoasterList(blankBallot):
 
                 # Everything good? do this
                     else:
-                        # add one to the number of total coasters on the ballot
-                        totalCoasters += 1
                         # pull out the name of the coaster
                         coasterName = words[1]
                         # initialize the number of riders for this coaster
@@ -162,7 +146,7 @@ def getCoasterList(blankBallot):
                         # add the coaster to the list of coasters on the ballot
                         coasterList.append(coasterName)
 
-    return totalCoasters, coasterList, riders
+    return coasterList, riders
 
 
 # ==================================================
@@ -172,7 +156,6 @@ def getBallotFilenames(ballotFolder):
     print("Getting the filenames of submitted ballots")
 
     global ballotList
-    global numBallots
 
     # iterate through the list of files in the ballot folder
     for file in os.listdir(ballotFolder):
@@ -181,9 +164,7 @@ def getBallotFilenames(ballotFolder):
         if file.endswith(".txt"):
             # add the filename to the list of ballot files
             ballotList.append(file)
-            # add 1 to the number of ballots
-            numBallots += 1
-    return ballotList, numBallots
+    return ballotList
 
 # ==================================================
 # create dictionary of coaster names paired with nums
@@ -196,7 +177,7 @@ def createDict():
     print("Creating the coaster dictionary")
 
     global coasterDict
-    global coasterNumber
+    coasterNumber = 0
     for coaster in coasterList:
         coasterDict[coaster] = coasterNumber
         coasterNumber += 1
@@ -532,9 +513,9 @@ def printToFile():
         f.write("\n")
 
     with open("rankedresults2017.txt", "w") as f:
-        f.write("Total number of valid ballots received:" + str(numBallots) + "\n")
-        f.write("total number of coasters on ballot:" + str(totalCoasters)+ "\n")
-        f.write("average number of coasters ridden by each voter:" + str(int(totalCredits/numBallots))+ "\n")
+        f.write("Total number of valid ballots received:" + str(len(ballotList)) + "\n")
+        f.write("total number of coasters on ballot:" + str(len(coasterList))+ "\n")
+        f.write("average number of coasters ridden by each voter:" + str(int(totalCredits/len(ballotList)))+ "\n")
         f.write("Coasters by ranking\n")
         for i in range(0,len(sortedResults)):
             f.write(str(i+1) + ": " + str(sortedResults[i]) + "\n")
