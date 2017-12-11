@@ -4,6 +4,15 @@
 # ==================================================
 
 import os
+import sys
+from openpyxl import Workbook
+from openpyxl.styles import Font
+
+# Excel file to save all results to
+xlout = Workbook()
+
+# font style for openpyxl
+preferredFixedWidthFont = Font(name="Menlo")
 
 # lines in a ballot beginning with this will be ignored
 commentStr = "* "
@@ -20,7 +29,7 @@ blankBallot = "blankballot2017.txt"
  # folder where ballots are contained
 ballotFolder = "ballots2017"
 
-# list of every coaster on the ballot
+# list of tuples representing every coaster on the ballot
 coasterList = []
 
 # list of ballot filenames
@@ -87,66 +96,75 @@ sortedPairs = []
 #  populate list of coasters in the poll
 # ==================================================
 
-def getCoasterList(blankBallot):
+def getCoasterList(blankBallot, masterlistws):
     print("Creating list of every coaster on the ballot")
 
     global coasterList
     global riders
     # initialize list to contain words in the ballot lines
-    words = []
+    # words = [] # should be unnecessary to initialize here
+
+    masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
+    masterlistws.column_dimensions['A'].width = 45.83
+    masterlistws.column_dimensions['B'].width = 12.83
+    masterlistws.column_dimensions['C'].width = 25.83
+    masterlistws.column_dimensions['D'].width = 25.83
+    masterlistws.column_dimensions['E'].width = 6.83
+    masterlistws['B1'].font = preferredFixedWidthFont
+    masterlistws['E1'].font = preferredFixedWidthFont
 
     #open the blank ballot file
     with open(blankBallot) as f:
-        # make sure lineNum is starting from 0
         lineNum = 0
         startProcessing = False
 
-        # begin going through the blank ballot one line at a time
+        # begin going through the blank ballot line by line
         for line in f:
-            # strip away the blank spaces from start and end of line
-            sline = line.strip()
+
+            sline = line.strip() # strip whitespace from start and end of line
             lineNum += 1
 
             # skip down the file to the coasters
             if startProcessing == False and sline == startLine:
                 startProcessing = True
 
-            # add the coasters to a list called coasterList
+            # add the coasters to coasterList and the masterlist worksheet
             elif startProcessing == True:
 
-                # skip comment lines (begin with * )
-                if commentStr in sline:
+                if commentStr in sline: # skip comment lines (begin with "* ")
                     continue
 
-                # skip blank lines
-                elif sline == "":
+                elif sline == "": # skip blank lines
                     continue
 
-                # if line is neither comment, nor blank then do this
                 else:
-                    # break the line into its components: name, rank
+                    # break the line into its components: rank, full coaster name, abbreviation
                     words = [x.strip() for x in sline.split(',')]
 
-                # make sure there are 2 'words' in each line
-                    if len(words) != 2:
+                    # make sure there are 3 'words' in each line
+                    if len(words) != 3:
                         print("Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line))
 
-                # Everything good? do this
                     else:
-                        # pull out the name of the coaster
-                        coasterName = words[1]
-                        # initialize the number of riders for this coaster
-                        riders[coasterName] = 0
-                        # initialize the number of pairwise contests this coaster has
-                        totalContests[coasterName] = 0
-                        # initialize the total wins for this coaster
-                        totalWins[coasterName] = 0
-                        # initialize the total ties for this coaster
-                        totalTies[coasterName] = 0
-                        # initialize the total losses for this coaster
-                        totalLosses[coasterName] = 0
+                        fullCoasterName = words[1]
+                        abbrCoasterName = words[2]
+
+                        # add a fullCoasterName entry to the dicts
+                        riders[fullCoasterName] = 0
+                        totalContests[fullCoasterName] = 0
+                        totalWins[fullCoasterName] = 0
+                        totalTies[fullCoasterName] = 0
+                        totalLosses[fullCoasterName] = 0
+
                         # add the coaster to the list of coasters on the ballot
-                        coasterList.append(coasterName)
+                        coasterList.append((fullCoasterName, abbrCoasterName))
+                        subwords = [x.strip() for x in fullCoasterName.split('-')]
+                        if len(subwords) != 3:
+                            masterlistws.append([fullCoasterName,abbrCoasterName])
+                        else:
+                            masterlistws.append([fullCoasterName,abbrCoasterName,subwords[0],subwords[1],subwords[2]])
+                            masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
+                        masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
 
     return coasterList, riders
 
@@ -155,6 +173,7 @@ def getCoasterList(blankBallot):
 # ==================================================
 #  import filenames of ballots
 # ==================================================
+
 def getBallotFilenames(ballotFolder):
     print("Getting the filenames of submitted ballots")
 
@@ -552,23 +571,27 @@ def printToFile():
 #  OK, let's do this!
 # ==================================================
 
-getCoasterList(blankBallot)
+xlout.active.title = "Coaster Masterlist"
 
-getBallotFilenames(ballotFolder)
+getCoasterList(blankBallot, xlout.active)
 
-createDict()
+# getBallotFilenames(ballotFolder)
 
-createMatrix()
+# createDict()
 
-minRiders = input("Minimum number of riders to qualify? ")
+# createMatrix()
 
-runTheContest()
+# minRiders = input("Minimum number of riders to qualify? ")
 
-calculateResults()
+# runTheContest()
 
-sortedLists()
+# calculateResults()
 
-printToFile()
+# sortedLists()
+
+# printToFile()
+
+xlout.save("Poll Results.xlsx")
 
 
 

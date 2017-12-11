@@ -2,5 +2,6 @@
 
 .DS_Store
 **ballots2017
+*.xlsx
 *.txt
 !blankballot2017.txt
