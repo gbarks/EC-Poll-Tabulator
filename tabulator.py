@@ -211,11 +211,11 @@ def createMatrix():
 
 
 
-# ==================================================
+# ================================================================
 #  read a ballot (just ONE ballot)
 #
 #  you need a loop to call this function for each ballot filename
-# ==================================================
+# ================================================================
 
 def processBallot(filename):
     print("Processing ballot:")
