@@ -1,90 +1,92 @@
 # ==================================================
-# import modules
+#  ElloCoaster poll tabulator
+#  Contributions from Jim Winslett, Grant Barker
 # ==================================================
+
 import os
-#import numpy as np
-#import pandas as pd
-#import pprint as pp
 
-# ==================================================
-# define variables, lists, dictionaries, etc
-# ==================================================
+# lines in a ballot beginning with this will be ignored
 commentStr = "* "
-# comment string from ballot
 
-blankUserField = "-Replace "
 # ballot field still in place if voter didn't fill in the info
+blankUserField = "-Replace "
 
-startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 # ballot line that separates voter info from coaster list
+startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 
-blankBallot = "blankballot2017.txt"
 # name of blank ballot file
+blankBallot = "blankballot2017.txt"
 
-ballotFolder = "ballots2017" # folder where ballots are contained
+ # folder where ballots are contained
+ballotFolder = "ballots2017"
 
-coasterList = [] # list of every coaster on the ballot
+# list of every coaster on the ballot
+coasterList = []
 
-ballotList = [] # list of ballot filenames
+# list of ballot filenames
+ballotList = []
 
-coasterDict = {}
 # dict that assigns a number to each coaster on the ballot
 # potentially useful for chart printouts, using an int rather than the whole name of coaster
+coasterDict = {}
 
-winLossMatrix = {}
 # for each pair of coasters, a string containing w, l, or t representing every contest between that pair
+winLossMatrix = {}
 
-voterInfo = []
 # list of strings containing name, email, city, state/prov, country
+voterInfo = []
 
-coasterAndRank = {}
 # for each ballot, the ranking given to each coaster voted on
+coasterAndRank = {}
 
-winPercentage = {}
 # for each pair of coasters, the % of times coasterA beat coasterB
+winPercentage = {}
 
-riders = {}
 # for each coaster on the ballot, the number of people who rode that coaster
+riders = {}
 
-numRiders = []
 # unsorted list of the coaster and the number of riders it had
+numRiders = []
 
-totalCredits = 0
 # the number of total credits for all the voters
+totalCredits = 0
 
-sortedRiders = []
 # sorted version of the above
+sortedRiders = []
 
-totalContests = {}
 # the number of times each coaster was paired up against another coaster
+totalContests = {}
 
-totalWins = {}
 # the total number of wins for each coaster
+totalWins = {}
 
-totalTies = {}
 # the total number of ties for each coaster
+totalTies = {}
 
-totalLosses = {}
 # the total number of losses for each coaster
+totalLosses = {}
 
-results = []
 # unsorted list of coasters and their total win percentages
+results = []
 
+# sorted version of above
 sortedResults = []
-# sorted version of above
 
-pairsList = []
 # unsorted list of every pair of coasters with the pair's win percentage
+pairsList = []
 
-sortedPairs = []
 # sorted version of above
+sortedPairs = []
 
 # minRiders
 # minimum number of riders a coaster must have before being included in the results
 
+
+
 # ==================================================
-# populate list of coasters in the poll
+#  populate list of coasters in the poll
 # ==================================================
+
 def getCoasterList(blankBallot):
     print("Creating list of every coaster on the ballot")
 
@@ -149,8 +151,9 @@ def getCoasterList(blankBallot):
     return coasterList, riders
 
 
+
 # ==================================================
-# import filenames of ballots
+#  import filenames of ballots
 # ==================================================
 def getBallotFilenames(ballotFolder):
     print("Getting the filenames of submitted ballots")
@@ -166,12 +169,15 @@ def getBallotFilenames(ballotFolder):
             ballotList.append(file)
     return ballotList
 
-# ==================================================
-# create dictionary of coaster names paired with nums
-# might make it easier to print charts and such later
-# since a grid with coaster names as rows and cols
-# could be unruly
-# ==================================================
+
+
+# =====================================================
+#  create dictionary of coaster names paired with nums
+#
+#  might make it easier to print charts and such later
+#    since a grid with coaster names as rows and cols
+#    could be unruly
+# =====================================================
 
 def createDict():
     print("Creating the coaster dictionary")
@@ -184,8 +190,10 @@ def createDict():
 
     return coasterDict
 
+
+
 # ==================================================
-# create win/loss matrix
+#  create win/loss matrix
 # ==================================================
 
 def createMatrix():
@@ -201,10 +209,12 @@ def createMatrix():
 
     return winLossMatrix
 
+
+
 # ==================================================
-# read a ballot
-# this reads just ONE ballot
-# you need a loop to call this function for each ballot filename
+#  read a ballot (just ONE ballot)
+#
+#  you need a loop to call this function for each ballot filename
 # ==================================================
 
 def processBallot(filename):
@@ -351,12 +361,13 @@ def processBallot(filename):
     return winLossMatrix
 
 
-# ==================================================
-# calculate results
-# no need to loop through this, since it calculates
-# with numbers gathered when the ballots were processed
-# ==================================================
 
+# ========================================================
+#  calculate results
+#
+#  no need to loop through this, since it calculates with
+#    numbers gathered when the ballots were processed
+# ========================================================
 
 def calculateResults():
     print("Calculating results")
@@ -423,9 +434,10 @@ def calculateResults():
     return winPercentage, totalContests
 
 
+
 # ==================================================
-# create sorted list of coasters by win pct
-# create sorted list of coasters by pairwise win pct
+#  create sorted list of coasters by win pct and
+#    sorted list of coasters by pairwise win pct
 # ==================================================
 
 def sortedLists():
@@ -458,8 +470,10 @@ def sortedLists():
 
     return sortedRiders, sortedPairs, sortedResults
 
+
+
 # ==================================================
-# cycle through all the ballots and tabulate them
+#  cycle through all the ballots and tabulate them
 # ==================================================
 
 def runTheContest():
@@ -497,9 +511,8 @@ def runTheContest():
 
 
 
-
 # ==================================================
-# Print everything to a file
+#  print everything to a file
 # ==================================================
 
 def printToFile():
@@ -535,12 +548,9 @@ def printToFile():
 
 
 
-
-
 # ==================================================
-# OK, let's do this!
+#  OK, let's do this!
 # ==================================================
-
 
 getCoasterList(blankBallot)
 
@@ -561,8 +571,9 @@ sortedLists()
 printToFile()
 
 
+
 # ==================================================
-# still to do
+#  still to do
 # ==================================================
 
 # handle ties: decide which one wins, if possible. If still tied, rank them the same
