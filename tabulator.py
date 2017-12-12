@@ -23,9 +23,6 @@ def main():
     # list of tuples representing every coaster on the ballot
     coasterList = []
 
-    # for each pair of coasters, a string containing w, l, or t representing every contest between that pair
-    winLossMatrix = {}
-
     # list of strings containing name, email, city, state/prov, country
     voterInfo = []
 
@@ -72,9 +69,8 @@ def main():
 
     ballotList = getBallotFilenames(ballotFolder)
 
-    # createDict()
-
-    # createMatrix()
+    # for each pair of coasters, a string containing w, l, or t representing every contest between that pair
+    winLossMatrix = createMatrix(coasterList)
 
     # minRiders = input("Minimum number of riders to qualify? ")
 
@@ -140,21 +136,21 @@ def getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, ma
                         print("Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line))
 
                     else:
-                        fullCoasterName = words[1]
-                        abbrCoasterName = words[2]
+                        fullName = words[1]
+                        abbrName = words[2]
 
-                        # add a fullCoasterName entry to the dicts
-                        riders[fullCoasterName] = 0
-                        totalContests[fullCoasterName] = 0
-                        totalWLT[fullCoasterName] = (0, 0, 0)
+                        # add an entry for the coaster in the dicts
+                        riders[fullName] = 0
+                        totalContests[fullName] = 0
+                        totalWLT[fullName] = (0, 0, 0)
 
                         # add the coaster to the list of coasters on the ballot
-                        coasterList.append((fullCoasterName, abbrCoasterName))
-                        subwords = [x.strip() for x in fullCoasterName.split('-')]
+                        coasterList.append((fullName, abbrName))
+                        subwords = [x.strip() for x in fullName.split('-')]
                         if len(subwords) != 3:
-                            masterlistws.append([fullCoasterName,abbrCoasterName])
+                            masterlistws.append([fullName,abbrName])
                         else:
-                            masterlistws.append([fullCoasterName,abbrCoasterName,subwords[0],subwords[1],subwords[2]])
+                            masterlistws.append([fullName,abbrName,subwords[0],subwords[1],subwords[2]])
                             masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
                         masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
 
@@ -181,17 +177,16 @@ def getBallotFilenames(ballotFolder):
 #  create win/loss matrix
 # ==================================================
 
-def createMatrix():
-    print("Creating the win/loss matrix")
+def createMatrix(coasterList):
+    print "Creating the win/loss matrix...",
 
     # create a matrix of blank strings for each pair of coasters
     # these strings will later contain w, l, t for each matchup
-    global winLossMatrix
+    winLossMatrix = {}
     for row in coasterList:
         for col in coasterList:
-            winLossMatrix[row,col] = ''
-
-
+            winLossMatrix[row,col] = ""
+    print len(winLossMatrix), "pairings."
     return winLossMatrix
 
 
