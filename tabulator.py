@@ -92,17 +92,41 @@ sortedPairs = []
 
 
 
+def main():
+    xlout.active.title = "Coaster Masterlist"
+
+    getCoasterList(blankBallot, xlout.active)
+
+    # getBallotFilenames(ballotFolder)
+
+    # createDict()
+
+    # createMatrix()
+
+    # minRiders = input("Minimum number of riders to qualify? ")
+
+    # runTheContest()
+
+    # calculateResults()
+
+    # sortedLists()
+
+    # printToFile()
+
+    xlout.save("Poll Results.xlsx")
+    print 'Output saved to "Poll Results.xlsx".'
+
+
+
 # ==================================================
 #  populate list of coasters in the poll
 # ==================================================
 
 def getCoasterList(blankBallot, masterlistws):
-    print("Creating list of every coaster on the ballot")
+    print "Creating list of every coaster on the ballot..."
 
     global coasterList
     global riders
-    # initialize list to contain words in the ballot lines
-    # words = [] # should be unnecessary to initialize here
 
     masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
     masterlistws.column_dimensions['A'].width = 45.83
@@ -571,27 +595,8 @@ def printToFile():
 #  OK, let's do this!
 # ==================================================
 
-xlout.active.title = "Coaster Masterlist"
-
-getCoasterList(blankBallot, xlout.active)
-
-# getBallotFilenames(ballotFolder)
-
-# createDict()
-
-# createMatrix()
-
-# minRiders = input("Minimum number of riders to qualify? ")
-
-# runTheContest()
-
-# calculateResults()
-
-# sortedLists()
-
-# printToFile()
-
-xlout.save("Poll Results.xlsx")
+if __name__ == "__main__": # allows us to put main at the beginning
+    main()
 
 
 
