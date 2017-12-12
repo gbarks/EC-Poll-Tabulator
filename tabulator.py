@@ -213,18 +213,16 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
     filename = os.path.basename(filepath)
     print("Processing ballot: {0}".format(filename))
 
+    voterInfo = [filename, "", "", "", "", ""]
+    coasterAndRank = {}
+    creditNum = 0
+    error = False
+
     # open the ballot file
     with open(filepath) as f:
-        # get the voter info
         infoField = 1
         lineNum = 0
-        creditNum = 0
-        voterInfo = [filename, "", "", "", "", ""]
-        coasterName = ''
-        coasterRank = 0
         startProcessing = False
-        error = False
-        coasterAndRank = {}
 
         for line in f:
             sline = line.strip()
@@ -235,33 +233,29 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
 
                 # if the line begins with "-Replace" then record a non-answer
                 if blankUserField in sline:
-                    voterInfo[infoField] = "(no answer)"
+                    voterInfo[infoField] = ""
                     infoField += 1
                 elif not startLine in sline:
                     voterInfo[infoField] = sline
                     infoField += 1
 
-            # get the list of coasters this voter has ridden
-            # check for the ballot line indicating that the coasters follow it
+            # skip down the file to the coasters
             if startProcessing == False and sline == startLine:
                 startProcessing = True
 
-            # break the line into its components: rank, name
             elif startProcessing == True:
 
-                # strip away any blank space, save just the text, look for the comma to split words
+                # break the line into its components: rank, name
                 words = [x.strip() for x in sline.split(',')]
 
-                # skip comment lines (begin with * )
-                if commentStr in sline:
+                if commentStr in sline: # skip comment lines (begin with "* ")
                     continue
 
-                # skip blank lines
-                elif sline == "":
+                elif sline == "": # skip blank lines
                     continue
 
-                # make sure there are 2 'words' in each line
-                elif len(words) != 2:
+                # make sure there are at least 2 'words' in each line
+                elif len(words) < 2:
                     print("Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line))
 
                 # make sure the ranking is a number
@@ -269,24 +263,17 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
                     print("Error in reading {0}, Line {1}: Rank must be an int.".format(filename, lineNum))
                     error = True
 
-                    # Everything good? do this
                 else:
-
-                    # pull out the coaster name
                     coasterName = words[1]
-                    # pull out the coaster's rank
                     coasterRank = int(words[0])
 
                     # skip coasters ranked zero or less (those weren't ridden)
                     if coasterRank <= 0:
                         continue
 
-
                     # check to make sure the coaster on the ballot is legit
                     if [coasterName in x[0] for x in coasterList]:
-                        # it is! Add to this voter's credit count
                         creditNum += 1
-                        # add one to the number of riders this coaster has
                         riders[coasterName] += 1
                         # add this voter's ranking of the coaster
                         coasterAndRank[coasterName] = coasterRank
@@ -333,10 +320,8 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
     print " ->",
 
     for i in range(1,len(voterInfo)):
-        if "(no answer)" not in voterInfo[i]:
+        if voterInfo[i] != "":
             print "{0},".format(voterInfo[i]),
-        else:
-            voterInfo[i] = ""
 
     print "CC: {0}".format(creditNum)
 
