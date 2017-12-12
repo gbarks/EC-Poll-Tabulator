@@ -28,9 +28,6 @@ def main():
     # list of tuples representing every coaster on the ballot
     coasterList = []
 
-    # list of strings containing name, email, city, state/prov, country
-    voterInfo = []
-
     # for each ballot, the ranking given to each coaster voted on
     coasterAndRank = {}
 
@@ -52,7 +49,7 @@ def main():
     # the number of times each coaster was paired up against another coaster
     totalContests = {}
 
-    # the total number of wins, losses, and ties in a tuple for each coaster
+    # the total number of wins, losses, and ties in a list for each coaster
     totalWLT = {}
 
     # unsorted list of coasters and their total win percentages
@@ -79,7 +76,9 @@ def main():
 
     minRiders = int(sys.argv[1])
 
-    # runTheContest()
+    # loop through all the ballot filenames and process each ballot
+    for filename in ballotList:
+        processBallot(filename, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix)
 
     # calculateResults()
 
@@ -147,7 +146,7 @@ def getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, ma
                         # add an entry for the coaster in the dicts
                         riders[fullName] = 0
                         totalContests[fullName] = 0
-                        totalWLT[fullName] = (0, 0, 0)
+                        totalWLT[fullName] = [0, 0, 0]
 
                         # add the coaster to the list of coasters on the ballot
                         coasterList.append((fullName, abbrName))
@@ -172,7 +171,7 @@ def getBallotFilenames(ballotFolder):
     ballotList = []
     for file in os.listdir(ballotFolder):
         if file.endswith(".txt"):
-            ballotList.append(file)
+            ballotList.append(os.path.join(ballotFolder, file))
     print len(ballotList), "ballots submitted."
     return ballotList
 
@@ -190,7 +189,7 @@ def createMatrix(coasterList):
     winLossMatrix = {}
     for row in coasterList:
         for col in coasterList:
-            winLossMatrix[row,col] = ""
+            winLossMatrix[row[0],col[0]] = ""
     print len(winLossMatrix), "pairings."
     return winLossMatrix
 
@@ -202,14 +201,8 @@ def createMatrix(coasterList):
 #  you need a loop to call this function for each ballot filename
 # ================================================================
 
-def processBallot(filename):
-    print("Processing ballot:")
-
-    global voterInfo
-    error = False
-    global creditNum
-    global totalCredits
-    global riders
+def processBallot(filename, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix):
+    print("Processing ballot: {0}".format(filename))
 
     # open the ballot file
     with open(filename) as f:
@@ -284,7 +277,7 @@ def processBallot(filename):
 
 
                     # check to make sure the coaster on the ballot is legit
-                    if coasterName in coasterList:
+                    if [coasterName in x[0] for x in coasterList]:
                         # it is! Add to this voter's credit count
                         creditNum += 1
                         # add one to the number of riders this coaster has
@@ -317,7 +310,7 @@ def processBallot(filename):
                     # add one to the total contests that coasterA has had
                     totalContests[coasterA] += 1
                     # add one to the total ties coasterA has had
-                    totalTies[coasterA] += 1
+                    totalWLT[coasterA][2] += 1
 
                 # if coasterA outranks coasterB (the rank's number is lower), call it a win for coasterA
                 elif coasterAndRank[coasterA] < coasterAndRank[coasterB]:
@@ -326,7 +319,7 @@ def processBallot(filename):
                     # add one to the total contests coasterA has had
                     totalContests[coasterA] += 1
                     # add one to the total wins coasterA has had
-                    totalWins[coasterA] += 1
+                    totalWLT[coasterA][0] += 1
 
                 # if not a tie nor a win, it must be a loss
                 else:
@@ -336,53 +329,40 @@ def processBallot(filename):
                     # add one to the total contests for coasterA
                     totalContests[coasterA] += 1
                     # add one to the total losses for coasterA
-                    totalLosses[coasterA] += 1
+                    totalWLT[coasterA][1] += 1
 
 
     # if none of the above conditions were met, there must've been an error
     else:
         print("Errors. File {0} not added.".format(filename))
 
-    return winLossMatrix
+
+    print("=========================================================")
+    for i in range(0,len(voterInfo)):
+        if i == 0:
+            print("Ballot: {0}".format(voterInfo[i]))
+
+        elif i == 1:
+            print("Name: {0}".format(voterInfo[i]))
+
+        elif i == 2:
+            print("Email: {0}".format(voterInfo[i]))
+
+        elif i == 3:
+            print("City: {0}".format(voterInfo[i]))
+
+        elif i == 4:
+            print("State/Province: {0}".format(voterInfo[i]))
+
+        elif i == 5:
+            print("Country: {0}".format(voterInfo[i]))
 
 
+    print("Coasters ridden: {0}".format(creditNum))
+    print("=========================================================")
+    print("=========================================================")
 
-# ==================================================
-#  cycle through all the ballots and tabulate them
-# ==================================================
-
-def runTheContest():
-    # loop through all the ballot filenames and process each ballot
-    for filename in ballotList:
-        print("Processing ballot: {0}".format(filename))
-        processBallot("ballots2017/" + filename)
-
-        print("=========================================================")
-        for i in range(0,len(voterInfo)):
-            if i == 0:
-                print("Ballot: {0}".format(voterInfo[i]))
-
-            elif i == 1:
-                print("Name: {0}".format(voterInfo[i]))
-
-            elif i == 2:
-                print("Email: {0}".format(voterInfo[i]))
-
-            elif i == 3:
-                print("City: {0}".format(voterInfo[i]))
-
-            elif i == 4:
-                print("State/Province: {0}".format(voterInfo[i]))
-
-            elif i == 5:
-                print("Country: {0}".format(voterInfo[i]))
-
-
-        print("Coasters ridden: {0}".format(creditNum))
-        print("=========================================================")
-        print("=========================================================")
-
-        print()
+    print()
 
 
 
