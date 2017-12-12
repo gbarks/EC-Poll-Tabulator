@@ -8,94 +8,74 @@ import sys
 from openpyxl import Workbook
 from openpyxl.styles import Font
 
-# Excel file to save all results to
-xlout = Workbook()
-
-# font style for openpyxl
-preferredFixedWidthFont = Font(name="Menlo")
-
-# lines in a ballot beginning with this will be ignored
+# global strings for parsing ballots
 commentStr = "* "
-
-# ballot field still in place if voter didn't fill in the info
 blankUserField = "-Replace "
-
-# ballot line that separates voter info from coaster list
 startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 
-# name of blank ballot file
-blankBallot = "blankballot2017.txt"
-
- # folder where ballots are contained
-ballotFolder = "ballots2017"
-
-# list of tuples representing every coaster on the ballot
-coasterList = []
-
-# list of ballot filenames
-ballotList = []
-
-# dict that assigns a number to each coaster on the ballot
-# potentially useful for chart printouts, using an int rather than the whole name of coaster
-coasterDict = {}
-
-# for each pair of coasters, a string containing w, l, or t representing every contest between that pair
-winLossMatrix = {}
-
-# list of strings containing name, email, city, state/prov, country
-voterInfo = []
-
-# for each ballot, the ranking given to each coaster voted on
-coasterAndRank = {}
-
-# for each pair of coasters, the % of times coasterA beat coasterB
-winPercentage = {}
-
-# for each coaster on the ballot, the number of people who rode that coaster
-riders = {}
-
-# unsorted list of the coaster and the number of riders it had
-numRiders = []
-
-# the number of total credits for all the voters
-totalCredits = 0
-
-# sorted version of the above
-sortedRiders = []
-
-# the number of times each coaster was paired up against another coaster
-totalContests = {}
-
-# the total number of wins for each coaster
-totalWins = {}
-
-# the total number of ties for each coaster
-totalTies = {}
-
-# the total number of losses for each coaster
-totalLosses = {}
-
-# unsorted list of coasters and their total win percentages
-results = []
-
-# sorted version of above
-sortedResults = []
-
-# unsorted list of every pair of coasters with the pair's win percentage
-pairsList = []
-
-# sorted version of above
-sortedPairs = []
-
-# minRiders
-# minimum number of riders a coaster must have before being included in the results
-
-
-
 def main():
+    xlout = Workbook()
+    menlo = Font(name="Menlo")
+
+    blankBallot = "blankballot2017.txt"
+    ballotFolder = "ballots2017"
+
+    # list of tuples representing every coaster on the ballot
+    coasterList = []
+
+    # list of ballot filenames
+    ballotList = []
+
+    # for each pair of coasters, a string containing w, l, or t representing every contest between that pair
+    winLossMatrix = {}
+
+    # list of strings containing name, email, city, state/prov, country
+    voterInfo = []
+
+    # for each ballot, the ranking given to each coaster voted on
+    coasterAndRank = {}
+
+    # for each pair of coasters, the % of times coasterA beat coasterB
+    winPercentage = {}
+
+    # for each coaster on the ballot, the number of people who rode that coaster
+    riders = {}
+
+    # unsorted list of the coaster and the number of riders it had
+    numRiders = []
+
+    # the number of total credits for all the voters
+    totalCredits = 0
+
+    # sorted version of the above
+    sortedRiders = []
+
+    # the number of times each coaster was paired up against another coaster
+    totalContests = {}
+
+    # the total number of wins for each coaster
+    totalWins = {}
+
+    # the total number of ties for each coaster
+    totalTies = {}
+
+    # the total number of losses for each coaster
+    totalLosses = {}
+
+    # unsorted list of coasters and their total win percentages
+    results = []
+
+    # sorted version of above
+    sortedResults = []
+
+    # unsorted list of every pair of coasters with the pair's win percentage
+    pairsList = []
+
+    # sorted version of above
+    sortedPairs = []
     xlout.active.title = "Coaster Masterlist"
 
-    getCoasterList(blankBallot, xlout.active)
+    getCoasterList(blankBallot, xlout.active, menlo, coasterList, riders)
 
     # getBallotFilenames(ballotFolder)
 
@@ -122,11 +102,8 @@ def main():
 #  populate list of coasters in the poll
 # ==================================================
 
-def getCoasterList(blankBallot, masterlistws):
+def getCoasterList(blankBallot, masterlistws, preferredFixedWidthFont, coasterList, riders):
     print "Creating list of every coaster on the ballot..."
-
-    global coasterList
-    global riders
 
     masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
     masterlistws.column_dimensions['A'].width = 45.83
@@ -175,10 +152,10 @@ def getCoasterList(blankBallot, masterlistws):
 
                         # add a fullCoasterName entry to the dicts
                         riders[fullCoasterName] = 0
-                        totalContests[fullCoasterName] = 0
-                        totalWins[fullCoasterName] = 0
-                        totalTies[fullCoasterName] = 0
-                        totalLosses[fullCoasterName] = 0
+                        # totalContests[fullCoasterName] = 0
+                        # totalWins[fullCoasterName] = 0
+                        # totalTies[fullCoasterName] = 0
+                        # totalLosses[fullCoasterName] = 0
 
                         # add the coaster to the list of coasters on the ballot
                         coasterList.append((fullCoasterName, abbrCoasterName))
@@ -189,8 +166,6 @@ def getCoasterList(blankBallot, masterlistws):
                             masterlistws.append([fullCoasterName,abbrCoasterName,subwords[0],subwords[1],subwords[2]])
                             masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
                         masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
-
-    return coasterList, riders
 
 
 
@@ -211,27 +186,6 @@ def getBallotFilenames(ballotFolder):
             # add the filename to the list of ballot files
             ballotList.append(file)
     return ballotList
-
-
-
-# =====================================================
-#  create dictionary of coaster names paired with nums
-#
-#  might make it easier to print charts and such later
-#    since a grid with coaster names as rows and cols
-#    could be unruly
-# =====================================================
-
-def createDict():
-    print("Creating the coaster dictionary")
-
-    global coasterDict
-    coasterNumber = 0
-    for coaster in coasterList:
-        coasterDict[coaster] = coasterNumber
-        coasterNumber += 1
-
-    return coasterDict
 
 
 
