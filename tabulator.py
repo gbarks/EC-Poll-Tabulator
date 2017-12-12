@@ -24,25 +24,24 @@ def main():
     blankBallot = "blankballot2017.txt"
     ballotFolder = "ballots2017"
 
-    # for each coaster on the ballot, the number of people who rode that coaster
-    riders = {}
+    riders = {} # for each coaster, the number of people who rode it
 
-    # the number of total credits for all the voters
-    totalCredits = 0
+    totalCredits = 0 # total number of credits across all voters
 
-    # the total number of wins, losses, ties, and totalContest in a list for each coaster
-    totalWLT = {}
-
+    totalWLT = {} # for each coaster, a list of numbers of the form [wins, losses, ties, totalContests]
 
     xlout = Workbook()
     menlo = Font(name="Menlo")
 
     xlout.active.title = "Coaster Masterlist"
+
+    # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
     coasterList = getCoasterList(blankBallot, riders, totalWLT, xlout.active, menlo)
 
+    # list of ballot filepaths
     ballotList = getBallotFilepaths(ballotFolder)
 
-    # for each pair of coasters, a string containing w, l, or t
+    # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
     winLossMatrix = createMatrix(coasterList)
 
     # loop through all the ballot filenames and process each ballot
@@ -59,34 +58,11 @@ def main():
             voterinfows.append(voterInfo)
     voterinfows.freeze_panes = voterinfows['A2']
 
+    # for each coaster, its win percentage across all pairings
     winPercentage = calculateResults(coasterList, totalWLT, winLossMatrix)
 
-    # for coaster in totalWLT.keys():
-    #     if totalWLT[coaster][3] > 0:
-    #         print coaster, totalWLT[coaster]
-
-    # for coaster in winLossMatrix.keys():
-    #     if "Lake Compounce" in coaster[0] and winLossMatrix[coaster][0] > 0 and winLossMatrix[coaster][1] > 0:
-    #         print coaster, winLossMatrix[coaster]
-
-    # for coaster in winLossMatrix.keys():
-    #     if winLossMatrix[coaster][0] > 1:
-    #         print coaster, winLossMatrix[coaster]
-
-    # for coaster in winPercentage.keys():
-    #     if winPercentage[coaster] > 0:
-    #         print " ->", coaster, winPercentage[coaster]
-
+    # sorted lists of tuples of the form (rankedCoaster, relevantNumber)
     finalResults, finalPairs, finalRiders = sortedLists(riders, winLossMatrix, winPercentage)
-
-    # for i in finalResults:
-    #     print "results:", i
-
-    # for i in finalPairs:
-    #     print "pairs:", i
-
-    # for i in finalRiders:
-    #     print "riders:", i
 
     printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterList, menlo)
 
@@ -190,10 +166,6 @@ def getBallotFilepaths(ballotFolder):
 
 def createMatrix(coasterList):
     print "Creating the win/loss matrix...",
-
-    # create a matrix of blank strings for each pair of coasters
-    # these strings will later contain w, l, t for each matchup
-    #   followed by the respective w, l, t numbers
     winLossMatrix = {}
     for row in coasterList:
         for col in coasterList:
@@ -361,8 +333,6 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
             elif numContests > 0:
                 winLossMatrix[x, y][3] = round(((wins / numContests)) * 100, 3)
 
-    # vvvvvvvvvv I'm not actually sure what this code does; planning on removing it
-
     winPercentage = {}
 
     # all those calculations we just did for each pair of coasters, now do for each coaster by itself
@@ -380,8 +350,6 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
             winPercentage[x] = round(((totalWLT[x][0] / totalWLT[x][3])) * 100, 3)
 
     return winPercentage
-
-    # ^^^^^^^^^^ I'm not actually sure what this code does; planning on removing it
 
 
 
@@ -472,7 +440,7 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferre
             coasterA = orderAbbr[i][0]
             coasterB = orderAbbr[j][0]
             cellStr = ""
-            if coasterA != coasterB: # and coasterA in winLossMatrix.keys():
+            if coasterA != coasterB:
                 if winLossMatrix[coasterA, coasterB][0] > winLossMatrix[coasterA, coasterB][1]:
                     cellStr += "W "
                 elif winLossMatrix[coasterA, coasterB][0] < winLossMatrix[coasterA, coasterB][1]:
