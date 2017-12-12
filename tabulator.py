@@ -202,11 +202,11 @@ def createMatrix(coasterList):
 # ================================================================
 
 def processBallot(filepath, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix):
-    print("Processing ballot: {0}".format(filepath))
+    filename = os.path.basename(filepath)
+    print("Processing ballot: {0}".format(filename))
 
     # open the ballot file
     with open(filepath) as f:
-        filename = os.path.basename(filepath)
         # get the voter info
         infoField = 1
         lineNum = 0
@@ -337,33 +337,13 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalContests, to
     else:
         print("Errors. File {0} not added.".format(filename))
 
+    print " ->",
 
-    print("=========================================================")
-    for i in range(0,len(voterInfo)):
-        if i == 0:
-            print("Ballot: {0}".format(voterInfo[i]))
+    for i in range(1,len(voterInfo)):
+        if "(no answer)" not in voterInfo[i]:
+            print "{0},".format(voterInfo[i]),
 
-        elif i == 1:
-            print("Name: {0}".format(voterInfo[i]))
-
-        elif i == 2:
-            print("Email: {0}".format(voterInfo[i]))
-
-        elif i == 3:
-            print("City: {0}".format(voterInfo[i]))
-
-        elif i == 4:
-            print("State/Province: {0}".format(voterInfo[i]))
-
-        elif i == 5:
-            print("Country: {0}".format(voterInfo[i]))
-
-
-    print("Coasters ridden: {0}".format(creditNum))
-    print("=========================================================")
-    print("=========================================================")
-
-    print()
+    print("CC: {0}".format(creditNum))
 
 
 
