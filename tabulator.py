@@ -23,9 +23,6 @@ def main():
     # list of tuples representing every coaster on the ballot
     coasterList = []
 
-    # list of ballot filenames
-    ballotList = []
-
     # for each pair of coasters, a string containing w, l, or t representing every contest between that pair
     winLossMatrix = {}
 
@@ -53,14 +50,8 @@ def main():
     # the number of times each coaster was paired up against another coaster
     totalContests = {}
 
-    # the total number of wins for each coaster
-    totalWins = {}
-
-    # the total number of ties for each coaster
-    totalTies = {}
-
-    # the total number of losses for each coaster
-    totalLosses = {}
+    # the total number of wins, losses, and ties in a tuple for each coaster
+    totalWLT = {}
 
     # unsorted list of coasters and their total win percentages
     results = []
@@ -73,11 +64,13 @@ def main():
 
     # sorted version of above
     sortedPairs = []
+
+
     xlout.active.title = "Coaster Masterlist"
 
-    getCoasterList(blankBallot, xlout.active, menlo, coasterList, riders)
+    getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, xlout.active, menlo)
 
-    # getBallotFilenames(ballotFolder)
+    ballotList = getBallotFilenames(ballotFolder)
 
     # createDict()
 
@@ -102,8 +95,8 @@ def main():
 #  populate list of coasters in the poll
 # ==================================================
 
-def getCoasterList(blankBallot, masterlistws, preferredFixedWidthFont, coasterList, riders):
-    print "Creating list of every coaster on the ballot..."
+def getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, masterlistws, preferredFixedWidthFont):
+    print "Creating list of every coaster on the ballot...",
 
     masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
     masterlistws.column_dimensions['A'].width = 45.83
@@ -152,10 +145,8 @@ def getCoasterList(blankBallot, masterlistws, preferredFixedWidthFont, coasterLi
 
                         # add a fullCoasterName entry to the dicts
                         riders[fullCoasterName] = 0
-                        # totalContests[fullCoasterName] = 0
-                        # totalWins[fullCoasterName] = 0
-                        # totalTies[fullCoasterName] = 0
-                        # totalLosses[fullCoasterName] = 0
+                        totalContests[fullCoasterName] = 0
+                        totalWLT[fullCoasterName] = (0, 0, 0)
 
                         # add the coaster to the list of coasters on the ballot
                         coasterList.append((fullCoasterName, abbrCoasterName))
@@ -167,6 +158,8 @@ def getCoasterList(blankBallot, masterlistws, preferredFixedWidthFont, coasterLi
                             masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
                         masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
 
+    print len(coasterList), "coasters on the ballot."
+
 
 
 # ==================================================
@@ -174,17 +167,12 @@ def getCoasterList(blankBallot, masterlistws, preferredFixedWidthFont, coasterLi
 # ==================================================
 
 def getBallotFilenames(ballotFolder):
-    print("Getting the filenames of submitted ballots")
-
-    global ballotList
-
-    # iterate through the list of files in the ballot folder
+    print "Getting the filenames of submitted ballots...",
+    ballotList = []
     for file in os.listdir(ballotFolder):
-
-        # only pull out text files
         if file.endswith(".txt"):
-            # add the filename to the list of ballot files
             ballotList.append(file)
+    print len(ballotList), "ballots submitted."
     return ballotList
 
 
