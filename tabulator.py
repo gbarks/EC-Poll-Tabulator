@@ -69,7 +69,7 @@ def main():
 
     getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, xlout.active, menlo)
 
-    ballotList = getBallotFilenames(ballotFolder)
+    ballotList = getBallotFilepaths(ballotFolder)
 
     # for each pair of coasters, a string containing w, l, or t
     winLossMatrix = createMatrix(coasterList)
@@ -77,8 +77,8 @@ def main():
     minRiders = int(sys.argv[1])
 
     # loop through all the ballot filenames and process each ballot
-    for filename in ballotList:
-        processBallot(filename, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix)
+    for filepath in ballotList:
+        processBallot(filepath, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix)
 
     # calculateResults()
 
@@ -163,11 +163,11 @@ def getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, ma
 
 
 # ==================================================
-#  import filenames of ballots
+#  import filepaths of ballots
 # ==================================================
 
-def getBallotFilenames(ballotFolder):
-    print "Getting the filenames of submitted ballots...",
+def getBallotFilepaths(ballotFolder):
+    print "Getting the filepaths of submitted ballots...",
     ballotList = []
     for file in os.listdir(ballotFolder):
         if file.endswith(".txt"):
@@ -201,11 +201,12 @@ def createMatrix(coasterList):
 #  you need a loop to call this function for each ballot filename
 # ================================================================
 
-def processBallot(filename, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix):
-    print("Processing ballot: {0}".format(filename))
+def processBallot(filepath, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix):
+    print("Processing ballot: {0}".format(filepath))
 
     # open the ballot file
-    with open(filename) as f:
+    with open(filepath) as f:
+        filename = os.path.basename(filepath)
         # get the voter info
         infoField = 1
         lineNum = 0
