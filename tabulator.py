@@ -46,10 +46,7 @@ def main():
     # sorted version of the above
     sortedRiders = []
 
-    # the number of times each coaster was paired up against another coaster
-    totalContests = {}
-
-    # the total number of wins, losses, and ties in a list for each coaster
+    # the total number of wins, losses, ties, and totalContest in a list for each coaster
     totalWLT = {}
 
     # unsorted list of coasters and their total win percentages
@@ -67,7 +64,7 @@ def main():
 
     xlout.active.title = "Coaster Masterlist"
 
-    getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, xlout.active, menlo)
+    getCoasterList(blankBallot, coasterList, riders, totalWLT, xlout.active, menlo)
 
     ballotList = getBallotFilepaths(ballotFolder)
 
@@ -78,7 +75,7 @@ def main():
 
     # loop through all the ballot filenames and process each ballot
     for filepath in ballotList:
-        processBallot(filepath, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix)
+        processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLossMatrix)
 
     # calculateResults()
 
@@ -95,7 +92,7 @@ def main():
 #  populate list of coasters in the poll
 # ==================================================
 
-def getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, masterlistws, preferredFixedWidthFont):
+def getCoasterList(blankBallot, coasterList, riders, totalWLT, masterlistws, preferredFixedWidthFont):
     print "Creating list of every coaster on the ballot...",
 
     masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
@@ -145,8 +142,7 @@ def getCoasterList(blankBallot, coasterList, riders, totalContests, totalWLT, ma
 
                         # add an entry for the coaster in the dicts
                         riders[fullName] = 0
-                        totalContests[fullName] = 0
-                        totalWLT[fullName] = [0, 0, 0]
+                        totalWLT[fullName] = [0, 0, 0, 0]
 
                         # add the coaster to the list of coasters on the ballot
                         coasterList.append((fullName, abbrName))
@@ -186,10 +182,11 @@ def createMatrix(coasterList):
 
     # create a matrix of blank strings for each pair of coasters
     # these strings will later contain w, l, t for each matchup
+    #   followed by the respective w, l, t numbers
     winLossMatrix = {}
     for row in coasterList:
         for col in coasterList:
-            winLossMatrix[row[0],col[0]] = ""
+            winLossMatrix[row[0],col[0]] = [0, 0, 0, ""]
     print len(winLossMatrix), "pairings."
     return winLossMatrix
 
@@ -201,7 +198,7 @@ def createMatrix(coasterList):
 #  you need a loop to call this function for each ballot filename
 # ================================================================
 
-def processBallot(filepath, coasterList, riders, totalCredits, totalContests, totalWLT, winLossMatrix):
+def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLossMatrix):
     filename = os.path.basename(filepath)
     print("Processing ballot: {0}".format(filename))
 
@@ -232,9 +229,6 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalContests, to
                 elif not startLine in sline:
                     voterInfo[infoField] = sline
                     infoField += 1
-
-
-
 
             # get the list of coasters this voter has ridden
             # check for the ballot line indicating that the coasters follow it
@@ -295,42 +289,33 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalContests, to
     if not error:
 
         # add this voter's credit count to the total credits
-        totalCredits = totalCredits + creditNum
+        totalCredits += creditNum
 
         # cycle through each pair of coasters this voter ranked
         for coasterA in coasterAndRank.keys():
             for coasterB in coasterAndRank.keys():
-                # you can't compare a coaster to itself, so skip those pairs
-                if coasterA == coasterB:
-                    continue
 
-                # if the coasters have the same ranking, call it a tie
-                elif coasterAndRank[coasterA] == coasterAndRank[coasterB]:
-                    # add a 't' to this pair's cell on the winLossMatrix
-                    winLossMatrix[coasterA, coasterB] = winLossMatrix[coasterA, coasterB] + ("t")
-                    # add one to the total contests that coasterA has had
-                    totalContests[coasterA] += 1
-                    # add one to the total ties coasterA has had
-                    totalWLT[coasterA][2] += 1
+                # can't compare a coaster to itself
+                if coasterA != coasterB:
+                    totalWLT[coasterA][3] += 1 # increment number of contests
 
-                # if coasterA outranks coasterB (the rank's number is lower), call it a win for coasterA
-                elif coasterAndRank[coasterA] < coasterAndRank[coasterB]:
-                    # add a 'w' to this pair's cell on the winLossMatrix
-                    winLossMatrix[coasterA, coasterB] = winLossMatrix[coasterA, coasterB] + ("w")
-                    # add one to the total contests coasterA has had
-                    totalContests[coasterA] += 1
-                    # add one to the total wins coasterA has had
-                    totalWLT[coasterA][0] += 1
+                    # if the coasters have the same ranking, call it a tie
+                    if coasterAndRank[coasterA] == coasterAndRank[coasterB]:
+                        winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("t")
+                        winLossMatrix[coasterA, coasterB][2] += 1
+                        totalWLT[coasterA][2] += 1
 
-                # if not a tie nor a win, it must be a loss
-                else:
-                    # if coasterB outranks coasterA (A's rank is a larger number), call it a loss for coasterA
-                    # add an 'l' to this pair's cell on the winLossMatrix
-                    winLossMatrix[coasterA, coasterB] = winLossMatrix[coasterA, coasterB] + ("l")
-                    # add one to the total contests for coasterA
-                    totalContests[coasterA] += 1
-                    # add one to the total losses for coasterA
-                    totalWLT[coasterA][1] += 1
+                    # if coasterA outranks coasterB (the rank's number is lower), call it a win for coasterA
+                    elif coasterAndRank[coasterA] < coasterAndRank[coasterB]:
+                        winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("w")
+                        winLossMatrix[coasterA, coasterB][0] += 1
+                        totalWLT[coasterA][0] += 1
+
+                    # if not a tie nor a win, it must be a loss
+                    else:
+                        winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("l")
+                        winLossMatrix[coasterA, coasterB][1] += 1
+                        totalWLT[coasterA][1] += 1
 
 
     # if none of the above conditions were met, there must've been an error
@@ -343,7 +328,11 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalContests, to
         if "(no answer)" not in voterInfo[i]:
             print "{0},".format(voterInfo[i]),
 
-    print("CC: {0}".format(creditNum))
+    print "CC: {0}".format(creditNum)
+
+    voterInfo.append(creditNum)
+
+    return voterInfo
 
 
 
