@@ -7,6 +7,7 @@ import os
 import sys
 from openpyxl import Workbook
 from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
 
 # exit if the first arg isn't an integer
 if len(sys.argv) < 2 or  not sys.argv[1].isdigit():
@@ -19,45 +20,25 @@ blankUserField = "-Replace "
 startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 
 def main():
-    xlout = Workbook()
-    menlo = Font(name="Menlo")
 
     blankBallot = "blankballot2017.txt"
     ballotFolder = "ballots2017"
 
-    # list of tuples representing every coaster on the ballot
-    coasterList = []
-
     # for each coaster on the ballot, the number of people who rode that coaster
     riders = {}
-
-    # unsorted list of the coaster and the number of riders it had
-    numRiders = []
 
     # the number of total credits for all the voters
     totalCredits = 0
 
-    # sorted version of the above
-    sortedRiders = []
-
     # the total number of wins, losses, ties, and totalContest in a list for each coaster
     totalWLT = {}
 
-    # unsorted list of coasters and their total win percentages
-    results = []
 
-    # sorted version of above
-    sortedResults = []
-
-    # unsorted list of every pair of coasters with the pair's win percentage
-    pairsList = []
-
-    # sorted version of above
-    sortedPairs = []
-
+    xlout = Workbook()
+    menlo = Font(name="Menlo")
 
     xlout.active.title = "Coaster Masterlist"
-    getCoasterList(blankBallot, coasterList, riders, totalWLT, xlout.active, menlo)
+    coasterList = getCoasterList(blankBallot, riders, totalWLT, xlout.active, menlo)
 
     ballotList = getBallotFilepaths(ballotFolder)
 
@@ -80,9 +61,13 @@ def main():
 
     winPercentage = calculateResults(coasterList, totalWLT, winLossMatrix)
 
-    for coaster in winLossMatrix.keys():
-        if "Lake Compounce" in coaster[0] and winLossMatrix[coaster][0] > 0:
-            print coaster, winLossMatrix[coaster]
+    # for coaster in totalWLT.keys():
+    #     if totalWLT[coaster][3] > 0:
+    #         print coaster, totalWLT[coaster]
+
+    # for coaster in winLossMatrix.keys():
+    #     if "Lake Compounce" in coaster[0] and winLossMatrix[coaster][0] > 0 and winLossMatrix[coaster][1] > 0:
+    #         print coaster, winLossMatrix[coaster]
 
     # for coaster in winLossMatrix.keys():
     #     if winLossMatrix[coaster][0] > 1:
@@ -92,11 +77,18 @@ def main():
     #     if winPercentage[coaster] > 0:
     #         print " ->", coaster, winPercentage[coaster]
 
-    minRiders = int(sys.argv[1])
+    finalResults, finalPairs, finalRiders = sortedLists(riders, winLossMatrix, winPercentage)
 
-    # sortedLists()
+    # for i in finalResults:
+    #     print "results:", i
 
-    # printToFile()
+    # for i in finalPairs:
+    #     print "pairs:", i
+
+    # for i in finalRiders:
+    #     print "riders:", i
+
+    printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterList, menlo)
 
     xlout.save("Poll Results.xlsx")
     print 'Output saved to "Poll Results.xlsx".'
@@ -107,7 +99,7 @@ def main():
 #  populate list of coasters in the poll
 # ==================================================
 
-def getCoasterList(blankBallot, coasterList, riders, totalWLT, masterlistws, preferredFixedWidthFont):
+def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWidthFont):
     print "Creating list of every coaster on the ballot...",
 
     masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
@@ -118,6 +110,8 @@ def getCoasterList(blankBallot, coasterList, riders, totalWLT, masterlistws, pre
     masterlistws.column_dimensions['E'].width = 6.83
     masterlistws['B1'].font = preferredFixedWidthFont
     masterlistws['E1'].font = preferredFixedWidthFont
+
+    coasterList = []
 
     #open the blank ballot file
     with open(blankBallot) as f:
@@ -171,6 +165,7 @@ def getCoasterList(blankBallot, coasterList, riders, totalWLT, masterlistws, pre
 
     masterlistws.freeze_panes = masterlistws['A2']
     print len(coasterList), "coasters on the ballot."
+    return coasterList
 
 
 
@@ -216,7 +211,7 @@ def createMatrix(coasterList):
 
 def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLossMatrix):
     filename = os.path.basename(filepath)
-    print("Processing ballot: {0}".format(filename))
+    print "Processing ballot: {0}".format(filename)
 
     voterInfo = [filename, "", "", "", "", ""]
     coasterAndRank = {}
@@ -261,11 +256,11 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
 
                 # make sure there are at least 2 'words' in each line
                 elif len(words) < 2:
-                    print("Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line))
+                    print "Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line)
 
                 # make sure the ranking is a number
                 elif not words[0].isdigit():
-                    print("Error in reading {0}, Line {1}: Rank must be an int.".format(filename, lineNum))
+                    print "Error in reading {0}, Line {1}: Rank must be an int.".format(filename, lineNum)
                     error = True
 
                 else:
@@ -284,7 +279,7 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
                         coasterAndRank[coasterName] = coasterRank
 
                     else: # it's not a legit coaster!
-                        print("Error in reading {0}, Line {1}: Unknown coaster {2}".format(filename, lineNum, coasterName))
+                        print "Error in reading {0}, Line {1}: Unknown coaster {2}".format(filename, lineNum, coasterName)
                         error = True
 
     # don't tally the ballot if there were any errors
@@ -340,7 +335,7 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
 # ========================================================
 
 def calculateResults(coasterList, totalWLT, winLossMatrix):
-    print("Calculating results...")
+    print "Calculating results..."
 
     # iterate through all the pairs in the matrix
     for coasterA in coasterList:
@@ -366,6 +361,8 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
             elif numContests > 0:
                 winLossMatrix[x, y][3] = round(((wins / numContests)) * 100, 3)
 
+    # vvvvvvvvvv I'm not actually sure what this code does; planning on removing it
+
     winPercentage = {}
 
     # all those calculations we just did for each pair of coasters, now do for each coaster by itself
@@ -384,6 +381,8 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
 
     return winPercentage
 
+    # ^^^^^^^^^^ I'm not actually sure what this code does; planning on removing it
+
 
 
 # ==================================================
@@ -391,35 +390,30 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
 #    sorted list of coasters by pairwise win pct
 # ==================================================
 
-def sortedLists():
-    print("Sorting the results")
+def sortedLists(riders, winLossMatrix, winPercentage):
+    print "Sorting the results..." 
 
-    global results
-    global pairsList
-    global sortedResults
-    global sortedPairs
-    global riders
-    global sortedRiders
+    results = []
+    numRiders = []
+    pairPercents = []
+
+    minRiders = int(sys.argv[1])
 
     # iterate through the winPercentage dict by keys
     for i in winPercentage.keys():
-        # pull out just the single-coaster keys for the total win percentage and number of riders
-        if i in coasterList:
-            numRiders.append((i, riders[i]))
-            if int(riders[i]) >= int(minRiders):
-                results.append((i, winPercentage[i]))
-            else:
-                continue
+        numRiders.append((i, riders[i]))
+        if int(riders[i]) >= int(minRiders):
+            results.append((i, winPercentage[i]))
 
-        # the rest are pairs keys and pairwise win percentages, they go in their own list
-        else:
-            pairsList.append((i, winPercentage[i]))
+    for i in winLossMatrix.keys():
+        pairPercents.append((i, winLossMatrix[i][3]))
+
     # now sort both lists by the win percentages, highest numbers first
     sortedResults = sorted(results, key=lambda x: x[1], reverse=True)
-    sortedPairs = sorted(pairsList, key=lambda x: x[1], reverse=True)
+    sortedPairs = sorted(pairPercents, key=lambda x: x[1], reverse=True)
     sortedRiders = sorted(numRiders, key=lambda x: x[1], reverse=True)
 
-    return sortedRiders, sortedPairs, sortedResults
+    return sortedResults, sortedPairs, sortedRiders
 
 
 
@@ -427,36 +421,73 @@ def sortedLists():
 #  print everything to a file
 # ==================================================
 
-def printToFile():
+def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferredFixedWidthFont):
+    print "Saving the results..."
 
-    with open("numriders2017.txt", "w") as f:
+    resultws = xl.create_sheet("Ranked Results")
+    resultws.append(["Rank","Coaster","Win Percentage"])
+    resultws.column_dimensions['A'].width = 4.83
+    resultws.column_dimensions['B'].width = 45.83
+    resultws.column_dimensions['C'].width = 12.83
+    for i in range(0, len(results)):
+        resultws.append([i+1, results[i][0], results[i][1]])
+    resultws.freeze_panes = resultws['A2']
 
-        f.write("Coasters by number of riders\n")
-        for i in range(0, len(sortedRiders)):
+    pairws = xl.create_sheet("Ranked Pairs")
+    pairws.append(["Rank","Primary Coaster","Rival Coaster","Win Percentage"])
+    pairws.column_dimensions['A'].width = 4.83
+    pairws.column_dimensions['B'].width = 45.83
+    pairws.column_dimensions['C'].width = 45.83
+    pairws.column_dimensions['D'].width = 12.83
+    for i in range(0, len(pairs)):
+        pairws.append([i+1, pairs[i][0][0], pairs[i][0][1], pairs[i][1]])
+    pairws.freeze_panes = pairws['A2']
 
-            f.write(str(i+1) + ": " + str(sortedRiders[i]) + "\n")
-        f.write("\n")
+    riderws = xl.create_sheet("Number of Riders")
+    riderws.append(["Rank","Coaster","Number of Riders"])
+    riderws.column_dimensions['A'].width = 4.83
+    riderws.column_dimensions['B'].width = 45.83
+    riderws.column_dimensions['C'].width = 13.83
+    for i in range(0, len(riders)):
+        riderws.append([i+1, riders[i][0], riders[i][1]])
+    riderws.freeze_panes = riderws['A2']
 
-    with open("rankedresults2017.txt", "w") as f:
-        f.write("Total number of valid ballots received:" + str(len(ballotList)) + "\n")
-        f.write("total number of coasters on ballot:" + str(len(coasterList))+ "\n")
-        f.write("average number of coasters ridden by each voter:" + str(int(totalCredits/len(ballotList)))+ "\n")
-        f.write("Coasters by ranking\n")
-        for i in range(0,len(sortedResults)):
-            f.write(str(i+1) + ": " + str(sortedResults[i]) + "\n")
-
-        f.write("\n")
-
-    with open("pairsrank2017.txt", "w") as f:
-        f.write("Pairs by ranking\n")
-        for i in range(0, len(sortedPairs)):
-
-            f.write(str(i+1) + ": " + str(sortedPairs[i]) + "\n")
-
-    with open("stuff.txt", "w") as f:
-        f.write("Pairs\n")
-        for i in range(0, len(pairsList)):
-            f.write(str(i+1) + ": " + str(pairsList[i]) + "\n")
+    hawkerWLTws = xl.create_sheet("Coaster vs Coaster Win-Loss-Tie")
+    headerRow = ["Rank",""]
+    orderAbbr = []
+    for coaster in results:
+        for abbr in coasterList:
+            if coaster[0] == abbr[0]:
+                headerRow.append(abbr[1])
+                orderAbbr.append((abbr[0], abbr[1])) # sorted version of coasterList
+                break
+    hawkerWLTws.append(headerRow)
+    hawkerWLTws.column_dimensions['A'].width = 4.83
+    hawkerWLTws.column_dimensions['B'].width = 45.83
+    for col in range(3, len(orderAbbr)+3):
+        hawkerWLTws.column_dimensions[get_column_letter(col)].width = 12.83
+    for i in range(0, len(orderAbbr)):
+        resultRow = [i+1, orderAbbr[i][0]]
+        for j in range(0, len(orderAbbr)):
+            coasterA = orderAbbr[i][0]
+            coasterB = orderAbbr[j][0]
+            cellStr = ""
+            if coasterA != coasterB: # and coasterA in winLossMatrix.keys():
+                if winLossMatrix[coasterA, coasterB][0] > winLossMatrix[coasterA, coasterB][1]:
+                    cellStr += "W "
+                elif winLossMatrix[coasterA, coasterB][0] < winLossMatrix[coasterA, coasterB][1]:
+                    cellStr += "L "
+                else:
+                    cellStr += "T "
+                cellStr += str(winLossMatrix[coasterA, coasterB][0]) + "-"
+                cellStr += str(winLossMatrix[coasterA, coasterB][1]) + "-"
+                cellStr += str(winLossMatrix[coasterA, coasterB][2])
+            resultRow.append(cellStr)
+        hawkerWLTws.append(resultRow)
+    hawkerWLTws.freeze_panes = hawkerWLTws['C2']
+    for col in hawkerWLTws.iter_cols(min_col=3):
+        for cell in col:
+            cell.font = preferredFixedWidthFont
 
 
 
@@ -467,34 +498,6 @@ def printToFile():
 if __name__ == "__main__": # allows us to put main at the beginning
     main()
 
-# <<<<<<< Updated upstream
-# =======
-# getCoasterList(blankBallot)
-
-# getBallotFilenames(ballotFolder)
-
-# createDict()
-
-# createMatrix()
-
-# minRiders = input("Minimum number of riders to qualify? ")
-
-# runTheContest()
-
-# calculateResults()
-
-# for coaster in winLossMatrix.keys():
-#     if len(winLossMatrix[coaster]) > 0:
-#         print coaster, winLossMatrix[coaster]
-
-# # for coaster in winPercentage.keys():
-# #     if winPercentage[coaster] > 0:
-# #         print " ->", coaster, winPercentage[coaster]
-
-# # sortedLists()
-
-# # printToFile()
-# >>>>>>> Stashed changes
 
 
 # ==================================================
