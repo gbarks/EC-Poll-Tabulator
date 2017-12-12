@@ -63,7 +63,6 @@ def main():
 
 
     xlout.active.title = "Coaster Masterlist"
-
     getCoasterList(blankBallot, coasterList, riders, totalWLT, xlout.active, menlo)
 
     ballotList = getBallotFilepaths(ballotFolder)
@@ -71,11 +70,21 @@ def main():
     # for each pair of coasters, a string containing w, l, or t
     winLossMatrix = createMatrix(coasterList)
 
-    minRiders = int(sys.argv[1])
-
     # loop through all the ballot filenames and process each ballot
+    voterinfows = xlout.create_sheet("Voter Info (SENSITIVE)")
+    voterinfows.append(["Ballot Filename","Name","Email","City","State/Province","Country","Coasters Ridden"])
+    voterinfows.column_dimensions['A'].width = 24.83
+    voterinfows.column_dimensions['B'].width = 16.83
+    voterinfows.column_dimensions['C'].width = 24.83
+    for col in ['D','E','F','G']:
+        voterinfows.column_dimensions[col].width = 12.83
     for filepath in ballotList:
-        processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLossMatrix)
+        voterInfo = processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLossMatrix)
+        if voterInfo:
+            voterinfows.append(voterInfo)
+    voterinfows.freeze_panes = voterinfows['A2']
+
+    minRiders = int(sys.argv[1])
 
     # calculateResults()
 
@@ -154,6 +163,8 @@ def getCoasterList(blankBallot, coasterList, riders, totalWLT, masterlistws, pre
                             masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
                         masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
 
+    
+    masterlistws.freeze_panes = masterlistws['A2']
     print len(coasterList), "coasters on the ballot."
 
 
@@ -285,48 +296,47 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
                         print("Error in reading {0}, Line {1}: Unknown coaster {2}".format(filename, lineNum, coasterName))
                         error = True
 
-    # no errors? Tally the ballot!
-    if not error:
+    # don't tally the ballot if there were any errors
+    if error:
+        print "Error encountered. File {0} not added.".format(filename)
+        return []
 
-        # add this voter's credit count to the total credits
-        totalCredits += creditNum
+    # add this voter's credit count to the total credits
+    totalCredits += creditNum
 
-        # cycle through each pair of coasters this voter ranked
-        for coasterA in coasterAndRank.keys():
-            for coasterB in coasterAndRank.keys():
+    # cycle through each pair of coasters this voter ranked
+    for coasterA in coasterAndRank.keys():
+        for coasterB in coasterAndRank.keys():
 
-                # can't compare a coaster to itself
-                if coasterA != coasterB:
-                    totalWLT[coasterA][3] += 1 # increment number of contests
+            # can't compare a coaster to itself
+            if coasterA != coasterB:
+                totalWLT[coasterA][3] += 1 # increment number of contests
 
-                    # if the coasters have the same ranking, call it a tie
-                    if coasterAndRank[coasterA] == coasterAndRank[coasterB]:
-                        winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("t")
-                        winLossMatrix[coasterA, coasterB][2] += 1
-                        totalWLT[coasterA][2] += 1
+                # if the coasters have the same ranking, call it a tie
+                if coasterAndRank[coasterA] == coasterAndRank[coasterB]:
+                    winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("t")
+                    winLossMatrix[coasterA, coasterB][2] += 1
+                    totalWLT[coasterA][2] += 1
 
-                    # if coasterA outranks coasterB (the rank's number is lower), call it a win for coasterA
-                    elif coasterAndRank[coasterA] < coasterAndRank[coasterB]:
-                        winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("w")
-                        winLossMatrix[coasterA, coasterB][0] += 1
-                        totalWLT[coasterA][0] += 1
+                # if coasterA outranks coasterB (the rank's number is lower), call it a win for coasterA
+                elif coasterAndRank[coasterA] < coasterAndRank[coasterB]:
+                    winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("w")
+                    winLossMatrix[coasterA, coasterB][0] += 1
+                    totalWLT[coasterA][0] += 1
 
-                    # if not a tie nor a win, it must be a loss
-                    else:
-                        winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("l")
-                        winLossMatrix[coasterA, coasterB][1] += 1
-                        totalWLT[coasterA][1] += 1
-
-
-    # if none of the above conditions were met, there must've been an error
-    else:
-        print("Errors. File {0} not added.".format(filename))
+                # if not a tie nor a win, it must be a loss
+                else:
+                    winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("l")
+                    winLossMatrix[coasterA, coasterB][1] += 1
+                    totalWLT[coasterA][1] += 1
 
     print " ->",
 
     for i in range(1,len(voterInfo)):
         if "(no answer)" not in voterInfo[i]:
             print "{0},".format(voterInfo[i]),
+        else:
+            voterInfo[i] = ""
 
     print "CC: {0}".format(creditNum)
 
