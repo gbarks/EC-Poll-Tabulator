@@ -28,12 +28,6 @@ def main():
     # list of tuples representing every coaster on the ballot
     coasterList = []
 
-    # for each ballot, the ranking given to each coaster voted on
-    coasterAndRank = {}
-
-    # for each pair of coasters, the % of times coasterA beat coasterB
-    winPercentage = {}
-
     # for each coaster on the ballot, the number of people who rode that coaster
     riders = {}
 
@@ -84,9 +78,12 @@ def main():
             voterinfows.append(voterInfo)
     voterinfows.freeze_panes = voterinfows['A2']
 
-    minRiders = int(sys.argv[1])
+    winPercentage = calculateResults(coasterList, totalWLT, winLossMatrix)
 
-    # calculateResults()
+    for coaster in winPercentage.keys():
+        print coaster, winPercentage[coaster]
+
+    minRiders = int(sys.argv[1])
 
     # sortedLists()
 
@@ -163,7 +160,6 @@ def getCoasterList(blankBallot, coasterList, riders, totalWLT, masterlistws, pre
                             masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
                         masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
 
-    
     masterlistws.freeze_panes = masterlistws['A2']
     print len(coasterList), "coasters on the ballot."
 
@@ -197,7 +193,7 @@ def createMatrix(coasterList):
     winLossMatrix = {}
     for row in coasterList:
         for col in coasterList:
-            winLossMatrix[row[0],col[0]] = [0, 0, 0, ""]
+            winLossMatrix[row[0],col[0]] = [0, 0, 0, 0.0]
     print len(winLossMatrix), "pairings."
     return winLossMatrix
 
@@ -278,8 +274,7 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
                         # add this voter's ranking of the coaster
                         coasterAndRank[coasterName] = coasterRank
 
-                    else:
-                        # it's not a legit coaster!
+                    else: # it's not a legit coaster!
                         print("Error in reading {0}, Line {1}: Unknown coaster {2}".format(filename, lineNum, coasterName))
                         error = True
 
@@ -301,19 +296,16 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
 
                 # if the coasters have the same ranking, call it a tie
                 if coasterAndRank[coasterA] == coasterAndRank[coasterB]:
-                    winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("t")
                     winLossMatrix[coasterA, coasterB][2] += 1
                     totalWLT[coasterA][2] += 1
 
                 # if coasterA outranks coasterB (the rank's number is lower), call it a win for coasterA
                 elif coasterAndRank[coasterA] < coasterAndRank[coasterB]:
-                    winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("w")
                     winLossMatrix[coasterA, coasterB][0] += 1
                     totalWLT[coasterA][0] += 1
 
                 # if not a tie nor a win, it must be a loss
                 else:
-                    winLossMatrix[coasterA, coasterB][3] = winLossMatrix[coasterA, coasterB][3] + ("l")
                     winLossMatrix[coasterA, coasterB][1] += 1
                     totalWLT[coasterA][1] += 1
 
@@ -338,69 +330,50 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
 #    numbers gathered when the ballots were processed
 # ========================================================
 
-def calculateResults():
-    print("Calculating results")
-
-    # initialize/reset the number of pairwise contests for each pair
-    contestsHead2Head = 0
-    # initialize/reset the number of wins for each pair of coasters
-    wins = 0
-    # initialize/reset the number of losses for each pair of coasters
-    losses = 0
-    # initialize/reset the number of ties for each pair of coasters
-    ties = 0
-
-    global winPercentage
-    global totalContests
+def calculateResults(coasterList, totalWLT, winLossMatrix):
+    print("Calculating results...")
 
     # iterate through all the pairs in the matrix
-    for row in coasterList:
-        for col in coasterList:
-            # there will be no info for a coaster paired with itself, so skip it
-            if row == col:
+    for coasterA in coasterList:
+        for coasterB in coasterList:
+
+            x = coasterA[0]
+            y = coasterB[0]
+
+            if x == y: # skip a coaster paired with itself
                 continue
 
-            # look at the pair of coasters
-            # and calculate the win percentage for coasterA(row) vs coasterB (col)
-            else:
-                # see how many times this pair went head-to-head
-                contestsHead2Head = len(winLossMatrix[row,col])
-                # count the number of wins for coasterA (row)
-                wins = winLossMatrix[row,col].count("w")
-                # count the number of losses for coasterA (row)
-                losses = winLossMatrix[row,col].count("l")
-                # count the number of ties for coasterA (row)
-                ties = winLossMatrix[row,col].count("t")
+            wins = winLossMatrix[x, y][0]
+            loss = winLossMatrix[x, y][1]
+            ties = winLossMatrix[x, y][2]
+            numContests = wins + loss + ties
 
+            # if this pair of coasters had mutual riders and there were ties, calculate with this formula
+            if ties != 0 and numContests > 0:
+                # formula: wins + half the ties divided by the number of times they competed against each other
+                # Multiply that by 100 to get the percentage, then round to three digits after the decimal
+                winLossMatrix[x, y][3] = round((((wins + (ties / 2)) / numContests)) * 100, 3)
+            # if this pair had mutual riders, but there were no ties, use this formula
+            elif numContests > 0:
+                winLossMatrix[x, y][3] = round(((wins / numContests)) * 100, 3)
 
-                # if this pair of coasters had mutual riders and there were ties, calculate with this formula
-                if ties != 0 and contestsHead2Head > 0:
-                    # formula: wins + half the ties divided by the number of times they competed against each other
-                    # Multiply that by 100 to get the percentage, then round to three digits after the decimal
-                    winPercentage[row,col] = round((((wins + (ties / 2)) / contestsHead2Head)) * 100, 3)
-                # if this pair had mutual riders, but there were no ties, use this formula
-                elif contestsHead2Head > 0:
-                    winPercentage[row,col] = round(((wins / contestsHead2Head)) * 100, 3)
-                # if there were no mutual riders for this pair, skip it
-                else:
-                    continue
-
-
-
+    winPercentage = {}
 
     # all those calculations we just did for each pair of coasters, now do for each coaster by itself
     # tallying up ALL the contests it had, not just the pairwise contests
     # this will give the total overall win percentage for each coaster, which will be used to determine
     # the final ranking of all the coasters
-    for row in coasterList:
-        if ties != 0 and totalContests[row] > 0:
-            winPercentage[row] = round((((totalWins[row] + (totalTies[row]/2)) / totalContests[row])) * 100, 3)
+    for coaster in coasterList:
 
-        elif totalContests[row] > 0:
-            winPercentage[row] = round(((totalWins[row] / totalContests[row])) * 100, 3)
+        x = coaster[0]
 
+        if totalWLT[x][2] > 0 and totalWLT[x][3] > 0: # if numTies and numContests > 0
+            winPercentage[x] = round((((totalWLT[x][0] + (totalWLT[x][2]/2)) / totalWLT[x][3])) * 100, 3)
 
-    return winPercentage, totalContests
+        elif totalWLT[x][3] > 0: # if numTies == 0 and numContests > 0
+            winPercentage[x] = round(((totalWLT[x][0] / totalWLT[x][3])) * 100, 3)
+
+    return winPercentage
 
 
 
