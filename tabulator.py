@@ -80,8 +80,17 @@ def main():
 
     winPercentage = calculateResults(coasterList, totalWLT, winLossMatrix)
 
-    for coaster in winPercentage.keys():
-        print coaster, winPercentage[coaster]
+    for coaster in winLossMatrix.keys():
+        if "Lake Compounce" in coaster[0] and winLossMatrix[coaster][0] > 0:
+            print coaster, winLossMatrix[coaster]
+
+    # for coaster in winLossMatrix.keys():
+    #     if winLossMatrix[coaster][0] > 1:
+    #         print coaster, winLossMatrix[coaster]
+
+    # for coaster in winPercentage.keys():
+    #     if winPercentage[coaster] > 0:
+    #         print " ->", coaster, winPercentage[coaster]
 
     minRiders = int(sys.argv[1])
 
@@ -458,6 +467,34 @@ def printToFile():
 if __name__ == "__main__": # allows us to put main at the beginning
     main()
 
+# <<<<<<< Updated upstream
+# =======
+# getCoasterList(blankBallot)
+
+# getBallotFilenames(ballotFolder)
+
+# createDict()
+
+# createMatrix()
+
+# minRiders = input("Minimum number of riders to qualify? ")
+
+# runTheContest()
+
+# calculateResults()
+
+# for coaster in winLossMatrix.keys():
+#     if len(winLossMatrix[coaster]) > 0:
+#         print coaster, winLossMatrix[coaster]
+
+# # for coaster in winPercentage.keys():
+# #     if winPercentage[coaster] > 0:
+# #         print " ->", coaster, winPercentage[coaster]
+
+# # sortedLists()
+
+# # printToFile()
+# >>>>>>> Stashed changes
 
 
 # ==================================================

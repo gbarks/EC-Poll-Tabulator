@@ -5,3 +5,6 @@
 *.xlsx
 *.txt
 !blankballot2017.txt
+
+tabulator_old.py
+blankballot2017_old.py
