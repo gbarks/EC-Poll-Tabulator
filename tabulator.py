@@ -8,6 +8,11 @@ import sys
 from openpyxl import Workbook
 from openpyxl.styles import Font
 
+# exit if the first arg isn't an integer
+if len(sys.argv) < 2 or  not sys.argv[1].isdigit():
+    print "Please specify the minimum number of riders per comparison as the 1st arg."
+    sys.exit()
+
 # global strings for parsing ballots
 commentStr = "* "
 blankUserField = "-Replace "
@@ -69,10 +74,10 @@ def main():
 
     ballotList = getBallotFilenames(ballotFolder)
 
-    # for each pair of coasters, a string containing w, l, or t representing every contest between that pair
+    # for each pair of coasters, a string containing w, l, or t
     winLossMatrix = createMatrix(coasterList)
 
-    # minRiders = input("Minimum number of riders to qualify? ")
+    minRiders = int(sys.argv[1])
 
     # runTheContest()
 
@@ -342,6 +347,45 @@ def processBallot(filename):
 
 
 
+# ==================================================
+#  cycle through all the ballots and tabulate them
+# ==================================================
+
+def runTheContest():
+    # loop through all the ballot filenames and process each ballot
+    for filename in ballotList:
+        print("Processing ballot: {0}".format(filename))
+        processBallot("ballots2017/" + filename)
+
+        print("=========================================================")
+        for i in range(0,len(voterInfo)):
+            if i == 0:
+                print("Ballot: {0}".format(voterInfo[i]))
+
+            elif i == 1:
+                print("Name: {0}".format(voterInfo[i]))
+
+            elif i == 2:
+                print("Email: {0}".format(voterInfo[i]))
+
+            elif i == 3:
+                print("City: {0}".format(voterInfo[i]))
+
+            elif i == 4:
+                print("State/Province: {0}".format(voterInfo[i]))
+
+            elif i == 5:
+                print("Country: {0}".format(voterInfo[i]))
+
+
+        print("Coasters ridden: {0}".format(creditNum))
+        print("=========================================================")
+        print("=========================================================")
+
+        print()
+
+
+
 # ========================================================
 #  calculate results
 #
@@ -449,45 +493,6 @@ def sortedLists():
     sortedRiders = sorted(numRiders, key=lambda x: x[1], reverse=True)
 
     return sortedRiders, sortedPairs, sortedResults
-
-
-
-# ==================================================
-#  cycle through all the ballots and tabulate them
-# ==================================================
-
-def runTheContest():
-    # loop through all the ballot filenames and process each ballot
-    for filename in ballotList:
-        print("Processing ballot: {0}".format(filename))
-        processBallot("ballots2017/" + filename)
-
-        print("=========================================================")
-        for i in range(0,len(voterInfo)):
-            if i == 0:
-                print("Ballot: {0}".format(voterInfo[i]))
-
-            elif i == 1:
-                print("Name: {0}".format(voterInfo[i]))
-
-            elif i == 2:
-                print("Email: {0}".format(voterInfo[i]))
-
-            elif i == 3:
-                print("City: {0}".format(voterInfo[i]))
-
-            elif i == 4:
-                print("State/Province: {0}".format(voterInfo[i]))
-
-            elif i == 5:
-                print("Country: {0}".format(voterInfo[i]))
-
-
-        print("Coasters ridden: {0}".format(creditNum))
-        print("=========================================================")
-        print("=========================================================")
-
-        print()
 
 
 
