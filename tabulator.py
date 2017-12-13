@@ -12,6 +12,7 @@ import sys
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
+from spinner import Spinner
 
 # global strings for parsing ballots
 commentStr = "* "
@@ -71,8 +72,12 @@ def main():
 
     printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterList, menlo)
 
+    print("Saving...", end=" ")
+    spinner = Spinner()
+    spinner.start()
     xlout.save("Poll Results.xlsx")
-    print('Output saved to "Poll Results.xlsx".')
+    spinner.stop()
+    print('output saved to "Poll Results.xlsx".')
 
 
 
@@ -82,6 +87,8 @@ def main():
 
 def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWidthFont):
     print("Creating list of every coaster on the ballot...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
     masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
     masterlistws.column_dimensions['A'].width = 45.83
@@ -145,6 +152,7 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
                         masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
 
     masterlistws.freeze_panes = masterlistws['A2']
+    spinner.stop()
     print("{0} coasters on the ballot.".format(len(coasterList)))
     return coasterList
 
@@ -156,10 +164,15 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
 
 def getBallotFilepaths(ballotFolder):
     print("Getting the filepaths of submitted ballots...", end=" ")
+    spinner = Spinner()
+    spinner.start()
+
     ballotList = []
     for file in os.listdir(ballotFolder):
         if file.endswith(".txt"):
             ballotList.append(os.path.join(ballotFolder, file))
+
+    spinner.stop()
     print("{0} ballots submitted.".format(len(ballotList)))
     return ballotList
 
@@ -171,10 +184,15 @@ def getBallotFilepaths(ballotFolder):
 
 def createMatrix(coasterList):
     print("Creating the win/loss matrix...", end=" ")
+    spinner = Spinner()
+    spinner.start()
+
     winLossMatrix = {}
     for row in coasterList:
         for col in coasterList:
             winLossMatrix[row[0],col[0]] = [0, 0, 0, 0.0]
+
+    spinner.stop()
     print("{0} pairings.".format(len(winLossMatrix)))
     return winLossMatrix
 
@@ -312,7 +330,9 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
 # ========================================================
 
 def calculateResults(coasterList, totalWLT, winLossMatrix):
-    print("Calculating results...")
+    print("Calculating results...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
     # iterate through all the pairs in the matrix
     for coasterA in coasterList:
@@ -354,6 +374,9 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
         elif totalWLT[x][3] > 0: # if numTies == 0 and numContests > 0
             winPercentage[x] = round(((totalWLT[x][0] / totalWLT[x][3])) * 100, 3)
 
+    spinner.stop()
+    print(" ")
+
     return winPercentage
 
 
@@ -364,7 +387,9 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
 # ==================================================
 
 def sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage):
-    print("Sorting the results...")
+    print("Sorting the results...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
     results = []
     numRiders = []
@@ -384,6 +409,9 @@ def sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage):
     sortedPairs = sorted(pairPercents, key=lambda x: x[1], reverse=True)
     sortedRiders = sorted(numRiders, key=lambda x: x[1], reverse=True)
 
+    spinner.stop()
+    print(" ")
+
     return sortedResults, sortedPairs, sortedRiders
 
 
@@ -393,7 +421,9 @@ def sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage):
 # ==================================================
 
 def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferredFixedWidthFont):
-    print("Saving the results...")
+    print("Writing the results...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
     resultws = xl.create_sheet("Ranked Results")
     resultws.append(["Rank","Coaster","Win Percentage","Total Wins","Total Losses","Total Ties"])
@@ -465,6 +495,9 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferre
     for col in hawkerWLTws.iter_cols(min_col=3):
         for cell in col:
             cell.font = preferredFixedWidthFont
+
+    spinner.stop()
+    print(" ")
 
 
 
