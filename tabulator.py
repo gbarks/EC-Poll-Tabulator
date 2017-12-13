@@ -12,7 +12,12 @@ import sys
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
-from spinner import Spinner
+
+try:
+    from spinner import Spinner
+except:
+    print('Could not find "spinner.py"; exiting...')
+    sys.exit()
 
 # global strings for parsing ballots
 commentStr = "* "
@@ -21,19 +26,38 @@ startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 
 def main():
 
+    # variable defaults that can be set by command line arguments
+    minRiders = 6
     blankBallot = "blankballot2017.txt"
     ballotFolder = "ballots2017"
 
-    riders = {} # for each coaster, the number of people who rode it
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        minRiders = int(sys.argv[1])
+    if len(sys.argv) > 2:
+        blankBallot = sys.argv[2]
+    if len(sys.argv) > 3:
+        ballotFolder = sys.argv[3]
 
-    totalCredits = 0 # total number of credits across all voters
+    if not os.path.isfile(blankBallot):
+        print('Blank ballot source "{0}" is not a file; exiting...'.format(blankBallot))
+        sys.exit()
 
-    totalWLT = {} # for each coaster, a list of numbers of the form [wins, losses, ties, totalContests]
+    if not os.path.isdir(ballotFolder) or len(os.listdir(ballotFolder)) < 1:
+        print('Ballot folder "{0}" does not exist or is empty; exiting...'.format(ballotFolder))
+        sys.exit()
 
+    # for each coaster, the number of people who rode it
+    riders = {}
+
+    # for each coaster, a list of numbers of the form [wins, losses, ties, totalContests]
+    totalWLT = {}
+
+    # create Excel workbook
     xlout = Workbook()
-    menlo = Font(name="Menlo")
-
     xlout.active.title = "Coaster Masterlist"
+
+    # preferred fixed-width font
+    menlo = Font(name="Menlo")
 
     # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
     coasterList = getCoasterList(blankBallot, riders, totalWLT, xlout.active, menlo)
@@ -53,7 +77,7 @@ def main():
     for col in ['D','E','F','G']:
         voterinfows.column_dimensions[col].width = 12.83
     for filepath in ballotList:
-        voterInfo = processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLossMatrix)
+        voterInfo = processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix)
         if voterInfo:
             voterinfows.append(voterInfo)
     voterinfows.freeze_panes = voterinfows['A2']
@@ -61,17 +85,13 @@ def main():
     # for each coaster, its win percentage across all pairings
     winPercentage = calculateResults(coasterList, totalWLT, winLossMatrix)
 
-    # minimum riders for comparison ranking defaults to 6, else set to first sys argument
-    if len(sys.argv) < 2 or not sys.argv[1].isdigit():
-        minRiders = 6
-    else:
-        minRiders = int(sys.argv[1])
-
     # sorted lists of tuples of the form (rankedCoaster, relevantNumber)
     finalResults, finalPairs, finalRiders = sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage)
 
+    # write worksheets related to finalResults, finalPairs, finalRiders, and winLossMatrix
     printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterList, menlo)
 
+    # save the Excel file
     print("Saving...", end=" ")
     spinner = Spinner()
     spinner.start()
@@ -90,6 +110,7 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
     spinner = Spinner()
     spinner.start()
 
+    # set up Coaster Masterlist worksheet
     masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
     masterlistws.column_dimensions['A'].width = 45.83
     masterlistws.column_dimensions['B'].width = 12.83
@@ -99,7 +120,7 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
     masterlistws['B1'].font = preferredFixedWidthFont
     masterlistws['E1'].font = preferredFixedWidthFont
 
-    coasterList = []
+    coasterList = [] # return value
 
     #open the blank ballot file
     with open(blankBallot) as f:
@@ -143,6 +164,8 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
 
                         # add the coaster to the list of coasters on the ballot
                         coasterList.append((fullName, abbrName))
+
+                        # extract park and state/country information from fullName to write to worksheet
                         subwords = [x.strip() for x in fullName.split('-')]
                         if len(subwords) != 3:
                             masterlistws.append([fullName,abbrName])
@@ -204,11 +227,11 @@ def createMatrix(coasterList):
 #  you need a loop to call this function for each ballot filename
 # ================================================================
 
-def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLossMatrix):
+def processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix):
     filename = os.path.basename(filepath)
     print("Processing ballot: {0}".format(filename))
 
-    voterInfo = [filename, "", "", "", "", ""]
+    voterInfo = [filename, "", "", "", "", ""] # return value
     coasterAndRank = {}
     creditNum = 0
     error = False
@@ -270,6 +293,7 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
                     if [coasterName in x[0] for x in coasterList]:
                         creditNum += 1
                         riders[coasterName] += 1
+
                         # add this voter's ranking of the coaster
                         coasterAndRank[coasterName] = coasterRank
 
@@ -277,13 +301,10 @@ def processBallot(filepath, coasterList, riders, totalCredits, totalWLT, winLoss
                         print("Error in reading {0}, Line {1}: Unknown coaster {2}".format(filename, lineNum, coasterName))
                         error = True
 
-    # don't tally the ballot if there were any errors
+    # don't tally the ballot if there were any errors, don't return voter info
     if error:
         print("Error encountered. File {0} not added.".format(filename))
         return []
-
-    # add this voter's credit count to the total credits
-    totalCredits += creditNum
 
     # cycle through each pair of coasters this voter ranked
     for coasterA in coasterAndRank.keys():
@@ -358,7 +379,7 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
             elif numContests > 0:
                 winLossMatrix[x, y][3] = round(((wins / numContests)) * 100, 3)
 
-    winPercentage = {}
+    winPercentage = {} # return value
 
     # all those calculations we just did for each pair of coasters, now do for each coaster by itself
     # tallying up ALL the contests it had, not just the pairwise contests
@@ -395,16 +416,21 @@ def sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage):
     numRiders = []
     pairPercents = []
 
-    # iterate through the winPercentage dict by keys
+    # iterate through the winPercentage dict by coasters
     for i in winPercentage.keys():
         numRiders.append((i, riders[i]))
         if int(riders[i]) >= int(minRiders):
+
+            # values are: "Rank", "Coaster", "Win %", "Total Wins", "Total Losses", "Total Ties"
             results.append((i, winPercentage[i], totalWLT[i][0], totalWLT[i][1], totalWLT[i][1]))
 
+    # iterate through the winLossMatrix dict by coaster pairings
     for i in winLossMatrix.keys():
+
+        # values are: "Rank", "coasterA", "coasterB", "Win %", "Wins", "Losses", "Ties"        
         pairPercents.append((i, winLossMatrix[i][3], winLossMatrix[i][0], winLossMatrix[i][1], winLossMatrix[i][2]))
 
-    # now sort both lists by the win percentages, highest numbers first
+    # sort lists by win percentages and ridership
     sortedResults = sorted(results, key=lambda x: x[1], reverse=True)
     sortedPairs = sorted(pairPercents, key=lambda x: x[1], reverse=True)
     sortedRiders = sorted(numRiders, key=lambda x: x[1], reverse=True)
@@ -425,6 +451,7 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferre
     spinner = Spinner()
     spinner.start()
 
+    # create and write primary results worksheet
     resultws = xl.create_sheet("Ranked Results")
     resultws.append(["Rank","Coaster","Win Percentage","Total Wins","Total Losses","Total Ties"])
     resultws.column_dimensions['A'].width = 4.83
@@ -437,6 +464,7 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferre
         resultws.append([i+1, results[i][0], results[i][1], results[i][2], results[i][3], results[i][4]])
     resultws.freeze_panes = resultws['A2']
 
+    # create and write pairwise result worksheet
     pairws = xl.create_sheet("Ranked Pairs")
     pairws.append(["Rank","Primary Coaster","Rival Coaster","Win Percentage","Wins","Losses","Ties"])
     pairws.column_dimensions['A'].width = 4.83
@@ -450,6 +478,7 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferre
         pairws.append([i+1, pairs[i][0][0], pairs[i][0][1], pairs[i][1], pairs[i][2], pairs[i][3], pairs[i][4]])
     pairws.freeze_panes = pairws['A2']
 
+    # create and write ridership worksheet
     riderws = xl.create_sheet("Number of Riders")
     riderws.append(["Rank","Coaster","Number of Riders"])
     riderws.column_dimensions['A'].width = 4.83
@@ -459,6 +488,7 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferre
         riderws.append([i+1, riders[i][0], riders[i][1]])
     riderws.freeze_panes = riderws['A2']
 
+    # create and write Mitch Hawker-style mutual rider comparison worksheet
     hawkerWLTws = xl.create_sheet("Coaster vs Coaster Win-Loss-Tie")
     headerRow = ["Rank",""]
     orderAbbr = []
@@ -466,7 +496,7 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferre
         for abbr in coasterList:
             if coaster[0] == abbr[0]:
                 headerRow.append(abbr[1])
-                orderAbbr.append((abbr[0], abbr[1])) # sorted version of coasterList
+                orderAbbr.append((abbr[0], abbr[1])) # coasterList sorted by win% (as in resultws)
                 break
     hawkerWLTws.append(headerRow)
     hawkerWLTws.column_dimensions['A'].width = 4.83
