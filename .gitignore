@@ -1,8 +1,8 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
 .DS_Store
-**ballots2017
 *.xlsx
+*.csv
 *.pyc
 *.txt
 !blankballot2017.txt
