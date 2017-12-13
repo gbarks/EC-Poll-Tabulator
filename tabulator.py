@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # ==================================================
 #  ElloCoaster poll tabulator
 #  Contributions from Jim Winslett, Grant Barker
