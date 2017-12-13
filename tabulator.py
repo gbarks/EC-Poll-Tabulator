@@ -254,7 +254,7 @@ def processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix):
                     voterInfo[infoField] = ""
                     infoField += 1
                 elif not startLine in sline:
-                    voterInfo[infoField] = sline
+                    voterInfo[infoField] = sline.strip('-')
                     infoField += 1
 
             # skip down the file to the coasters
