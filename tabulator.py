@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# ==================================================
+# ==========================================================
 #  ElloCoaster poll tabulator
-#  Contributions from Jim Winslett, Grant Barker
-# ==================================================
+#  Contributions from Jim Winslett, Dave Wong, Grant Barker
+# ==========================================================
 
 from __future__ import print_function # for Python 2.x users
 
