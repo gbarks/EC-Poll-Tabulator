@@ -48,25 +48,8 @@ def getcolor(f, i=128, multiplier=1.0, offset = 0.0):
         g = i
         b = int(round(255 - scalar * space))
 
-    colorstr = hex(r)[2:] + hex(g)[2:] + hex(b)[2:]
-    print str(f) + "\t" + colorstr
-    return colorstr
+    return hex(r)[2:] + hex(g)[2:] + hex(b)[2:]
 
 def phicolor(n, lightness=128, multiplier=1.0, offset=0.0):
     phi = float((1 + sqrt(5)) / 2)
     return getcolor(float(n * phi), lightness, multiplier, offset)
-
-import sys
-from random import random, seed
-from openpyxl import Workbook
-from openpyxl.styles import PatternFill
-
-xl = Workbook()
-ws = xl.active
-seed()
-offset = 0.4
-multi = 1
-for i in range(1, 100):
-    ws.append(["test" + str(i)])
-    ws["A" + str(i)].fill = PatternFill("solid", fgColor=phicolor(i, 186, multi, offset))
-xl.save("Color Test.xlsx")

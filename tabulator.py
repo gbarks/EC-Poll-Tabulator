@@ -10,13 +10,14 @@ from __future__ import print_function # for Python 2.x users
 import os
 import sys
 from openpyxl import Workbook
-from openpyxl.styles import Font
+from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 try:
+    from phicolor import phicolor
     from spinner import Spinner
 except:
-    print('Could not find "spinner.py"; exiting...')
+    print('Could not find "phicolor.py" and/or spinner.py"; exiting...')
     sys.exit()
 
 # global strings for parsing ballots
@@ -59,8 +60,23 @@ def main():
     # preferred fixed-width font
     menlo = Font(name="Menlo")
 
+    light = 186
+    multi = 1
+    offset = 0.4
+    manColors = { # fill colors for certain roller coaster manufacturers/designers
+        "CCI"            : PatternFill("solid", fgColor=phicolor(1, light, multi, offset)),
+        "GG"             : PatternFill("solid", fgColor=phicolor(2, light, multi, offset)),
+        "GCI"            : PatternFill("solid", fgColor=phicolor(3, light, multi, offset)),
+        "Intamin"        : PatternFill("solid", fgColor=phicolor(4, light, multi, offset)),
+        "PTC"            : PatternFill("solid", fgColor=phicolor(5, light, multi, offset)),
+        "Prior & Church" : PatternFill("solid", fgColor=phicolor(6, light, multi, offset)),
+        "RMC"            : PatternFill("solid", fgColor=phicolor(7, light, multi, offset)),
+        "Locally built"  : PatternFill("solid", fgColor=phicolor(8, light, multi, offset)),
+        "Other"          : PatternFill("solid", fgColor="bababa")
+    }
+
     # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
-    coasterList = getCoasterList(blankBallot, riders, totalWLT, xlout.active, menlo)
+    coasterList = getCoasterList(blankBallot, riders, totalWLT, xlout.active, menlo, manColors)
 
     # list of ballot filepaths
     ballotList = getBallotFilepaths(ballotFolder)
@@ -105,18 +121,19 @@ def main():
 #  populate list of coasters in the poll
 # ==================================================
 
-def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWidthFont):
+def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWidthFont, manColors):
     print("Creating list of every coaster on the ballot...", end=" ")
     spinner = Spinner()
     spinner.start()
 
     # set up Coaster Masterlist worksheet
-    masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
+    masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State","Designer"])
     masterlistws.column_dimensions['A'].width = 45.83
     masterlistws.column_dimensions['B'].width = 12.83
     masterlistws.column_dimensions['C'].width = 25.83
     masterlistws.column_dimensions['D'].width = 25.83
     masterlistws.column_dimensions['E'].width = 6.83
+    masterlistws.column_dimensions['F'].width = 11.83
     masterlistws['B1'].font = preferredFixedWidthFont
     masterlistws['E1'].font = preferredFixedWidthFont
 
@@ -162,17 +179,26 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
                         riders[fullName] = 0
                         totalWLT[fullName] = [0, 0, 0, 0]
 
+                        manufacturerName = ""
+                        if len(words) > 3:
+                            manufacturerName = words[3]
+
                         # add the coaster to the list of coasters on the ballot
-                        coasterList.append((fullName, abbrName))
+                        coasterList.append((fullName, abbrName, manufacturerName))
 
                         # extract park and state/country information from fullName to write to worksheet
                         subwords = [x.strip() for x in fullName.split('-')]
                         if len(subwords) != 3:
-                            masterlistws.append([fullName,abbrName])
+                            masterlistws.append([fullName,abbrName,manufacturerName])
                         else:
-                            masterlistws.append([fullName,abbrName,subwords[0],subwords[1],subwords[2]])
+                            masterlistws.append([fullName,abbrName,subwords[0],subwords[1],subwords[2],manufacturerName])
                             masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
                         masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
+
+                        if manufacturerName and manufacturerName in manColors.keys():
+                            masterlistws.cell(row=len(coasterList)+1, column=6).fill = manColors[manufacturerName]
+                        else:
+                            masterlistws.cell(row=len(coasterList)+1, column=6).fill = manColors["Other"]
 
     masterlistws.freeze_panes = masterlistws['A2']
     spinner.stop()
