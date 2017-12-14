@@ -54,318 +54,318 @@
 
 * NORTH AMERICA *
 * Canada * 
-0, Coaster-PNE Playland-CANDA	
-0, Ghoster Coaster-Canadas Wonderland-CANDA
-0, Mighty Canadian Minebuster-Canadas Wonderland-CANDA
-0, Wild Beast-Canadas Wonderland-CANDA		
-0, Roller Coaster-Upper Clements Park-CANDA		
-0, Monstre (left)-LaRonde-CANDA
-0, Monstre (right)-LaRonde-CANDA
+0, Coaster-PNE Playland-CANDA, CoasterPNE
+0, Ghoster Coaster-Canadas Wonderland-CANDA, GhostrCoCW
+0, Mighty Canadian Minebuster-Canadas Wonderland-CANDA, MightyCaCW
+0, Wild Beast-Canadas Wonderland-CANDA, WildBeasCW
+0, Roller Coaster-Upper Clements Park-CANDA, RCClements
+0, Monstre (left)-LaRonde-CANDA, LeMonstreL
+0, Monstre (right)-LaRonde-CANDA, LeMonstreR
 
 * MEXICO *
-0, Montana Rusa (Left)-La Feria Chapultepec Magico-MEXCO
-0, Montana Rusa (Right)-La Feria Chapultepec Magico-MEXCO
+0, Montana Rusa (Left)-La Feria Chapultepec Magico-MEXCO, MontanaRuL
+0, Montana Rusa (Right)-La Feria Chapultepec Magico-MEXCO, MontanaRuR
 		
 * UNITED STATES *		
 * Alabama *
-0, Cannonball-Waterville USA-USAAL
-0, Rampage-Alabama Splash Adventure-USAAL
+0, Cannonball-Waterville USA-USAAL, CannonbaAL
+0, Rampage-Alabama Splash Adventure-USAAL, RampageAL
 		
 * ARKANSAS *
-0, Arkansas Twister-Magic Springs-USAAR
+0, Arkansas Twister-Magic Springs-USAAR, ArkTwister
 
 * CALIFORNIA *
-0, Ghost Rider-Knott’s Berry Farm-USACA
-0, Giant Dipper-Belmont Park-USACA
-0, Giant Dipper-Santa Cruz Beach Boardwalk-USACA
-0, Gold Striker-Californias Great America-USACA
-0, Grizzly-Californias Great America-USACA		
-0, Apocalypse-SF Magic Mountain-USACA
+0, Ghost Rider-Knott’s Berry Farm-USACA, GhostRider
+0, Giant Dipper-Belmont Park-USACA, GDippBelmo
+0, Giant Dipper-Santa Cruz Beach Boardwalk-USACA, GDippSCruz
+0, Gold Striker-Californias Great America-USACA, GoldStrikr
+0, Grizzly-Californias Great America-USACA, GrizzlyCGA
+0, Apocalypse-SF Magic Mountain-USACA, ApocalypMM
 
 * COLORADO *
-0, Cyclone-Lakeside-USACO
-0, Twister II-Elitch Gardens-USACO
+0, Cyclone-Lakeside-USACO, LakesideCy
+0, Twister II-Elitch Gardens-USACO, TwisterII
 
 * CONNECTICUT *
-0, Boulder Dash-Lake Compounce-USACT
-0, Wildcat-Lake Compounce-USACT
-0, Wooden Warrior-Quassy-USACT
+0, Boulder Dash-Lake Compounce-USACT, BoulderDLC
+0, Wildcat-Lake Compounce-USACT, WildcatLC
+0, Wooden Warrior-Quassy-USACT, WoodWarrQs
 
 * FLORIDA *
-0, Coastersaurus-Legoland Florida-USAFL
-0, Mine Blower-Fun Spot America-USAFL
-0, White Lightning-Fun Spot America-USAFL
+0, Coastersaurus-Legoland Florida-USAFL, CsaurLegoF
+0, Mine Blower-Fun Spot America-USAFL, MineBlower
+0, White Lightning-Fun Spot America-USAFL, WhiLightni
 
 * GEORGIA *
-0, Georgia Cyclone-SF Over Georgia-USAGA
-0, Great American Scream Machine-SF Over Georgia-USAGA
-0, Cannon Ball-Lake Winnepesaukah-USAGA
-0, Cheetah-Wild Adventures-USAGA
+0, Georgia Cyclone-SF Over Georgia-USAGA, GACyclSFOG
+0, Great American Scream Machine-SF Over Georgia-USAGA, GrAmSMSFOG
+0, Cannon Ball-Lake Winnepesaukah-USAGA, CannonbaGA
+0, Cheetah-Wild Adventures-USAGA, CheetahGA
 
 * IDAHO *
-0, Timber Terror-Silverwood-USAID
-0, Tremors-Silverwood-USAID
+0, Timber Terror-Silverwood-USAID, TimbTerrSW
+0, Tremors-Silverwood-USAID, TremorsSW
 
 * ILLINOIS *	
-0, American Eagle (Red)-SF Great America-USAIL
-0, American Eagle (Blue)-SF Great America-USAIL
-0, Goliath-SF Great America-USAIL
-0, Little Dipper-SF Great America-USAIL
-0, Viper-SF Great America-USAIL
+0, American Eagle (Red)-SF Great America-USAIL, AERedSFGAm
+0, American Eagle (Blue)-SF Great America-USAIL, AEBluSFGAm
+0, Goliath-SF Great America-USAIL, GoliaSFGAm
+0, Little Dipper-SF Great America-USAIL, LDippSFGAm
+0, Viper-SF Great America-USAIL, ViperSFGAm
 
 * INDIANA *
-0, Cornball Express-Indiana Beach-USAIN
-0, Hoosier Hurricane-Indiana Beach-USAIN
-0, Lost Coaster of Superstition Mtn-Indiana Beach-USAIN
-0, Legend-Holiday World-USAIN
-0, Raven-Holiday World-USAIN
-0, Voyage-Holiday World-USAIN
+0, Cornball Express-Indiana Beach-USAIN, CornballEx
+0, Hoosier Hurricane-Indiana Beach-USAIN, HoosierHur
+0, Lost Coaster of Superstition Mtn-Indiana Beach-USAIN, LCoSMtn
+0, Legend-Holiday World-USAIN, LegendHW
+0, Raven-Holiday World-USAIN, RavenHW
+0, Voyage-Holiday World-USAIN, VoyageHW
 
 * IOWA *
-0, Outlaw-Adventureland-USAIA
-0, Tornado-Adventureland-USAIA
-0, Underground-Adventureland-USAIA
-0, Legend-Arnolds Park-USAIA
+0, Outlaw-Adventureland-USAIA, OutlawIA
+0, Tornado-Adventureland-USAIA, TornadoIA
+0, Underground-Adventureland-USAIA, UndergroIA
+0, Legend-Arnolds Park-USAIA, LegendArnP
 
 * KENTUCKY *
-0, Kentucky Rumbler-Beech Bend-USAKY
-0, Thunder Run-Kentucky Kingdom-USAKY
+0, Kentucky Rumbler-Beech Bend-USAKY, KYRumbler
+0, Thunder Run-Kentucky Kingdom-USAKY, ThundRunKK
 
 * MAINE *
-0, Excalibur-Funtown-USAME
+0, Excalibur-Funtown-USAME, ExcalibuME
 
 * MARYLAND *
-0, Roar-SF America-USAMD
-0, Wild One-SF America-USAMD
+0, Roar-SF America-USAMD, RoarSFA
+0, Wild One-SF America-USAMD, WildOneSFA
 
 * MASSACHUSETTS *
-0, Thunderbolt-SF New England-USAMA
+0, Thunderbolt-SF New England-USAMA, TboltSFNE
 
 * MICHIGAN *
-0, Shivering Timbers-Michigans Adventure-USAMI
-0, Wolverine Wildcat-Michigans Adventure-USAMI
-0, Zachs Zoomer-Michigans Adventure-USAMI
+0, Shivering Timbers-Michigans Adventure-USAMI, ShivTimber
+0, Wolverine Wildcat-Michigans Adventure-USAMI, WolWildcat
+0, Zachs Zoomer-Michigans Adventure-USAMI, ZachZoomer
 
 * MINNESOTA *	
-0, High Roller-Valleyfair-USAMN
-0, Renegade-Valleyfair-USAMN
+0, High Roller-Valleyfair-USAMN, HiRollerVF
+0, Renegade-Valleyfair-USAMN, RenegadeVF
 
 * MISSOURI *
-0, Outlaw Run-Silver Dollar City-USAMO
-0, American Thunder-SF StLouis-USAMO
-0, Boss-SF StLouis-USAMO
-0, Screamin Eagle-SF StLouis-USAMO		
-0, Prowler-Worlds of Fun-USAMO
-0, Timber Wolf-Worlds of Fun-USAMO
+0, Outlaw Run-Silver Dollar City-USAMO, OutlawRSDC
+0, American Thunder-SF StLouis-USAMO, AmerThSFSL
+0, Boss-SF StLouis-USAMO, BossSFSL
+0, Screamin Eagle-SF StLouis-USAMO, ScEaglSFSL		
+0, Prowler-Worlds of Fun-USAMO, ProwlerWoF
+0, Timber Wolf-Worlds of Fun-USAMO, TimWolfWoF
 
 * NEW HAMPSHIRE *
-0, Roar O Saurus-Story Land-USANH
-0, Yankee Cannonball-Canobie Lake Park-USANH
+0, Roar O Saurus-Story Land-USANH, RoarSaurus
+0, Yankee Cannonball-Canobie Lake Park-USANH, CannonbaNH
 
 * NEW JERSEY *
-0, Hell Cat-Clementon Park-USANJ
-0, El Toro-SF Great Adventure-USANJ		
-0, Great White-Moreys Piers-USANJ
+0, Hell Cat-Clementon Park-USANJ, HellCatNJ
+0, El Toro-SF Great Adventure-USANJ, ElToroSFGA
+0, Great White-Moreys Piers-USANJ, GreWhiteNJ
 
 * NEW MEXICO *
-0, New Mexico Rattler-Cliffs-USANM
+0, New Mexico Rattler-Cliffs-USANM, NMRattler
 
 * NEW YORK *
-0, Comet-Great Escape-USANY
-0, Cyclone-Luna Park-USANY
-0, Dragon Coaster-Rye Playland-USANY
-0, Kiddy Coaster-Rye Playnald-USANY
-0, Jack Rabbit-Seabreeze-USANY
-0, Predator-Darien Lake-USANY
-0, Silver Comet-Martin’s Fantasy Island-USANY
+0, Comet-Great Escape-USANY, CometGrEsc
+0, Cyclone-Luna Park-USANY, ConeyIslCy
+0, Dragon Coaster-Rye Playland-USANY, DragonCRye
+0, Kiddy Coaster-Rye Playnald-USANY, KiddyCRye
+0, Jack Rabbit-Seabreeze-USANY, JacRaSeabr
+0, Predator-Darien Lake-USANY, PredatorDL
+0, Silver Comet-Martin’s Fantasy Island-USANY, SilCometNY
 
 * NORTH CAROLINA *
-0, Hurler-Carowinds-USANC
-0, Woodstock Express-Carowinds-USANC
+0, Hurler-Carowinds-USANC, HurlerCaro
+0, Woodstock Express-Carowinds-USANC, WoodstCaro
 
 * OHIO *
-0, Blue Streak-Cedar Point-USAOH
-0, Beast-Kings Island-USAOH
-0, Mystic Timbers-Kings Island-USAOH
-0, Racer (Red)-Kings Island-USAOH
-0, Racer (Blue)-Kings Island-USAOH
-0, Woodstock Express-Kings Island-USAOH
-0, Sea Dragon-Colombus Zoo-USAOH
-0, Teddy Bear-Strickers Grove-USAOH
-0, Tornado-Strickers Grove-USAOH
+0, Blue Streak-Cedar Point-USAOH, BlStreakCP
+0, Beast-Kings Island-USAOH, BeastKI
+0, Mystic Timbers-Kings Island-USAOH, MysticTiKI
+0, Racer (Red)-Kings Island-USAOH, RacerRedKI
+0, Racer (Blue)-Kings Island-USAOH, RacerBluKI
+0, Woodstock Express-Kings Island-USAOH, WoodstExKI
+0, Sea Dragon-Colombus Zoo-USAOH, SeaDragZoo
+0, Teddy Bear-Strickers Grove-USAOH, TeddyBrStr
+0, Tornado-Strickers Grove-USAOH, TornadoStr
 
 * OKLAHOMA *
-0, Wildcat-Frontier City-USAOK
+0, Wildcat-Frontier City-USAOK, WildcatFC
 
 * PENNSYLVANIA *
-0, Blue Streak-Conneaut Lake-USAPA
-0, Devils Den-Conneaut Lake-USAPA
-0, Thunderhawk-Dorney-USAPA
-0, Kingdom Coaster-Dutch Wonderland-USAPA
-0, Rollo Coaster-Idlewild-USAPA
-0, Jack Rabbit-Kennywood-USAPA
-0, Racer (Left)-Kennywood-USAPA
-0, Racer (Right)-Kennywood-USAPA
-0, Thunderbolt-Kennywood-USAPA		
-0, Comet-HersheyPark-USAPA
-0, Lightning Racer (Lightning)-HersheyPark-USAPA
-0, Lightning Racer (Thunder)-HersheyPark-USAPA
-0, Wildcat-HersheyPark-USAPA
-0, Flying Turns-Knoebels-USAPA
-0, Phoenix-Knoebels-USAPA
-0, Twister-Knoebels-USAPA
-0, Comet-Waldameer-USAPA
-0, Ravine Flyer II-Waldameer-USAPA
+0, Blue Streak-Conneaut Lake-USAPA, BlStreakCL
+0, Devils Den-Conneaut Lake-USAPA, DevilDenCL
+0, Thunderhawk-Dorney-USAPA, ThawkDorny
+0, Kingdom Coaster-Dutch Wonderland-USAPA, KingCDutch
+0, Rollo Coaster-Idlewild-USAPA, RolloCIdle
+0, Jack Rabbit-Kennywood-USAPA, JacRaKenny
+0, Racer (Left)-Kennywood-USAPA, RacrLKenny
+0, Racer (Right)-Kennywood-USAPA, RacrRKenny
+0, Thunderbolt-Kennywood-USAPA, TboltKenny
+0, Comet-HersheyPark-USAPA, CometHersh
+0, Lightning Racer (Lightning)-HersheyPark-USAPA, LRLigHersh
+0, Lightning Racer (Thunder)-HersheyPark-USAPA, LRThuHersh
+0, Wildcat-HersheyPark-USAPA, WildcHersh
+0, Flying Turns-Knoebels-USAPA, FlyTurnsKn
+0, Phoenix-Knoebels-USAPA, PhoenixKn
+0, Twister-Knoebels-USAPA, TwisterKn
+0, Comet-Waldameer-USAPA, CometWalda
+0, Ravine Flyer II-Waldameer-USAPA, RFIIWalda
 
 * SOUTH CAROLINA *
-0, Swamp Fox-Family Kingdom-USASC
+0, Swamp Fox-Family Kingdom-USASC, SwampFoxFK
 
 * TENNESSEE *
-0, Lightning Rod-Dollywood-USATN
-0, Thunderhead-Dollywood-USATN
+0, Lightning Rod-Dollywood-USATN, LiRodDolly
+0, Thunderhead-Dollywood-USATN, TheadDolly
 		
 * TEXAS *
-0, Boardwalk Bullet-Kemah Boardwalk-USATX
-0, Judge Roy Scream-SF Over Texas-USATX
-0, Switchback-ZDTs-USATX
+0, Boardwalk Bullet-Kemah Boardwalk-USATX, BoardBulTX
+0, Judge Roy Scream-SF Over Texas-USATX, JudgRoSFOT
+0, Switchback-ZDTs-USATX, SwitchbZDT
 
 * UTAH *
-0, Roller Coaster-Lagoon-USAUT
+0, Roller Coaster-Lagoon-USAUT, RCLagoon
 
 * VIRGINIA *	
-0, Grizzly-Kings Dominion-USAVA
-0, Rebel Yell (Red)-Kings Dominion-USAVA
-0, Rebel Yell (Blue)-Kings Dominion-USAVA
-0, Woodstock Express-Kings Dominion-USAVA
-0, InvadR-Busch Gardens-USAVA
+0, Grizzly-Kings Dominion-USAVA, GrizzlyKD
+0, Rebel Yell (Red)-Kings Dominion-USAVA, RebYeRedKD
+0, Rebel Yell (Blue)-Kings Dominion-USAVA, RebYeBluKD
+0, Woodstock Express-Kings Dominion-USAVA, WoodstExKD
+0, InvadR-Busch Gardens-USAVA, InvadRBGW
 
 * WASHINGTON *
-0, Classic Coaster-Washington State Fair-USAWA
-0, Timberhawk Ride of Prey-Wild Waves-USAWA
+0, Classic Coaster-Washington State Fair-USAWA, ClasCoWASF
+0, Timberhawk Ride of Prey-Wild Waves-USAWA, TimbhawkWW
 
 * WEST VIRGINIA *
-0, Big Dipper-Camden-USAWV
-0, Hawnted House-Camden-USAWV
-0, Lil Dipper-Camden-USAWV
+0, Big Dipper-Camden-USAWV, BDippCamdn
+0, Hawnted House-Camden-USAWV, HawntCamdn
+0, Lil Dipper-Camden-USAWV, LDippCamdn
 
 * WISCONSIN *
-0, Zippin Pippin-Bay Beach-USAWI
-0, Cyclops-Mt Olympus-USAWI
-0, Hades360-Mt Olympus-USAWI
-0, Pegasus-Mt Olympus-USAWI
-0, Zeus-Mt Olympus-USAWI
-0, Meteor-Little Amerricka-USAWI
-0, Avalanche-Timber Falls-USAWI
+0, Zippin Pippin-Bay Beach-USAWI, ZipPipBayB
+0, Cyclops-Mt Olympus-USAWI, CyclopsMtO
+0, Hades360-Mt Olympus-USAWI, Hades36MtO
+0, Pegasus-Mt Olympus-USAWI, PegasusMtO
+0, Zeus-Mt Olympus-USAWI, ZeusMtO
+0, Meteor-Little Amerricka-USAWI, MeteorLAWI
+0, Avalanche-Timber Falls-USAWI, AvalanTFWI
 
 * SOUTH AMERICA *
 * BRAZIL *
-0, Montezum-Hopi Hari-BRAZL
+0, Montezum-Hopi Hari-BRAZL, MontezumHH
 
 * EUROPE AND THE UK *
 * AUSTRIA *
-0, Auto BergBahn-WienerPrater-AUSTA
-0, Hochschaubahn-WienerPrater-AUSTA
+0, Auto BergBahn-WienerPrater-AUSTA, AutoBrBahn
+0, Hochschaubahn-WienerPrater-AUSTA, Hochshauba
 
 * BELGIUM *
-0, Heidi The Ride-Plopsaland-BELGM
-0, LoupGarou-Walibi Belgium-BELGM
+0, Heidi The Ride-Plopsaland-BELGM, HeidiPlops
+0, LoupGarou-Walibi Belgium-BELGM, LoupGarou
 
 * DENMARK *
-0, Falken-Farup Sommerland-DENMK
-0, Rutschebanan-Bakken-DENMK
-0, Rutschebanan-Tivoli Gardens-DENMK
+0, Falken-Farup Sommerland-DENMK, FalkenFaru
+0, Rutschebanan-Bakken-DENMK, RutsBakken
+0, Rutschebanan-Tivoli Gardens-DENMK, RutsTivoli
 
 * ENGLAND *
-0, Antelope-Gullivers Warrington-ENGLD
-0, Scenic Railway-Dreamland-ENGLD
-0, Big Dipper-Blackpool-ENGLD
-0, Blue Flyer-Blackpool-ENGLD
-0, Grand National (left)-Blackpool-ENGLD
-0, Grand National (right)-Blackpool-ENGLD
-0, Nickelodeon Streak-Blackpool-ENGLD
-0, Wild Mouse-Blackpool-ENGLD
-0, Roller Coaster-Great Yarmouth Pleasure Beach-ENGLD
-0, Tyrolean Tubtwist-Joyland-ENGLD
+0, Antelope-Gullivers Warrington-ENGLD, AntelENGLD
+0, Scenic Railway-Dreamland-ENGLD, ScRaiENGLD
+0, Big Dipper-Blackpool-ENGLD, BigDippBPB
+0, Blue Flyer-Blackpool-ENGLD, BluFlyrBPB
+0, Grand National (left)-Blackpool-ENGLD, GraNatLBPB
+0, Grand National (right)-Blackpool-ENGLD, GraNatRBPB
+0, Nickelodeon Streak-Blackpool-ENGLD, NStreakBPB
+0, Wild Mouse-Blackpool-ENGLD, WiMouseBPB
+0, Roller Coaster-Great Yarmouth Pleasure Beach-ENGLD, RoCoGrYaPB
+0, Tyrolean Tubtwist-Joyland-ENGLD, TyroTubJoy
 
 * FINLAND *
-0, Thunderbird-PowerLand-FINLD
-0, Vuoristorata-Linnanmaki-FINLD
+0, Thunderbird-PowerLand-FINLD, TbirdPower
+0, Vuoristorata-Linnanmaki-FINLD, Vuoristora
 
 * FRANCE *
-0, Anaconda-Walygator Parc-FRANC
-0, Timber-Walibi Rhone Alpes-FRANC
-0, Tonnere de Zeus-Parc Asterix-FRANC
+0, Anaconda-Walygator Parc-FRANC, AnacondaFR
+0, Timber-Walibi Rhone Alpes-FRANC, TimberWRhA
+0, Tonnere de Zeus-Parc Asterix-FRANC, TonnereZeu
 
 * GERMANY *
-0, Bandit-MoviePark-GMANY
-0, El Toro-Freizeitpark Plohn-GMANY
-0, Mammut-Eriebnispark Tripsdrill-GMANY
-0, Wodan Timburcoaster-EuropaPark-GMANY
+0, Bandit-MoviePark-GMANY, BanditMovP
+0, El Toro-Freizeitpark Plohn-GMANY, ElToroGMNY
+0, Mammut-Eriebnispark Tripsdrill-GMANY, MammutTrip
+0, Wodan Timburcoaster-EuropaPark-GMANY, WodanEurop
 
 * IRELAND *
-0, Cu Chulainn-Tayto Park-IRLND
+0, Cu Chulainn-Tayto Park-IRLND, CuChulainn
 
 * NETHERLANDS *
-0, Joris en de Draak (water)-Efteling-NTHRL
-0, Joris en de Draak (vuur)-Efteling-NTHRL
-0, Robin Hood-Walibi Holland-NTHRL
-0, Troy-Toverland-NTHRL
+0, Joris en de Draak (water)-Efteling-NTHRL, JorisWatrE
+0, Joris en de Draak (vuur)-Efteling-NTHRL, JorisVuurE
+0, Robin Hood-Walibi Holland-NTHRL, RobiHoodWH
+0, Troy-Toverland-NTHRL, TroyToverl
 
 * NORWAY *
-0, Thundercoaster-TusenFryd-NORWY
+0, Thundercoaster-TusenFryd-NORWY, TcoasTFryd
 
 * SPAIN *
-0, Coaster Express-Parque Warner Madrid-SPAIN
-0, Stampida (left)-PortAventura-SPAIN
-0, Stampida (right)-PortAventura-SPAIN
-0, Tomahawk-PortAventura-SPAIN
+0, Coaster Express-Parque Warner Madrid-SPAIN, CoasExpPWM
+0, Stampida (left)-PortAventura-SPAIN, StamLPortA
+0, Stampida (right)-PortAventura-SPAIN, StamRPortA
+0, Tomahawk-PortAventura-SPAIN, TomahPortA
 
 * SWEDEN *
-0, Wildfire-Kolmården-SWDEN
-0, Balder-Liseberg-SWDEN
-0, Twister-Grona Lund-SWDEN
+0, Wildfire-Kolmården-SWDEN, WildfireSE
+0, Balder-Liseberg-SWDEN, BalderLise
+0, Twister-Grona Lund-SWDEN, TwisterGLu
 
 * WALES *
-0, Megaphobia-Oakwood-WALES
+0, Megaphobia-Oakwood-WALES, Megaphobia
 
 * AUSTRALIA *
-0, Wild Mouse-Luna Park-AUSTL
-0, Scenic Railway-Luna Park-AUSTL
+0, Wild Mouse-Luna Park-AUSTL, WMousLuAUS
+0, Scenic Railway-Luna Park-AUSTL, ScRaiLuAUS
 
 * ASIA *
 * CHINA *
-0, Fjord Flying Dragon-Happy Valley Dongli-CHINA
-0, Dauling Dragon (red)-Happy Valley Hongshan-CHINA
-0, Dauling Dragon (blue)-Happy Valley Hongshan-CHINA
-0, Great Desert Rally-Happy Valley Jinniu-CHINA
-0, Jungle Dragon-Happy Valley Yubei-CHINA
-0, Jungle Trailblazer-Fantawild Dreamland Shifeng-CHINA
-0, Jungle Trailblazer-Fantawild Dreamland Zhongmu-CHINA
-0, Jungle Trailblazer-Oriental Heritage Cixi-CHINA
-0, Jungle Trailblazer-Oriental Heritage Huaiyin-CHINA
-0, Jungle Trailblazer-Oriental Heritage Juijiang-CHINA
-0, Jungle Trailblazer-Oriental Heritage Tong an-CHINA
-0, Python in Bamboo Forest-Nanchang Wanda Park-CHINA
-0, Time Travel-Hot Go Park Happy Jungle World-CHINA
-0, Wood Coaster-Knight Valley-CHINA
-0, Wooden Coaster Fireball-Happy Valley Dongli-CHINA
+0, Fjord Flying Dragon-Happy Valley Dongli-CHINA, FjordFDrag
+0, Dauling Dragon (red)-Happy Valley Hongshan-CHINA, DaulDragoR
+0, Dauling Dragon (blue)-Happy Valley Hongshan-CHINA, DaulDragoB
+0, Great Desert Rally-Happy Valley Jinniu-CHINA, GrDesRally
+0, Jungle Dragon-Happy Valley Yubei-CHINA, JungleDrag
+0, Jungle Trailblazer-Fantawild Dreamland Shifeng-CHINA, JTraFanShi
+0, Jungle Trailblazer-Fantawild Dreamland Zhongmu-CHINA, JTraFanZho
+0, Jungle Trailblazer-Oriental Heritage Cixi-CHINA, JTraOriCix
+0, Jungle Trailblazer-Oriental Heritage Huaiyin-CHINA, JTraOriHua
+0, Jungle Trailblazer-Oriental Heritage Juijiang-CHINA, JTraOriJui
+0, Jungle Trailblazer-Oriental Heritage Tong an-CHINA, JTraOriTon
+0, Python in Bamboo Forest-Nanchang Wanda Park-CHINA, PythonBamb
+0, Time Travel-Hot Go Park Happy Jungle World-CHINA, TimTravHGP
+0, Wood Coaster-Knight Valley-CHINA, WoodCoasKV
+0, Wooden Coaster Fireball-Happy Valley Dongli-CHINA, WCFireball
 
 * INDIA *
-0, Cyclone-Nicco Park-INDIA
-0, Zipper Dipper-EsselWorld-INDIA
+0, Cyclone-Nicco Park-INDIA, NiccoParCy
+0, Zipper Dipper-EsselWorld-INDIA, ZipDippEss
 
 * INDONESIA *
-0, Animal Coaster-Jawa Timur Park 2-INDSA
-0, Crazy Car Coaster-Wisata Bahari Lamongan-INDSA
+0, Animal Coaster-Jawa Timur Park 2-INDSA, AnimalCoas
+0, Crazy Car Coaster-Wisata Bahari Lamongan-INDSA, CrazyCarCo
 
 * JAPAN *
-0, Elf-Hirakata Park-JAPAN
-0, Jupiter-Kijima Kogen-JAPAN
-0, Regina-Tobu Zoo-JAPAN
-0, White Cyclone-Nagashima Spa Land-JAPAN
+0, Elf-Hirakata Park-JAPAN, ElfHirakat
+0, Jupiter-Kijima Kogen-JAPAN, JupiterKij
+0, Regina-Tobu Zoo-JAPAN, ReginaTobu
+0, White Cyclone-Nagashima Spa Land-JAPAN, NagaWhitCy
 
 * SOUTH KOREA *
-0, T Express-Everland-SKREA
+0, T Express-Everland-SKREA, TExpress
 
 
 

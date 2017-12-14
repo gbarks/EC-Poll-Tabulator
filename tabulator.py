@@ -1,252 +1,246 @@
-# ==================================================
-# import modules
-# ==================================================
+#!/usr/bin/env python
+
+# ==========================================================
+#  ElloCoaster poll tabulator
+#  Contributions from Jim Winslett, Dave Wong, Grant Barker
+# ==========================================================
+
+from __future__ import print_function # for Python 2.x users
+
 import os
-#import numpy as np
-#import pandas as pd
-#import pprint as pp
+import sys
+from openpyxl import Workbook
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
 
-# ==================================================
-# define variables, lists, dictionaries, etc
-# ==================================================
+try:
+    from spinner import Spinner
+except:
+    print('Could not find "spinner.py"; exiting...')
+    sys.exit()
+
+# global strings for parsing ballots
 commentStr = "* "
-# comment string from ballot
-
 blankUserField = "-Replace "
-# ballot field still in place if voter didn't fill in the info
-
 startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
-# ballot line that separates voter info from coaster list
 
-blankBallot = "blankballot2017.txt"
-# name of blank ballot file
+def main():
 
-ballotFolder = "ballots2017"
-# folder where ballots are contained
+    # variable defaults that can be set by command line arguments
+    minRiders = 6
+    blankBallot = "blankballot2017.txt"
+    ballotFolder = "ballots2017"
 
-coasterList = []
-# list of every coaster on the ballot
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        minRiders = int(sys.argv[1])
+    if len(sys.argv) > 2:
+        blankBallot = sys.argv[2]
+    if len(sys.argv) > 3:
+        ballotFolder = sys.argv[3]
 
-totalCoasters = 0
-# total number of coasters on the ballot
+    if not os.path.isfile(blankBallot):
+        print('Blank ballot source "{0}" is not a file; exiting...'.format(blankBallot))
+        sys.exit()
 
-ballotList = []
-# list of ballot filenames
+    if not os.path.isdir(ballotFolder) or len(os.listdir(ballotFolder)) < 1:
+        print('Ballot folder "{0}" does not exist or is empty; exiting...'.format(ballotFolder))
+        sys.exit()
 
-numBallots = 0
-# number of ballots received
+    # for each coaster, the number of people who rode it
+    riders = {}
 
-coasterDict = {}
-# dict that assigns a number to each coaster on the ballot
-# potentially useful for chart printouts, using an int rather than the whole name of coaster
+    # for each coaster, a list of numbers of the form [wins, losses, ties, totalContests]
+    totalWLT = {}
 
-coasterNumber = 0
-# in the coasterDict, the number assigned to the coaster
+    # create Excel workbook
+    xlout = Workbook()
+    xlout.active.title = "Coaster Masterlist"
 
-winLossMatrix = {}
-# for each pair of coasters, a string containing w, l, or t representing every contest between that pair
+    # preferred fixed-width font
+    menlo = Font(name="Menlo")
 
-voterInfo = []
-# list of strings containing name, email, city, state/prov, country
+    # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
+    coasterList = getCoasterList(blankBallot, riders, totalWLT, xlout.active, menlo)
 
-coasterAndRank = {}
-# for each ballot, the ranking given to each coaster voted on
+    # list of ballot filepaths
+    ballotList = getBallotFilepaths(ballotFolder)
 
-winPercentage = {}
-# for each pair of coasters, the % of times coasterA beat coasterB
+    # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
+    winLossMatrix = createMatrix(coasterList)
 
-riders = {}
-# for each coaster on the ballot, the number of people who rode that coaster
+    # loop through all the ballot filenames and process each ballot
+    voterinfows = xlout.create_sheet("Voter Info (SENSITIVE)")
+    voterinfows.append(["Ballot Filename","Name","Email","City","State/Province","Country","Coasters Ridden"])
+    voterinfows.column_dimensions['A'].width = 24.83
+    voterinfows.column_dimensions['B'].width = 16.83
+    voterinfows.column_dimensions['C'].width = 24.83
+    for col in ['D','E','F','G']:
+        voterinfows.column_dimensions[col].width = 12.83
+    for filepath in ballotList:
+        voterInfo = processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix)
+        if voterInfo:
+            voterinfows.append(voterInfo)
+    voterinfows.freeze_panes = voterinfows['A2']
 
-numRiders = []
-# unsorted list of the coaster and the number of riders it had
+    # for each coaster, its win percentage across all pairings
+    winPercentage = calculateResults(coasterList, totalWLT, winLossMatrix)
 
-totalCredits = 0
-# the number of total credits for all the voters
+    # sorted lists of tuples of the form (rankedCoaster, relevantNumber)
+    finalResults, finalPairs, finalRiders = sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage)
 
-sortedRiders = []
-# sorted version of the above
+    # write worksheets related to finalResults, finalPairs, finalRiders, and winLossMatrix
+    printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterList, menlo)
 
-totalContests = {}
-# the number of times each coaster was paired up against another coaster
+    # save the Excel file
+    print("Saving...", end=" ")
+    spinner = Spinner()
+    spinner.start()
+    xlout.save("Poll Results.xlsx")
+    spinner.stop()
+    print('output saved to "Poll Results.xlsx".')
 
-totalWins = {}
-# the total number of wins for each coaster
 
-totalTies = {}
-# the total number of ties for each coaster
-
-totalLosses = {}
-# the total number of losses for each coaster
-
-results = []
-# unsorted list of coasters and their total win percentages
-
-sortedResults = []
-# sorted version of above
-
-pairsList = []
-# unsorted list of every pair of coasters with the pair's win percentage
-
-sortedPairs = []
-# sorted version of above
-
-# minRiders
-# minimum number of riders a coaster must have before being included in the results
 
 # ==================================================
-# populate list of coasters in the poll
+#  populate list of coasters in the poll
 # ==================================================
-def getCoasterList(blankBallot):
-    print("Creating list of every coaster on the ballot")
 
-    global coasterList
-    global totalCoasters
-    global riders
-    # initialize list to contain words in the ballot lines
-    words = []
+def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWidthFont):
+    print("Creating list of every coaster on the ballot...", end=" ")
+    spinner = Spinner()
+    spinner.start()
+
+    # set up Coaster Masterlist worksheet
+    masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State"])
+    masterlistws.column_dimensions['A'].width = 45.83
+    masterlistws.column_dimensions['B'].width = 12.83
+    masterlistws.column_dimensions['C'].width = 25.83
+    masterlistws.column_dimensions['D'].width = 25.83
+    masterlistws.column_dimensions['E'].width = 6.83
+    masterlistws['B1'].font = preferredFixedWidthFont
+    masterlistws['E1'].font = preferredFixedWidthFont
+
+    coasterList = [] # return value
 
     #open the blank ballot file
     with open(blankBallot) as f:
-        # make sure totalCoasters and lineNum are starting from 0
-        totalCoasters = 0
         lineNum = 0
         startProcessing = False
 
-        # begin going through the blank ballot one line at a time
+        # begin going through the blank ballot line by line
         for line in f:
-            # strip away the blank spaces from start and end of line
-            sline = line.strip()
+
+            sline = line.strip() # strip whitespace from start and end of line
             lineNum += 1
 
             # skip down the file to the coasters
             if startProcessing == False and sline == startLine:
                 startProcessing = True
 
-            # add the coasters to a list called coasterList
+            # add the coasters to coasterList and the masterlist worksheet
             elif startProcessing == True:
 
-                # skip comment lines (begin with * )
-                if commentStr in sline:
+                if commentStr in sline: # skip comment lines (begin with "* ")
                     continue
 
-                # skip blank lines
-                elif sline == "":
+                elif sline == "": # skip blank lines
                     continue
 
-                # if line is neither comment, nor blank then do this
                 else:
-                    # break the line into its components: name, rank
+                    # break the line into its components: rank, full coaster name, abbreviation
                     words = [x.strip() for x in sline.split(',')]
 
-                # make sure there are 2 'words' in each line
-                    if len(words) != 2:
+                    # make sure there are 3 'words' in each line
+                    if len(words) != 3:
                         print("Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line))
 
-                # Everything good? do this
                     else:
-                        # add one to the number of total coasters on the ballot
-                        totalCoasters += 1
-                        # pull out the name of the coaster
-                        coasterName = words[1]
-                        # initialize the number of riders for this coaster
-                        riders[coasterName] = 0
-                        # initialize the number of pairwise contests this coaster has
-                        totalContests[coasterName] = 0
-                        # initialize the total wins for this coaster
-                        totalWins[coasterName] = 0
-                        # initialize the total ties for this coaster
-                        totalTies[coasterName] = 0
-                        # initialize the total losses for this coaster
-                        totalLosses[coasterName] = 0
+                        fullName = words[1]
+                        abbrName = words[2]
+
+                        # add an entry for the coaster in the dicts
+                        riders[fullName] = 0
+                        totalWLT[fullName] = [0, 0, 0, 0]
+
                         # add the coaster to the list of coasters on the ballot
-                        coasterList.append(coasterName)
+                        coasterList.append((fullName, abbrName))
 
-    return totalCoasters, coasterList, riders
+                        # extract park and state/country information from fullName to write to worksheet
+                        subwords = [x.strip() for x in fullName.split('-')]
+                        if len(subwords) != 3:
+                            masterlistws.append([fullName,abbrName])
+                        else:
+                            masterlistws.append([fullName,abbrName,subwords[0],subwords[1],subwords[2]])
+                            masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
+                        masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
+
+    masterlistws.freeze_panes = masterlistws['A2']
+    spinner.stop()
+    print("{0} coasters on the ballot.".format(len(coasterList)))
+    return coasterList
+
 
 
 # ==================================================
-# import filenames of ballots
+#  import filepaths of ballots
 # ==================================================
-def getBallotFilenames(ballotFolder):
-    print("Getting the filenames of submitted ballots")
 
-    global ballotList
-    global numBallots
+def getBallotFilepaths(ballotFolder):
+    print("Getting the filepaths of submitted ballots...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
-    # iterate through the list of files in the ballot folder
+    ballotList = []
     for file in os.listdir(ballotFolder):
-
-        # only pull out text files
         if file.endswith(".txt"):
-            # add the filename to the list of ballot files
-            ballotList.append(file)
-            # add 1 to the number of ballots
-            numBallots += 1
-    return ballotList, numBallots
+            ballotList.append(os.path.join(ballotFolder, file))
+
+    spinner.stop()
+    print("{0} ballots submitted.".format(len(ballotList)))
+    return ballotList
+
+
 
 # ==================================================
-# create dictionary of coaster names paired with nums
-# might make it easier to print charts and such later
-# since a grid with coaster names as rows and cols
-# could be unruly
+#  create win/loss matrix
 # ==================================================
 
-def createDict():
-    print("Creating the coaster dictionary")
+def createMatrix(coasterList):
+    print("Creating the win/loss matrix...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
-    global coasterDict
-    global coasterNumber
-    for coaster in coasterList:
-        coasterDict[coaster] = coasterNumber
-        coasterNumber += 1
-
-    return coasterDict
-
-# ==================================================
-# create win/loss matrix
-# ==================================================
-
-def createMatrix():
-    print("Creating the win/loss matrix")
-
-    # create a matrix of blank strings for each pair of coasters
-    # these strings will later contain w, l, t for each matchup
-    global winLossMatrix
+    winLossMatrix = {}
     for row in coasterList:
         for col in coasterList:
-            winLossMatrix[row,col] = ''
+            winLossMatrix[row[0],col[0]] = [0, 0, 0, 0.0]
 
-
+    spinner.stop()
+    print("{0} pairings.".format(len(winLossMatrix)))
     return winLossMatrix
 
-# ==================================================
-# read a ballot
-# this reads just ONE ballot
-# you need a loop to call this function for each ballot filename
-# ==================================================
 
-def processBallot(filename):
-    print("Processing ballot:")
 
-    global voterInfo
+# ================================================================
+#  read a ballot (just ONE ballot)
+#
+#  you need a loop to call this function for each ballot filename
+# ================================================================
+
+def processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix):
+    filename = os.path.basename(filepath)
+    print("Processing ballot: {0}".format(filename))
+
+    voterInfo = [filename, "", "", "", "", ""] # return value
+    coasterAndRank = {}
+    creditNum = 0
     error = False
-    global creditNum
-    global totalCredits
-    global riders
 
     # open the ballot file
-    with open(filename) as f:
-        # get the voter info
+    with open(filepath) as f:
         infoField = 1
         lineNum = 0
-        creditNum = 0
-        voterInfo = [filename, "", "", "", "", ""]
-        coasterName = ''
-        coasterRank = 0
         startProcessing = False
-        error = False
-        coasterAndRank = {}
 
         for line in f:
             sline = line.strip()
@@ -257,36 +251,29 @@ def processBallot(filename):
 
                 # if the line begins with "-Replace" then record a non-answer
                 if blankUserField in sline:
-                    voterInfo[infoField] = "(no answer)"
+                    voterInfo[infoField] = ""
                     infoField += 1
                 elif not startLine in sline:
-                    voterInfo[infoField] = sline
+                    voterInfo[infoField] = sline.strip('-')
                     infoField += 1
 
-
-
-
-            # get the list of coasters this voter has ridden
-            # check for the ballot line indicating that the coasters follow it
+            # skip down the file to the coasters
             if startProcessing == False and sline == startLine:
                 startProcessing = True
 
-            # break the line into its components: rank, name
             elif startProcessing == True:
 
-                # strip away any blank space, save just the text, look for the comma to split words
+                # break the line into its components: rank, name
                 words = [x.strip() for x in sline.split(',')]
 
-                # skip comment lines (begin with * )
-                if commentStr in sline:
+                if commentStr in sline: # skip comment lines (begin with "* ")
                     continue
 
-                # skip blank lines
-                elif sline == "":
+                elif sline == "": # skip blank lines
                     continue
 
-                # make sure there are 2 'words' in each line
-                elif len(words) != 2:
+                # make sure there are at least 2 'words' in each line
+                elif len(words) < 2:
                     print("Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line))
 
                 # make sure the ranking is a number
@@ -294,294 +281,267 @@ def processBallot(filename):
                     print("Error in reading {0}, Line {1}: Rank must be an int.".format(filename, lineNum))
                     error = True
 
-                    # Everything good? do this
                 else:
-
-                    # pull out the coaster name
                     coasterName = words[1]
-                    # pull out the coaster's rank
                     coasterRank = int(words[0])
 
                     # skip coasters ranked zero or less (those weren't ridden)
                     if coasterRank <= 0:
                         continue
 
-
                     # check to make sure the coaster on the ballot is legit
-                    if coasterName in coasterList:
-                        # it is! Add to this voter's credit count
+                    if [coasterName in x[0] for x in coasterList]:
                         creditNum += 1
-                        # add one to the number of riders this coaster has
                         riders[coasterName] += 1
+
                         # add this voter's ranking of the coaster
                         coasterAndRank[coasterName] = coasterRank
 
-                    else:
-                        # it's not a legit coaster!
+                    else: # it's not a legit coaster!
                         print("Error in reading {0}, Line {1}: Unknown coaster {2}".format(filename, lineNum, coasterName))
                         error = True
 
-    # no errors? Tally the ballot!
-    if not error:
+    # don't tally the ballot if there were any errors, don't return voter info
+    if error:
+        print("Error encountered. File {0} not added.".format(filename))
+        return []
 
-        # add this voter's credit count to the total credits
-        totalCredits = totalCredits + creditNum
+    # cycle through each pair of coasters this voter ranked
+    for coasterA in coasterAndRank.keys():
+        for coasterB in coasterAndRank.keys():
 
-        # cycle through each pair of coasters this voter ranked
-        for coasterA in coasterAndRank.keys():
-            for coasterB in coasterAndRank.keys():
-                # you can't compare a coaster to itself, so skip those pairs
-                if coasterA == coasterB:
-                    continue
+            # can't compare a coaster to itself
+            if coasterA != coasterB:
+                totalWLT[coasterA][3] += 1 # increment number of contests
 
                 # if the coasters have the same ranking, call it a tie
-                elif coasterAndRank[coasterA] == coasterAndRank[coasterB]:
-                    # add a 't' to this pair's cell on the winLossMatrix
-                    winLossMatrix[coasterA, coasterB] = winLossMatrix[coasterA, coasterB] + ("t")
-                    # add one to the total contests that coasterA has had
-                    totalContests[coasterA] += 1
-                    # add one to the total ties coasterA has had
-                    totalTies[coasterA] += 1
+                if coasterAndRank[coasterA] == coasterAndRank[coasterB]:
+                    winLossMatrix[coasterA, coasterB][2] += 1
+                    totalWLT[coasterA][2] += 1
 
                 # if coasterA outranks coasterB (the rank's number is lower), call it a win for coasterA
                 elif coasterAndRank[coasterA] < coasterAndRank[coasterB]:
-                    # add a 'w' to this pair's cell on the winLossMatrix
-                    winLossMatrix[coasterA, coasterB] = winLossMatrix[coasterA, coasterB] + ("w")
-                    # add one to the total contests coasterA has had
-                    totalContests[coasterA] += 1
-                    # add one to the total wins coasterA has had
-                    totalWins[coasterA] += 1
+                    winLossMatrix[coasterA, coasterB][0] += 1
+                    totalWLT[coasterA][0] += 1
 
                 # if not a tie nor a win, it must be a loss
                 else:
-                    # if coasterB outranks coasterA (A's rank is a larger number), call it a loss for coasterA
-                    # add an 'l' to this pair's cell on the winLossMatrix
-                    winLossMatrix[coasterA, coasterB] = winLossMatrix[coasterA, coasterB] + ("l")
-                    # add one to the total contests for coasterA
-                    totalContests[coasterA] += 1
-                    # add one to the total losses for coasterA
-                    totalLosses[coasterA] += 1
+                    winLossMatrix[coasterA, coasterB][1] += 1
+                    totalWLT[coasterA][1] += 1
+
+    print(" ->", end=" ")
+
+    for i in range(1,len(voterInfo)):
+        if voterInfo[i] != "":
+            print("{0},".format(voterInfo[i]), end=" ")
+
+    print("CC: {0}".format(creditNum))
+
+    voterInfo.append(creditNum)
+
+    return voterInfo
 
 
-    # if none of the above conditions were met, there must've been an error
-    else:
-        print("Errors. File {0} not added.".format(filename))
 
-    return winLossMatrix
+# ========================================================
+#  calculate results
+#
+#  no need to loop through this, since it calculates with
+#    numbers gathered when the ballots were processed
+# ========================================================
 
-
-# ==================================================
-# calculate results
-# no need to loop through this, since it calculates
-# with numbers gathered when the ballots were processed
-# ==================================================
-
-
-def calculateResults():
-    print("Calculating results")
-
-    # initialize/reset the number of pairwise contests for each pair
-    contestsHead2Head = 0
-    # initialize/reset the number of wins for each pair of coasters
-    wins = 0
-    # initialize/reset the number of losses for each pair of coasters
-    losses = 0
-    # initialize/reset the number of ties for each pair of coasters
-    ties = 0
-
-    global winPercentage
-    global totalContests
+def calculateResults(coasterList, totalWLT, winLossMatrix):
+    print("Calculating results...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
     # iterate through all the pairs in the matrix
-    for row in coasterList:
-        for col in coasterList:
-            # there will be no info for a coaster paired with itself, so skip it
-            if row == col:
+    for coasterA in coasterList:
+        for coasterB in coasterList:
+
+            x = coasterA[0]
+            y = coasterB[0]
+
+            if x == y: # skip a coaster paired with itself
                 continue
 
-            # look at the pair of coasters
-            # and calculate the win percentage for coasterA(row) vs coasterB (col)
-            else:
-                # see how many times this pair went head-to-head
-                contestsHead2Head = len(winLossMatrix[row,col])
-                # count the number of wins for coasterA (row)
-                wins = winLossMatrix[row,col].count("w")
-                # count the number of losses for coasterA (row)
-                losses = winLossMatrix[row,col].count("l")
-                # count the number of ties for coasterA (row)
-                ties = winLossMatrix[row,col].count("t")
+            wins = winLossMatrix[x, y][0]
+            loss = winLossMatrix[x, y][1]
+            ties = winLossMatrix[x, y][2]
+            numContests = wins + loss + ties
 
+            # if this pair of coasters had mutual riders and there were ties, calculate with this formula
+            if ties != 0 and numContests > 0:
+                # formula: wins + half the ties divided by the number of times they competed against each other
+                # Multiply that by 100 to get the percentage, then round to three digits after the decimal
+                winLossMatrix[x, y][3] = round((((wins + (ties / 2)) / numContests)) * 100, 3)
+            # if this pair had mutual riders, but there were no ties, use this formula
+            elif numContests > 0:
+                winLossMatrix[x, y][3] = round(((wins / numContests)) * 100, 3)
 
-                # if this pair of coasters had mutual riders and there were ties, calculate with this formula
-                if ties != 0 and contestsHead2Head > 0:
-                    # formula: wins + half the ties divided by the number of times they competed against each other
-                    # Multiply that by 100 to get the percentage, then round to three digits after the decimal
-                    winPercentage[row,col] = round((((wins + (ties / 2)) / contestsHead2Head)) * 100, 3)
-                # if this pair had mutual riders, but there were no ties, use this formula
-                elif contestsHead2Head > 0:
-                    winPercentage[row,col] = round(((wins / contestsHead2Head)) * 100, 3)
-                # if there were no mutual riders for this pair, skip it
-                else:
-                    continue
-
-
-
+    winPercentage = {} # return value
 
     # all those calculations we just did for each pair of coasters, now do for each coaster by itself
     # tallying up ALL the contests it had, not just the pairwise contests
     # this will give the total overall win percentage for each coaster, which will be used to determine
     # the final ranking of all the coasters
-    for row in coasterList:
-        if ties != 0 and totalContests[row] > 0:
-            winPercentage[row] = round((((totalWins[row] + (totalTies[row]/2)) / totalContests[row])) * 100, 3)
+    for coaster in coasterList:
 
-        elif totalContests[row] > 0:
-            winPercentage[row] = round(((totalWins[row] / totalContests[row])) * 100, 3)
+        x = coaster[0]
 
+        if totalWLT[x][2] > 0 and totalWLT[x][3] > 0: # if numTies and numContests > 0
+            winPercentage[x] = round((((totalWLT[x][0] + (totalWLT[x][2]/2)) / totalWLT[x][3])) * 100, 3)
 
-    return winPercentage, totalContests
+        elif totalWLT[x][3] > 0: # if numTies == 0 and numContests > 0
+            winPercentage[x] = round(((totalWLT[x][0] / totalWLT[x][3])) * 100, 3)
+
+    spinner.stop()
+    print(" ")
+
+    return winPercentage
+
 
 
 # ==================================================
-# create sorted list of coasters by win pct
-# create sorted list of coasters by pairwise win pct
+#  create sorted list of coasters by win pct and
+#    sorted list of coasters by pairwise win pct
 # ==================================================
 
-def sortedLists():
-    print("Sorting the results")
+def sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage):
+    print("Sorting the results...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
-    global results
-    global pairsList
-    global sortedResults
-    global sortedPairs
-    global riders
-    global sortedRiders
+    results = []
+    numRiders = []
+    pairPercents = []
 
-    # iterate through the winPercentage dict by keys
+    # iterate through the winPercentage dict by coasters
     for i in winPercentage.keys():
-        # pull out just the single-coaster keys for the total win percentage and number of riders
-        if i in coasterList:
-            numRiders.append((i, riders[i]))
-            if int(riders[i]) >= int(minRiders):
-                results.append((i, winPercentage[i]))
-            else:
-                continue
+        numRiders.append((i, riders[i]))
+        if int(riders[i]) >= int(minRiders):
 
-        # the rest are pairs keys and pairwise win percentages, they go in their own list
-        else:
-            pairsList.append((i, winPercentage[i]))
-    # now sort both lists by the win percentages, highest numbers first
+            # values are: "Rank", "Coaster", "Win %", "Total Wins", "Total Losses", "Total Ties"
+            results.append((i, winPercentage[i], totalWLT[i][0], totalWLT[i][1], totalWLT[i][1]))
+
+    # iterate through the winLossMatrix dict by coaster pairings
+    for i in winLossMatrix.keys():
+
+        # values are: "Rank", "coasterA", "coasterB", "Win %", "Wins", "Losses", "Ties"        
+        pairPercents.append((i, winLossMatrix[i][3], winLossMatrix[i][0], winLossMatrix[i][1], winLossMatrix[i][2]))
+
+    # sort lists by win percentages and ridership
     sortedResults = sorted(results, key=lambda x: x[1], reverse=True)
-    sortedPairs = sorted(pairsList, key=lambda x: x[1], reverse=True)
+    sortedPairs = sorted(pairPercents, key=lambda x: x[1], reverse=True)
     sortedRiders = sorted(numRiders, key=lambda x: x[1], reverse=True)
 
-    return sortedRiders, sortedPairs, sortedResults
+    spinner.stop()
+    print(" ")
 
-# ==================================================
-# cycle through all the ballots and tabulate them
-# ==================================================
-
-def runTheContest():
-    # loop through all the ballot filenames and process each ballot
-    for filename in ballotList:
-        print("Processing ballot: {0}".format(filename))
-        processBallot("ballots2017/" + filename)
-
-        print("=========================================================")
-        for i in range(0,len(voterInfo)):
-            if i == 0:
-                print("Ballot: {0}".format(voterInfo[i]))
-
-            elif i == 1:
-                print("Name: {0}".format(voterInfo[i]))
-
-            elif i == 2:
-                print("Email: {0}".format(voterInfo[i]))
-
-            elif i == 3:
-                print("City: {0}".format(voterInfo[i]))
-
-            elif i == 4:
-                print("State/Province: {0}".format(voterInfo[i]))
-
-            elif i == 5:
-                print("Country: {0}".format(voterInfo[i]))
-
-
-        print("Coasters ridden: {0}".format(creditNum))
-        print("=========================================================")
-        print("=========================================================")
-
-        print()
-
+    return sortedResults, sortedPairs, sortedRiders
 
 
 
 # ==================================================
-# Print everything to a file
+#  print everything to a file
 # ==================================================
 
-def printToFile():
+def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferredFixedWidthFont):
+    print("Writing the results...", end=" ")
+    spinner = Spinner()
+    spinner.start()
 
-    with open("numriders2017.txt", "w") as f:
+    # create and write primary results worksheet
+    resultws = xl.create_sheet("Ranked Results")
+    resultws.append(["Rank","Coaster","Win Percentage","Total Wins","Total Losses","Total Ties"])
+    resultws.column_dimensions['A'].width = 4.83
+    resultws.column_dimensions['B'].width = 45.83
+    resultws.column_dimensions['C'].width = 12.83
+    resultws.column_dimensions['D'].width = 8.83
+    resultws.column_dimensions['E'].width = 9.83
+    resultws.column_dimensions['F'].width = 7.83
+    for i in range(0, len(results)):
+        resultws.append([i+1, results[i][0], results[i][1], results[i][2], results[i][3], results[i][4]])
+    resultws.freeze_panes = resultws['A2']
 
-        f.write("Coasters by number of riders\n")
-        for i in range(0, len(sortedRiders)):
+    # create and write pairwise result worksheet
+    pairws = xl.create_sheet("Ranked Pairs")
+    pairws.append(["Rank","Primary Coaster","Rival Coaster","Win Percentage","Wins","Losses","Ties"])
+    pairws.column_dimensions['A'].width = 4.83
+    pairws.column_dimensions['B'].width = 45.83
+    pairws.column_dimensions['C'].width = 45.83
+    pairws.column_dimensions['D'].width = 12.83
+    pairws.column_dimensions['E'].width = 4.5
+    pairws.column_dimensions['F'].width = 5.5
+    pairws.column_dimensions['G'].width = 3.83
+    for i in range(0, len(pairs)):
+        pairws.append([i+1, pairs[i][0][0], pairs[i][0][1], pairs[i][1], pairs[i][2], pairs[i][3], pairs[i][4]])
+    pairws.freeze_panes = pairws['A2']
 
-            f.write(str(i+1) + ": " + str(sortedRiders[i]) + "\n")
-        f.write("\n")
+    # create and write ridership worksheet
+    riderws = xl.create_sheet("Number of Riders")
+    riderws.append(["Rank","Coaster","Number of Riders"])
+    riderws.column_dimensions['A'].width = 4.83
+    riderws.column_dimensions['B'].width = 45.83
+    riderws.column_dimensions['C'].width = 13.83
+    for i in range(0, len(riders)):
+        riderws.append([i+1, riders[i][0], riders[i][1]])
+    riderws.freeze_panes = riderws['A2']
 
-    with open("rankedresults2017.txt", "w") as f:
-        f.write("Total number of valid ballots received:" + str(numBallots) + "\n")
-        f.write("total number of coasters on ballot:" + str(totalCoasters)+ "\n")
-        f.write("average number of coasters ridden by each voter:" + str(int(totalCredits/numBallots))+ "\n")
-        f.write("Coasters by ranking\n")
-        for i in range(0,len(sortedResults)):
-            f.write(str(i+1) + ": " + str(sortedResults[i]) + "\n")
+    # create and write Mitch Hawker-style mutual rider comparison worksheet
+    hawkerWLTws = xl.create_sheet("Coaster vs Coaster Win-Loss-Tie")
+    headerRow = ["Rank",""]
+    orderAbbr = []
+    for coaster in results:
+        for abbr in coasterList:
+            if coaster[0] == abbr[0]:
+                headerRow.append(abbr[1])
+                orderAbbr.append((abbr[0], abbr[1])) # coasterList sorted by win% (as in resultws)
+                break
+    hawkerWLTws.append(headerRow)
+    hawkerWLTws.column_dimensions['A'].width = 4.83
+    hawkerWLTws.column_dimensions['B'].width = 45.83
+    for col in range(3, len(orderAbbr)+3):
+        hawkerWLTws.column_dimensions[get_column_letter(col)].width = 12.83
+    for i in range(0, len(orderAbbr)):
+        resultRow = [i+1, orderAbbr[i][0]]
+        for j in range(0, len(orderAbbr)):
+            coasterA = orderAbbr[i][0]
+            coasterB = orderAbbr[j][0]
+            cellStr = ""
+            if coasterA != coasterB:
+                if winLossMatrix[coasterA, coasterB][0] > winLossMatrix[coasterA, coasterB][1]:
+                    cellStr += "W "
+                elif winLossMatrix[coasterA, coasterB][0] < winLossMatrix[coasterA, coasterB][1]:
+                    cellStr += "L "
+                else:
+                    cellStr += "T "
+                cellStr += str(winLossMatrix[coasterA, coasterB][0]) + "-"
+                cellStr += str(winLossMatrix[coasterA, coasterB][1]) + "-"
+                cellStr += str(winLossMatrix[coasterA, coasterB][2])
+            resultRow.append(cellStr)
+        hawkerWLTws.append(resultRow)
+    hawkerWLTws.freeze_panes = hawkerWLTws['C2']
+    for col in hawkerWLTws.iter_cols(min_col=3):
+        for cell in col:
+            cell.font = preferredFixedWidthFont
 
-        f.write("\n")
-
-    with open("pairsrank2017.txt", "w") as f:
-        f.write("Pairs by ranking\n")
-        for i in range(0, len(sortedPairs)):
-
-            f.write(str(i+1) + ": " + str(sortedPairs[i]) + "\n")
-
-    with open("stuff.txt", "w") as f:
-        f.write("Pairs\n")
-        for i in range(0, len(pairsList)):
-            f.write(str(i+1) + ": " + str(pairsList[i]) + "\n")
-
-
+    spinner.stop()
+    print(" ")
 
 
 
 # ==================================================
-# OK, let's do this!
+#  OK, let's do this!
 # ==================================================
 
+if __name__ == "__main__": # allows us to put main at the beginning
+    main()
 
-getCoasterList(blankBallot)
-
-getBallotFilenames(ballotFolder)
-
-createDict()
-
-createMatrix()
-
-minRiders = input("Minimum number of riders to qualify? ")
-
-runTheContest()
-
-calculateResults()
-
-sortedLists()
-
-printToFile()
 
 
 # ==================================================
-# still to do
+#  still to do
 # ==================================================
 
 # handle ties: decide which one wins, if possible. If still tied, rank them the same
