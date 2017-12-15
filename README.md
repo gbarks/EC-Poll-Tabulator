@@ -19,7 +19,7 @@ And output will be saved to `Poll Results.xlsx`
 Alternatively, the command line argument defaults are:
 
 * `6`
-* `blankballot2017`
+* `blankballot2017.txt`
 * `ballots2017`
 
 ## Dependencies
