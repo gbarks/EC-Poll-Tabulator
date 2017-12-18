@@ -9,6 +9,7 @@ from __future__ import print_function # for Python 2.x users
 
 import os
 import sys
+import argparse
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -25,28 +26,36 @@ commentStr = "* "
 blankUserField = "-Replace "
 startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 
+# command line arguments
+parser = argparse.ArgumentParser(description='Process Mitch Hawker-style coaster poll.')
+
+parser.add_argument("-b", "--blankBallot", default="blankballot2017.txt",
+                    help="specify blank ballot file")
+parser.add_argument("-f", "--ballotFolder", default="ballots2017",
+                    help="specify folder containing filled ballots")
+parser.add_argument("-m", "--minRiders", type=int, default=6,
+                    help="specify minimum number of riders for a coaster to rank")
+parser.add_argument("-o", "--outfile", default="Poll Results.xlsx",
+                    help="specify name of output .xlsx file")
+parser.add_argument("-c", "--colorize", action="store_true",
+                    help="color coaster labels by make in output spreadsheet")
+parser.add_argument("-r", "--botherRCDB", action="store_true",
+                    help="bother RCDB to grab metadata from links in blankBallot")
+
+args = parser.parse_args()
+
+if not os.path.isfile(args.blankBallot):
+    print('Blank ballot source "{0}" is not a file; exiting...'.format(args.blankBallot))
+    sys.exit()
+
+if not os.path.isdir(args.ballotFolder) or len(os.listdir(args.ballotFolder)) < 1:
+    print('Ballot folder "{0}" does not exist or is empty; exiting...'.format(args.ballotFolder))
+    sys.exit()
+
+if args.outfile[:-5] != ".xlsx":
+    args.outfile += ".xlsx"
+
 def main():
-
-    # variable defaults that can be set by command line arguments
-    minRiders = 6
-    blankBallot = "blankballot2017.txt"
-    ballotFolder = "ballots2017"
-
-    if len(sys.argv) > 1 and sys.argv[1].isdigit():
-        minRiders = int(sys.argv[1])
-    if len(sys.argv) > 2:
-        blankBallot = sys.argv[2]
-    if len(sys.argv) > 3:
-        ballotFolder = sys.argv[3]
-
-    if not os.path.isfile(blankBallot):
-        print('Blank ballot source "{0}" is not a file; exiting...'.format(blankBallot))
-        sys.exit()
-
-    if not os.path.isdir(ballotFolder) or len(os.listdir(ballotFolder)) < 1:
-        print('Ballot folder "{0}" does not exist or is empty; exiting...'.format(ballotFolder))
-        sys.exit()
-
     # for each coaster, the number of people who rode it
     riders = {}
 
@@ -78,10 +87,10 @@ def main():
     }
 
     # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
-    coasterList = getCoasterList(blankBallot, riders, totalWLT, xlout.active, menlo, manColors)
+    coasterList = getCoasterList(riders, totalWLT, xlout.active, menlo, manColors)
 
     # list of ballot filepaths
-    ballotList = getBallotFilepaths(ballotFolder)
+    ballotList = getBallotFilepaths()
 
     # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
     winLossMatrix = createMatrix(coasterList)
@@ -104,7 +113,7 @@ def main():
     winPercentage = calculateResults(coasterList, totalWLT, winLossMatrix)
 
     # sorted lists of tuples of the form (rankedCoaster, relevantNumber)
-    finalResults, finalPairs, finalRiders = sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage)
+    finalResults, finalPairs, finalRiders = sortedLists(riders, totalWLT, winLossMatrix, winPercentage)
 
     # write worksheets related to finalResults, finalPairs, finalRiders, and winLossMatrix
     printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterList, menlo)
@@ -113,7 +122,7 @@ def main():
     print("Saving...", end=" ")
     spinner = Spinner()
     spinner.start()
-    xlout.save("Poll Results.xlsx")
+    xlout.save(args.outfile)
     spinner.stop()
     print('output saved to "Poll Results.xlsx".')
 
@@ -123,7 +132,7 @@ def main():
 #  populate list of coasters in the poll
 # ==================================================
 
-def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWidthFont, manColors):
+def getCoasterList(riders, totalWLT, masterlistws, preferredFixedWidthFont, manColors):
     print("Creating list of every coaster on the ballot...", end=" ")
     spinner = Spinner()
     spinner.start()
@@ -142,7 +151,7 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
     coasterList = [] # return value
 
     #open the blank ballot file
-    with open(blankBallot) as f:
+    with open(args.blankBallot) as f:
         lineNum = 0
         startProcessing = False
 
@@ -171,7 +180,7 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
 
                     # make sure there are 3 'words' in each line
                     if len(words) != 3:
-                        print("Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line))
+                        print("Error in {0}, Line {1}: {2}".format(args.blankBallot, lineNum, line))
 
                     else:
                         fullName = words[1]
@@ -213,15 +222,15 @@ def getCoasterList(blankBallot, riders, totalWLT, masterlistws, preferredFixedWi
 #  import filepaths of ballots
 # ==================================================
 
-def getBallotFilepaths(ballotFolder):
+def getBallotFilepaths():
     print("Getting the filepaths of submitted ballots...", end=" ")
     spinner = Spinner()
     spinner.start()
 
     ballotList = []
-    for file in os.listdir(ballotFolder):
+    for file in os.listdir(args.ballotFolder):
         if file.endswith(".txt"):
-            ballotList.append(os.path.join(ballotFolder, file))
+            ballotList.append(os.path.join(args.ballotFolder, file))
 
     spinner.stop()
     print("{0} ballots submitted.".format(len(ballotList)))
@@ -302,7 +311,7 @@ def processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix):
 
                 # make sure there are at least 2 'words' in each line
                 elif len(words) < 2:
-                    print("Error in {0}, Line {1}: {2}".format(blankBallot, lineNum, line))
+                    print("Error in {0}, Line {1}: {2}".format(args.blankBallot, lineNum, line))
 
                 # make sure the ranking is a number
                 elif not words[0].isdigit():
@@ -435,7 +444,7 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
 #    sorted list of coasters by pairwise win pct
 # ==================================================
 
-def sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage):
+def sortedLists(riders, totalWLT, winLossMatrix, winPercentage):
     print("Sorting the results...", end=" ")
     spinner = Spinner()
     spinner.start()
@@ -447,7 +456,7 @@ def sortedLists(riders, minRiders, totalWLT, winLossMatrix, winPercentage):
     # iterate through the winPercentage dict by coasters
     for i in winPercentage.keys():
         numRiders.append((i, riders[i]))
-        if int(riders[i]) >= int(minRiders):
+        if int(riders[i]) >= args.minRiders:
 
             # values are: "Rank", "Coaster", "Win %", "Total Wins", "Total Losses", "Total Ties"
             results.append((i, winPercentage[i], totalWLT[i][0], totalWLT[i][1], totalWLT[i][1]))
