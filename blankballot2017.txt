@@ -54,318 +54,318 @@
 
 * NORTH AMERICA *
 * Canada * 
-0, Coaster-PNE Playland-CANDA, CoasterPNE
-0, Ghoster Coaster-Canadas Wonderland-CANDA, GhostrCoCW
-0, Mighty Canadian Minebuster-Canadas Wonderland-CANDA, MightyCaCW
-0, Wild Beast-Canadas Wonderland-CANDA, WildBeasCW
-0, Roller Coaster-Upper Clements Park-CANDA, RCClements
-0, Monstre (left)-LaRonde-CANDA, LeMonstreL
-0, Monstre (right)-LaRonde-CANDA, LeMonstreR
+0, Coaster-PNE Playland-CANDA, CoasterPNE, https://rcdb.com/320.htm
+0, Ghoster Coaster-Canadas Wonderland-CANDA, GhostrCoCW, https://rcdb.com/61.htm
+0, Mighty Canadian Minebuster-Canadas Wonderland-CANDA, MightyCaCW, https://rcdb.com/59.htm
+0, Wild Beast-Canadas Wonderland-CANDA, WildBeasCW, https://rcdb.com/60.htm
+0, Roller Coaster-Upper Clements Park-CANDA, RCClements, https://rcdb.com/195.htm
+0, Monstre (left)-LaRonde-CANDA, LeMonstreL, https://rcdb.com/186.htm
+0, Monstre (right)-LaRonde-CANDA, LeMonstreR, https://rcdb.com/186.htm
 
 * MEXICO *
-0, Montana Rusa (Left)-La Feria Chapultepec Magico-MEXCO, MontanaRuL
-0, Montana Rusa (Right)-La Feria Chapultepec Magico-MEXCO, MontanaRuR
+0, Montana Rusa (Left)-La Feria Chapultepec Magico-MEXCO, MontanaRuL, https://rcdb.com/354.htm
+0, Montana Rusa (Right)-La Feria Chapultepec Magico-MEXCO, MontanaRuR, https://rcdb.com/354.htm
 		
 * UNITED STATES *		
 * Alabama *
-0, Cannonball-Waterville USA-USAAL, CannonbaAL
-0, Rampage-Alabama Splash Adventure-USAAL, RampageAL
+0, Cannonball-Waterville USA-USAAL, CannonbaAL, https://rcdb.com/360.htm
+0, Rampage-Alabama Splash Adventure-USAAL, RampageAL, https://rcdb.com/475.htm
 		
 * ARKANSAS *
-0, Arkansas Twister-Magic Springs-USAAR, ArkTwister
+0, Arkansas Twister-Magic Springs-USAAR, ArkTwister, https://rcdb.com/418.htm
 
 * CALIFORNIA *
-0, Ghost Rider-Knott’s Berry Farm-USACA, GhostRider
-0, Giant Dipper-Belmont Park-USACA, GDippBelmo
-0, Giant Dipper-Santa Cruz Beach Boardwalk-USACA, GDippSCruz
-0, Gold Striker-Californias Great America-USACA, GoldStrikr
-0, Grizzly-Californias Great America-USACA, GrizzlyCGA
-0, Apocalypse-SF Magic Mountain-USACA, ApocalypMM
+0, Ghost Rider-Knott’s Berry Farm-USACA, GhostRider, https://rcdb.com/526.htm
+0, Giant Dipper-Belmont Park-USACA, GDippBelmo, https://rcdb.com/203.htm
+0, Giant Dipper-Santa Cruz Beach Boardwalk-USACA, GDippSCruz, https://rcdb.com/204.htm
+0, Gold Striker-Californias Great America-USACA, GoldStrikr, https://rcdb.com/10857.htm
+0, Grizzly-Californias Great America-USACA, GrizzlyCGA, https://rcdb.com/77.htm
+0, Apocalypse-SF Magic Mountain-USACA, ApocalypMM, https://rcdb.com/4173.htm
 
 * COLORADO *
-0, Cyclone-Lakeside-USACO, LakesideCy
-0, Twister II-Elitch Gardens-USACO, TwisterII
+0, Cyclone-Lakeside-USACO, LakesideCy, https://rcdb.com/211.htm
+0, Twister II-Elitch Gardens-USACO, TwisterII, https://rcdb.com/210.htm
 
 * CONNECTICUT *
-0, Boulder Dash-Lake Compounce-USACT, BoulderDLC
-0, Wildcat-Lake Compounce-USACT, WildcatLC
-0, Wooden Warrior-Quassy-USACT, WoodWarrQs
+0, Boulder Dash-Lake Compounce-USACT, BoulderDLC, https://rcdb.com/602.htm
+0, Wildcat-Lake Compounce-USACT, WildcatLC, https://rcdb.com/420.htm
+0, Wooden Warrior-Quassy-USACT, WoodWarrQs, https://rcdb.com/4495.htm
 
 * FLORIDA *
-0, Coastersaurus-Legoland Florida-USAFL, CsaurLegoF
-0, Mine Blower-Fun Spot America-USAFL, MineBlower
-0, White Lightning-Fun Spot America-USAFL, WhiLightni
+0, Coastersaurus-Legoland Florida-USAFL, CsaurLegoF, https://rcdb.com/2746.htm
+0, Mine Blower-Fun Spot America-USAFL, MineBlower, https://rcdb.com/14554.htm
+0, White Lightning-Fun Spot America-USAFL, WhiLightni, https://rcdb.com/10348.htm
 
 * GEORGIA *
-0, Georgia Cyclone-SF Over Georgia-USAGA, GACyclSFOG
-0, Great American Scream Machine-SF Over Georgia-USAGA, GrAmSMSFOG
-0, Cannon Ball-Lake Winnepesaukah-USAGA, CannonbaGA
-0, Cheetah-Wild Adventures-USAGA, CheetahGA
+0, Georgia Cyclone-SF Over Georgia-USAGA, GACyclSFOG, https://rcdb.com/36.htm
+0, Great American Scream Machine-SF Over Georgia-USAGA, GrAmSMSFOG, https://rcdb.com/41.htm
+0, Cannon Ball-Lake Winnepesaukah-USAGA, CannonbaGA, https://rcdb.com/348.htm
+0, Cheetah-Wild Adventures-USAGA, CheetahGA, https://rcdb.com/1044.htm
 
 * IDAHO *
-0, Timber Terror-Silverwood-USAID, TimbTerrSW
-0, Tremors-Silverwood-USAID, TremorsSW
+0, Timber Terror-Silverwood-USAID, TimbTerrSW, https://rcdb.com/176.htm
+0, Tremors-Silverwood-USAID, TremorsSW, https://rcdb.com/550.htm
 
 * ILLINOIS *	
-0, American Eagle (Red)-SF Great America-USAIL, AERedSFGAm
-0, American Eagle (Blue)-SF Great America-USAIL, AEBluSFGAm
-0, Goliath-SF Great America-USAIL, GoliaSFGAm
-0, Little Dipper-SF Great America-USAIL, LDippSFGAm
-0, Viper-SF Great America-USAIL, ViperSFGAm
+0, American Eagle (Red)-SF Great America-USAIL, AERedSFGAm, https://rcdb.com/9.htm
+0, American Eagle (Blue)-SF Great America-USAIL, AEBluSFGAm, https://rcdb.com/9.htm
+0, Goliath-SF Great America-USAIL, GoliaSFGAm, https://rcdb.com/9972.htm
+0, Little Dipper-SF Great America-USAIL, LDippSFGAm, https://rcdb.com/8985.htm
+0, Viper-SF Great America-USAIL, ViperSFGAm, https://rcdb.com/10.htm
 
 * INDIANA *
-0, Cornball Express-Indiana Beach-USAIN, CornballEx
-0, Hoosier Hurricane-Indiana Beach-USAIN, HoosierHur
-0, Lost Coaster of Superstition Mtn-Indiana Beach-USAIN, LCoSMtn
-0, Legend-Holiday World-USAIN, LegendHW
-0, Raven-Holiday World-USAIN, RavenHW
-0, Voyage-Holiday World-USAIN, VoyageHW
+0, Cornball Express-Indiana Beach-USAIN, CornballEx, https://rcdb.com/741.htm
+0, Hoosier Hurricane-Indiana Beach-USAIN, HoosierHur, https://rcdb.com/270.htm
+0, Lost Coaster of Superstition Mtn-Indiana Beach-USAIN, LCoSMtn, https://rcdb.com/460.htm
+0, Legend-Holiday World-USAIN, LegendHW, https://rcdb.com/582.htm
+0, Raven-Holiday World-USAIN, RavenHW, https://rcdb.com/136.htm
+0, Voyage-Holiday World-USAIN, VoyageHW, https://rcdb.com/3231.htm
 
 * IOWA *
-0, Outlaw-Adventureland-USAIA, OutlawIA
-0, Tornado-Adventureland-USAIA, TornadoIA
-0, Underground-Adventureland-USAIA, UndergroIA
-0, Legend-Arnolds Park-USAIA, LegendArnP
+0, Outlaw-Adventureland-USAIA, OutlawIA, https://rcdb.com/214.htm
+0, Tornado-Adventureland-USAIA, TornadoIA, https://rcdb.com/212.htm
+0, Underground-Adventureland-USAIA, UndergroIA, https://rcdb.com/215.htm
+0, Legend-Arnolds Park-USAIA, LegendArnP, https://rcdb.com/347.htm
 
 * KENTUCKY *
-0, Kentucky Rumbler-Beech Bend-USAKY, KYRumbler
-0, Thunder Run-Kentucky Kingdom-USAKY, ThundRunKK
+0, Kentucky Rumbler-Beech Bend-USAKY, KYRumbler, https://rcdb.com/2967.htm
+0, Thunder Run-Kentucky Kingdom-USAKY, ThundRunKK, https://rcdb.com/173.htm
 
 * MAINE *
-0, Excalibur-Funtown-USAME, ExcalibuME
+0, Excalibur-Funtown-USAME, ExcalibuME, https://rcdb.com/471.htm
 
 * MARYLAND *
-0, Roar-SF America-USAMD, RoarSFA
-0, Wild One-SF America-USAMD, WildOneSFA
+0, Roar-SF America-USAMD, RoarSFA, https://rcdb.com/485.htm
+0, Wild One-SF America-USAMD, WildOneSFA, https://rcdb.com/148.htm
 
 * MASSACHUSETTS *
-0, Thunderbolt-SF New England-USAMA, TboltSFNE
+0, Thunderbolt-SF New England-USAMA, TboltSFNE, https://rcdb.com/182.htm
 
 * MICHIGAN *
-0, Shivering Timbers-Michigans Adventure-USAMI, ShivTimber
-0, Wolverine Wildcat-Michigans Adventure-USAMI, WolWildcat
-0, Zachs Zoomer-Michigans Adventure-USAMI, ZachZoomer
+0, Shivering Timbers-Michigans Adventure-USAMI, ShivTimber, https://rcdb.com/478.htm
+0, Wolverine Wildcat-Michigans Adventure-USAMI, WolWildcat, https://rcdb.com/219.htm
+0, Zachs Zoomer-Michigans Adventure-USAMI, ZachZoomer, https://rcdb.com/415.htm
 
 * MINNESOTA *	
-0, High Roller-Valleyfair-USAMN, HiRollerVF
-0, Renegade-Valleyfair-USAMN, RenegadeVF
+0, High Roller-Valleyfair-USAMN, HiRollerVF, https://rcdb.com/117.htm
+0, Renegade-Valleyfair-USAMN, RenegadeVF, https://rcdb.com/3660.htm
 
 * MISSOURI *
-0, Outlaw Run-Silver Dollar City-USAMO, OutlawRSDC
-0, American Thunder-SF StLouis-USAMO, AmerThSFSL
-0, Boss-SF StLouis-USAMO, BossSFSL
-0, Screamin Eagle-SF StLouis-USAMO, ScEaglSFSL		
-0, Prowler-Worlds of Fun-USAMO, ProwlerWoF
-0, Timber Wolf-Worlds of Fun-USAMO, TimWolfWoF
+0, Outlaw Run-Silver Dollar City-USAMO, OutlawRSDC, https://rcdb.com/10582.htm
+0, American Thunder-SF StLouis-USAMO, AmerThSFSL, https://rcdb.com/4045.htm
+0, Boss-SF StLouis-USAMO, BossSFSL, https://rcdb.com/616.htm
+0, Screamin Eagle-SF StLouis-USAMO, ScEaglSFSL, https://rcdb.com/44.htm
+0, Prowler-Worlds of Fun-USAMO, ProwlerWoF, https://rcdb.com/4296.htm
+0, Timber Wolf-Worlds of Fun-USAMO, TimWolfWoF, https://rcdb.com/22.htm
 
 * NEW HAMPSHIRE *
-0, Roar O Saurus-Story Land-USANH, RoarSaurus
-0, Yankee Cannonball-Canobie Lake Park-USANH, CannonbaNH
+0, Roar O Saurus-Story Land-USANH, RoarSaurus, https://rcdb.com/11611.htm
+0, Yankee Cannonball-Canobie Lake Park-USANH, CannonbaNH, https://rcdb.com/298.htm
 
 * NEW JERSEY *
-0, Hell Cat-Clementon Park-USANJ, HellCatNJ
-0, El Toro-SF Great Adventure-USANJ, ElToroSFGA
-0, Great White-Moreys Piers-USANJ, GreWhiteNJ
+0, Hell Cat-Clementon Park-USANJ, HellCatNJ, https://rcdb.com/2586.htm
+0, El Toro-SF Great Adventure-USANJ, ElToroSFGA, https://rcdb.com/3183.htm
+0, Great White-Moreys Piers-USANJ, GreWhiteNJ, https://rcdb.com/408.htm
 
 * NEW MEXICO *
-0, New Mexico Rattler-Cliffs-USANM, NMRattler
+0, New Mexico Rattler-Cliffs-USANM, NMRattler, https://rcdb.com/1659.htm
 
 * NEW YORK *
-0, Comet-Great Escape-USANY, CometGrEsc
-0, Cyclone-Luna Park-USANY, ConeyIslCy
-0, Dragon Coaster-Rye Playland-USANY, DragonCRye
-0, Kiddy Coaster-Rye Playnald-USANY, KiddyCRye
-0, Jack Rabbit-Seabreeze-USANY, JacRaSeabr
-0, Predator-Darien Lake-USANY, PredatorDL
-0, Silver Comet-Martin’s Fantasy Island-USANY, SilCometNY
+0, Comet-Great Escape-USANY, CometGrEsc, https://rcdb.com/262.htm
+0, Cyclone-Luna Park-USANY, ConeyIslCy, https://rcdb.com/222.htm
+0, Dragon Coaster-Rye Playland-USANY, DragonCRye, https://rcdb.com/231.htm
+0, Kiddy Coaster-Rye Playnald-USANY, KiddyCRye, https://rcdb.com/232.htm
+0, Jack Rabbit-Seabreeze-USANY, JacRaSeabr, https://rcdb.com/227.htm
+0, Predator-Darien Lake-USANY, PredatorDL, https://rcdb.com/223.htm
+0, Silver Comet-Martin’s Fantasy Island-USANY, SilCometNY, https://rcdb.com/548.htm
 
 * NORTH CAROLINA *
-0, Hurler-Carowinds-USANC, HurlerCaro
-0, Woodstock Express-Carowinds-USANC, WoodstCaro
+0, Hurler-Carowinds-USANC, HurlerCaro, https://rcdb.com/85.htm
+0, Woodstock Express-Carowinds-USANC, WoodstCaro, https://rcdb.com/82.htm
 
 * OHIO *
-0, Blue Streak-Cedar Point-USAOH, BlStreakCP
-0, Beast-Kings Island-USAOH, BeastKI
-0, Mystic Timbers-Kings Island-USAOH, MysticTiKI
-0, Racer (Red)-Kings Island-USAOH, RacerRedKI
-0, Racer (Blue)-Kings Island-USAOH, RacerBluKI
-0, Woodstock Express-Kings Island-USAOH, WoodstExKI
-0, Sea Dragon-Colombus Zoo-USAOH, SeaDragZoo
-0, Teddy Bear-Strickers Grove-USAOH, TeddyBrStr
-0, Tornado-Strickers Grove-USAOH, TornadoStr
+0, Blue Streak-Cedar Point-USAOH, BlStreakCP, https://rcdb.com/12.htm
+0, Beast-Kings Island-USAOH, BeastKI, https://rcdb.com/67.htm
+0, Mystic Timbers-Kings Island-USAOH, MysticTiKI, https://rcdb.com/14116.htm
+0, Racer (Red)-Kings Island-USAOH, RacerRedKI, https://rcdb.com/69.htm
+0, Racer (Blue)-Kings Island-USAOH, RacerBluKI, https://rcdb.com/69.htm
+0, Woodstock Express-Kings Island-USAOH, WoodstExKI, https://rcdb.com/72.htm
+0, Sea Dragon-Colombus Zoo-USAOH, SeaDragZoo, https://rcdb.com/324.htm
+0, Teddy Bear-Strickers Grove-USAOH, TeddyBrStr, https://rcdb.com/325.htm
+0, Tornado-Strickers Grove-USAOH, TornadoStr, https://rcdb.com/326.htm
 
 * OKLAHOMA *
-0, Wildcat-Frontier City-USAOK, WildcatFC
+0, Wildcat-Frontier City-USAOK, WildcatFC, https://rcdb.com/155.htm
 
 * PENNSYLVANIA *
-0, Blue Streak-Conneaut Lake-USAPA, BlStreakCL
-0, Devils Den-Conneaut Lake-USAPA, DevilDenCL
-0, Thunderhawk-Dorney-USAPA, ThawkDorny
-0, Kingdom Coaster-Dutch Wonderland-USAPA, KingCDutch
-0, Rollo Coaster-Idlewild-USAPA, RolloCIdle
-0, Jack Rabbit-Kennywood-USAPA, JacRaKenny
-0, Racer (Left)-Kennywood-USAPA, RacrLKenny
-0, Racer (Right)-Kennywood-USAPA, RacrRKenny
-0, Thunderbolt-Kennywood-USAPA, TboltKenny
-0, Comet-HersheyPark-USAPA, CometHersh
-0, Lightning Racer (Lightning)-HersheyPark-USAPA, LRLigHersh
-0, Lightning Racer (Thunder)-HersheyPark-USAPA, LRThuHersh
-0, Wildcat-HersheyPark-USAPA, WildcHersh
-0, Flying Turns-Knoebels-USAPA, FlyTurnsKn
-0, Phoenix-Knoebels-USAPA, PhoenixKn
-0, Twister-Knoebels-USAPA, TwisterKn
-0, Comet-Waldameer-USAPA, CometWalda
-0, Ravine Flyer II-Waldameer-USAPA, RFIIWalda
+0, Blue Streak-Conneaut Lake-USAPA, BlStreakCL, https://rcdb.com/249.htm
+0, Devils Den-Conneaut Lake-USAPA, DevilDenCL, https://rcdb.com/13597.htm
+0, Thunderhawk-Dorney-USAPA, ThawkDorny, https://rcdb.com/239.htm
+0, Kingdom Coaster-Dutch Wonderland-USAPA, KingCDutch, https://rcdb.com/251.htm
+0, Rollo Coaster-Idlewild-USAPA, RolloCIdle, https://rcdb.com/272.htm
+0, Jack Rabbit-Kennywood-USAPA, JacRaKenny, https://rcdb.com/120.htm
+0, Racer (Left)-Kennywood-USAPA, RacrLKenny, https://rcdb.com/121.htm
+0, Racer (Right)-Kennywood-USAPA, RacrRKenny, https://rcdb.com/121.htm
+0, Thunderbolt-Kennywood-USAPA, TboltKenny, https://rcdb.com/122.htm
+0, Comet-HersheyPark-USAPA, CometHersh, https://rcdb.com/106.htm
+0, Lightning Racer (Lightning)-HersheyPark-USAPA, LRLigHersh, https://rcdb.com/597.htm
+0, Lightning Racer (Thunder)-HersheyPark-USAPA, LRThuHersh, https://rcdb.com/597.htm
+0, Wildcat-HersheyPark-USAPA, WildcHersh, https://rcdb.com/100.htm
+0, Flying Turns-Knoebels-USAPA, FlyTurnsKn, https://rcdb.com/3458.htm
+0, Phoenix-Knoebels-USAPA, PhoenixKn, https://rcdb.com/143.htm
+0, Twister-Knoebels-USAPA, TwisterKn, https://rcdb.com/546.htm
+0, Comet-Waldameer-USAPA, CometWalda, https://rcdb.com/377.htm
+0, Ravine Flyer II-Waldameer-USAPA, RFIIWalda, https://rcdb.com/3917.htm
 
 * SOUTH CAROLINA *
-0, Swamp Fox-Family Kingdom-USASC, SwampFoxFK
+0, Swamp Fox-Family Kingdom-USASC, SwampFoxFK, https://rcdb.com/337.htm
 
 * TENNESSEE *
-0, Lightning Rod-Dollywood-USATN, LiRodDolly
-0, Thunderhead-Dollywood-USATN, TheadDolly
+0, Lightning Rod-Dollywood-USATN, LiRodDolly, https://rcdb.com/13369.htm
+0, Thunderhead-Dollywood-USATN, TheadDolly, https://rcdb.com/2451.htm
 		
 * TEXAS *
-0, Boardwalk Bullet-Kemah Boardwalk-USATX, BoardBulTX
-0, Judge Roy Scream-SF Over Texas-USATX, JudgRoSFOT
-0, Switchback-ZDTs-USATX, SwitchbZDT
+0, Boardwalk Bullet-Kemah Boardwalk-USATX, BoardBulTX, https://rcdb.com/3757.htm
+0, Judge Roy Scream-SF Over Texas-USATX, JudgRoSFOT, https://rcdb.com/29.htm
+0, Switchback-ZDTs-USATX, SwitchbZDT, https://rcdb.com/12392.htm
 
 * UTAH *
-0, Roller Coaster-Lagoon-USAUT, RCLagoon
+0, Roller Coaster-Lagoon-USAUT, RCLagoon, https://rcdb.com/196.htm
 
 * VIRGINIA *	
-0, Grizzly-Kings Dominion-USAVA, GrizzlyKD
-0, Rebel Yell (Red)-Kings Dominion-USAVA, RebYeRedKD
-0, Rebel Yell (Blue)-Kings Dominion-USAVA, RebYeBluKD
-0, Woodstock Express-Kings Dominion-USAVA, WoodstExKD
-0, InvadR-Busch Gardens-USAVA, InvadRBGW
+0, Grizzly-Kings Dominion-USAVA, GrizzlyKD, https://rcdb.com/90.htm
+0, Rebel Yell (Red)-Kings Dominion-USAVA, RebYeRedKD, https://rcdb.com/88.htm
+0, Rebel Yell (Blue)-Kings Dominion-USAVA, RebYeBluKD, https://rcdb.com/88.htm
+0, Woodstock Express-Kings Dominion-USAVA, WoodstExKD, https://rcdb.com/89.htm
+0, InvadR-Busch Gardens-USAVA, InvadRBGW, https://rcdb.com/8027.htm
 
 * WASHINGTON *
-0, Classic Coaster-Washington State Fair-USAWA, ClasCoWASF
-0, Timberhawk Ride of Prey-Wild Waves-USAWA, TimbhawkWW
+0, Classic Coaster-Washington State Fair-USAWA, ClasCoWASF, https://rcdb.com/257.htm
+0, Timberhawk Ride of Prey-Wild Waves-USAWA, TimbhawkWW, https://rcdb.com/1862.htm
 
 * WEST VIRGINIA *
-0, Big Dipper-Camden-USAWV, BDippCamdn
-0, Hawnted House-Camden-USAWV, HawntCamdn
-0, Lil Dipper-Camden-USAWV, LDippCamdn
+0, Big Dipper-Camden-USAWV, BDippCamdn, https://rcdb.com/315.htm
+0, Hawnted House-Camden-USAWV, HawntCamdn, https://rcdb.com/14022.htm
+0, Lil Dipper-Camden-USAWV, LDippCamdn, https://rcdb.com/316.htm
 
 * WISCONSIN *
-0, Zippin Pippin-Bay Beach-USAWI, ZipPipBayB
-0, Cyclops-Mt Olympus-USAWI, CyclopsMtO
-0, Hades360-Mt Olympus-USAWI, Hades36MtO
-0, Pegasus-Mt Olympus-USAWI, PegasusMtO
-0, Zeus-Mt Olympus-USAWI, ZeusMtO
-0, Meteor-Little Amerricka-USAWI, MeteorLAWI
-0, Avalanche-Timber Falls-USAWI, AvalanTFWI
+0, Zippin Pippin-Bay Beach-USAWI, ZipPipBayB, https://rcdb.com/9088.htm
+0, Cyclops-Mt Olympus-USAWI, CyclopsMtO, https://rcdb.com/161.htm
+0, Hades360-Mt Olympus-USAWI, Hades36MtO, https://rcdb.com/2667.htm
+0, Pegasus-Mt Olympus-USAWI, PegasusMtO, https://rcdb.com/279.htm
+0, Zeus-Mt Olympus-USAWI, ZeusMtO, https://rcdb.com/280.htm
+0, Meteor-Little Amerricka-USAWI, MeteorLAWI, https://rcdb.com/2570.htm
+0, Avalanche-Timber Falls-USAWI, AvalanTFWI, https://rcdb.com/2588.htm
 
 * SOUTH AMERICA *
 * BRAZIL *
-0, Montezum-Hopi Hari-BRAZL, MontezumHH
+0, Montezum-Hopi Hari-BRAZL, MontezumHH, https://rcdb.com/1150.htm
 
 * EUROPE AND THE UK *
 * AUSTRIA *
-0, Auto BergBahn-WienerPrater-AUSTA, AutoBrBahn
-0, Hochschaubahn-WienerPrater-AUSTA, Hochshauba
+0, Auto BergBahn-WienerPrater-AUSTA, AutoBrBahn, https://rcdb.com/3139.htm
+0, Hochschaubahn-WienerPrater-AUSTA, Hochshauba, https://rcdb.com/1103.htm
 
 * BELGIUM *
-0, Heidi The Ride-Plopsaland-BELGM, HeidiPlops
-0, LoupGarou-Walibi Belgium-BELGM, LoupGarou
+0, Heidi The Ride-Plopsaland-BELGM, HeidiPlops, https://rcdb.com/7645.htm
+0, LoupGarou-Walibi Belgium-BELGM, LoupGarou, https://rcdb.com/1029.htm
 
 * DENMARK *
-0, Falken-Farup Sommerland-DENMK, FalkenFaru
-0, Rutschebanan-Bakken-DENMK, RutsBakken
-0, Rutschebanan-Tivoli Gardens-DENMK, RutsTivoli
+0, Falken-Farup Sommerland-DENMK, FalkenFaru, https://rcdb.com/2482.htm
+0, Rutschebanan-Bakken-DENMK, RutsBakken, https://rcdb.com/1055.htm
+0, Rutschebanan-Tivoli Gardens-DENMK, RutsTivoli, https://rcdb.com/1054.htm
 
 * ENGLAND *
-0, Antelope-Gullivers Warrington-ENGLD, AntelENGLD
-0, Scenic Railway-Dreamland-ENGLD, ScRaiENGLD
-0, Big Dipper-Blackpool-ENGLD, BigDippBPB
-0, Blue Flyer-Blackpool-ENGLD, BluFlyrBPB
-0, Grand National (left)-Blackpool-ENGLD, GraNatLBPB
-0, Grand National (right)-Blackpool-ENGLD, GraNatRBPB
-0, Nickelodeon Streak-Blackpool-ENGLD, NStreakBPB
-0, Wild Mouse-Blackpool-ENGLD, WiMouseBPB
-0, Roller Coaster-Great Yarmouth Pleasure Beach-ENGLD, RoCoGrYaPB
-0, Tyrolean Tubtwist-Joyland-ENGLD, TyroTubJoy
+0, Antelope-Gullivers Warrington-ENGLD, AntelENGLD, https://rcdb.com/866.htm
+0, Scenic Railway-Dreamland-ENGLD, ScRaiENGLD, https://rcdb.com/875.htm
+0, Big Dipper-Blackpool-ENGLD, BigDippBPB, https://rcdb.com/790.htm
+0, Blue Flyer-Blackpool-ENGLD, BluFlyrBPB, https://rcdb.com/797.htm
+0, Grand National (left)-Blackpool-ENGLD, GraNatLBPB, https://rcdb.com/792.htm
+0, Grand National (right)-Blackpool-ENGLD, GraNatRBPB, https://rcdb.com/792.htm
+0, Nickelodeon Streak-Blackpool-ENGLD, NStreakBPB, https://rcdb.com/793.htm
+0, Wild Mouse-Blackpool-ENGLD, WiMouseBPB, https://rcdb.com/796.htm
+0, Roller Coaster-Great Yarmouth Pleasure Beach-ENGLD, RoCoGrYaPB, https://rcdb.com/811.htm
+0, Tyrolean Tubtwist-Joyland-ENGLD, TyroTubJoy, https://rcdb.com/884.htm
 
 * FINLAND *
-0, Thunderbird-PowerLand-FINLD, TbirdPower
-0, Vuoristorata-Linnanmaki-FINLD, Vuoristora
+0, Thunderbird-PowerLand-FINLD, TbirdPower, https://rcdb.com/2955.htm
+0, Vuoristorata-Linnanmaki-FINLD, Vuoristora, https://rcdb.com/1073.htm
 
 * FRANCE *
-0, Anaconda-Walygator Parc-FRANC, AnacondaFR
-0, Timber-Walibi Rhone Alpes-FRANC, TimberWRhA
-0, Tonnere de Zeus-Parc Asterix-FRANC, TonnereZeu
+0, Anaconda-Walygator Parc-FRANC, AnacondaFR, https://rcdb.com/939.htm
+0, Timber-Walibi Rhone Alpes-FRANC, TimberWRhA, https://rcdb.com/12954.htm
+0, Tonnere de Zeus-Parc Asterix-FRANC, TonnereZeu, https://rcdb.com/752.htm
 
 * GERMANY *
-0, Bandit-MoviePark-GMANY, BanditMovP
-0, El Toro-Freizeitpark Plohn-GMANY, ElToroGMNY
-0, Mammut-Eriebnispark Tripsdrill-GMANY, MammutTrip
-0, Wodan Timburcoaster-EuropaPark-GMANY, WodanEurop
+0, Bandit-MoviePark-GMANY, BanditMovP, https://rcdb.com/967.htm
+0, El Toro-Freizeitpark Plohn-GMANY, ElToroGMNY, https://rcdb.com/4274.htm
+0, Mammut-Eriebnispark Tripsdrill-GMANY, MammutTrip, https://rcdb.com/4065.htm
+0, Wodan Timburcoaster-EuropaPark-GMANY, WodanEurop, https://rcdb.com/10018.htm
 
 * IRELAND *
-0, Cu Chulainn-Tayto Park-IRLND, CuChulainn
+0, Cu Chulainn-Tayto Park-IRLND, CuChulainn, https://rcdb.com/12364.htm
 
 * NETHERLANDS *
-0, Joris en de Draak (water)-Efteling-NTHRL, JorisWatrE
-0, Joris en de Draak (vuur)-Efteling-NTHRL, JorisVuurE
-0, Robin Hood-Walibi Holland-NTHRL, RobiHoodWH
-0, Troy-Toverland-NTHRL, TroyToverl
+0, Joris en de Draak (water)-Efteling-NTHRL, JorisWatrE, https://rcdb.com/4526.htm
+0, Joris en de Draak (vuur)-Efteling-NTHRL, JorisVuurE, https://rcdb.com/4526.htm
+0, Robin Hood-Walibi Holland-NTHRL, RobiHoodWH, https://rcdb.com/771.htm
+0, Troy-Toverland-NTHRL, TroyToverl, https://rcdb.com/3589.htm
 
 * NORWAY *
-0, Thundercoaster-TusenFryd-NORWY, TcoasTFryd
+0, Thundercoaster-TusenFryd-NORWY, TcoasTFryd, https://rcdb.com/1042.htm
 
 * SPAIN *
-0, Coaster Express-Parque Warner Madrid-SPAIN, CoasExpPWM
-0, Stampida (left)-PortAventura-SPAIN, StamLPortA
-0, Stampida (right)-PortAventura-SPAIN, StamRPortA
-0, Tomahawk-PortAventura-SPAIN, TomahPortA
+0, Coaster Express-Parque Warner Madrid-SPAIN, CoasExpPWM, https://rcdb.com/1368.htm
+0, Stampida (left)-PortAventura-SPAIN, StamLPortA, https://rcdb.com/759.htm
+0, Stampida (right)-PortAventura-SPAIN, StamRPortA, https://rcdb.com/759.htm
+0, Tomahawk-PortAventura-SPAIN, TomahPortA, https://rcdb.com/761.htm
 
 * SWEDEN *
-0, Wildfire-Kolmården-SWDEN, WildfireSE
-0, Balder-Liseberg-SWDEN, BalderLise
-0, Twister-Grona Lund-SWDEN, TwisterGLu
+0, Wildfire-Kolmården-SWDEN, WildfireSE, https://rcdb.com/12032.htm
+0, Balder-Liseberg-SWDEN, BalderLise, https://rcdb.com/1562.htm
+0, Twister-Grona Lund-SWDEN, TwisterGLu, https://rcdb.com/9352.htm
 
 * WALES *
-0, Megaphobia-Oakwood-WALES, Megaphobia
+0, Megaphobia-Oakwood-WALES, Megaphobia, https://rcdb.com/756.htm
 
 * AUSTRALIA *
-0, Wild Mouse-Luna Park-AUSTL, WMousLuAUS
-0, Scenic Railway-Luna Park-AUSTL, ScRaiLuAUS
+0, Wild Mouse-Luna Park-AUSTL, WMousLuAUS, https://rcdb.com/1140.htm
+0, Scenic Railway-Luna Park-AUSTL, ScRaiLuAUS, https://rcdb.com/1136.htm
 
 * ASIA *
 * CHINA *
-0, Fjord Flying Dragon-Happy Valley Dongli-CHINA, FjordFDrag
-0, Dauling Dragon (red)-Happy Valley Hongshan-CHINA, DaulDragoR
-0, Dauling Dragon (blue)-Happy Valley Hongshan-CHINA, DaulDragoB
-0, Great Desert Rally-Happy Valley Jinniu-CHINA, GrDesRally
-0, Jungle Dragon-Happy Valley Yubei-CHINA, JungleDrag
-0, Jungle Trailblazer-Fantawild Dreamland Shifeng-CHINA, JTraFanShi
-0, Jungle Trailblazer-Fantawild Dreamland Zhongmu-CHINA, JTraFanZho
-0, Jungle Trailblazer-Oriental Heritage Cixi-CHINA, JTraOriCix
-0, Jungle Trailblazer-Oriental Heritage Huaiyin-CHINA, JTraOriHua
-0, Jungle Trailblazer-Oriental Heritage Juijiang-CHINA, JTraOriJui
-0, Jungle Trailblazer-Oriental Heritage Tong an-CHINA, JTraOriTon
-0, Python in Bamboo Forest-Nanchang Wanda Park-CHINA, PythonBamb
-0, Time Travel-Hot Go Park Happy Jungle World-CHINA, TimTravHGP
-0, Wood Coaster-Knight Valley-CHINA, WoodCoasKV
-0, Wooden Coaster Fireball-Happy Valley Dongli-CHINA, WCFireball
+0, Fjord Flying Dragon-Happy Valley Dongli-CHINA, FjordFDrag, https://rcdb.com/10353.htm
+0, Dauling Dragon (red)-Happy Valley Hongshan-CHINA, DaulDragoR, https://rcdb.com/3775.htm
+0, Dauling Dragon (blue)-Happy Valley Hongshan-CHINA, DaulDragoB, https://rcdb.com/3775.htm
+0, Great Desert Rally-Happy Valley Jinniu-CHINA, GrDesRally, https://rcdb.com/13657.htm
+0, Jungle Dragon-Happy Valley Yubei-CHINA, JungleDrag, https://rcdb.com/13833.htm
+0, Jungle Trailblazer-Fantawild Dreamland Shifeng-CHINA, JTraFanShi, https://rcdb.com/11601.htm
+0, Jungle Trailblazer-Fantawild Dreamland Zhongmu-CHINA, JTraFanZho, https://rcdb.com/12393.htm
+0, Jungle Trailblazer-Oriental Heritage Cixi-CHINA, JTraOriCix, https://rcdb.com/12236.htm
+0, Jungle Trailblazer-Oriental Heritage Huaiyin-CHINA, JTraOriHua, https://rcdb.com/11604.htm
+0, Jungle Trailblazer-Oriental Heritage Juijiang-CHINA, JTraOriJui, https://rcdb.com/11602.htm
+0, Jungle Trailblazer-Oriental Heritage Tong an-CHINA, JTraOriTon, https://rcdb.com/13453.htm
+0, Python in Bamboo Forest-Nanchang Wanda Park-CHINA, PythonBamb, https://rcdb.com/11608.htm
+0, Time Travel-Hot Go Park Happy Jungle World-CHINA, TimTravHGP, https://rcdb.com/11606.htm
+0, Wood Coaster-Knight Valley-CHINA, WoodCoasKV, https://rcdb.com/9039.htm
+0, Wooden Coaster Fireball-Happy Valley Dongli-CHINA, WCFireball, https://rcdb.com/4150.htm
 
 * INDIA *
-0, Cyclone-Nicco Park-INDIA, NiccoParCy
-0, Zipper Dipper-EsselWorld-INDIA, ZipDippEss
+0, Cyclone-Nicco Park-INDIA, NiccoParCy, https://rcdb.com/2485.htm
+0, Zipper Dipper-EsselWorld-INDIA, ZipDippEss, https://rcdb.com/1390.htm
 
 * INDONESIA *
-0, Animal Coaster-Jawa Timur Park 2-INDSA, AnimalCoas
-0, Crazy Car Coaster-Wisata Bahari Lamongan-INDSA, CrazyCarCo
+0, Animal Coaster-Jawa Timur Park 2-INDSA, AnimalCoas, https://rcdb.com/10419.htm
+0, Crazy Car Coaster-Wisata Bahari Lamongan-INDSA, CrazyCarCo, https://rcdb.com/9953.htm
 
 * JAPAN *
-0, Elf-Hirakata Park-JAPAN, ElfHirakat
-0, Jupiter-Kijima Kogen-JAPAN, JupiterKij
-0, Regina-Tobu Zoo-JAPAN, ReginaTobu
-0, White Cyclone-Nagashima Spa Land-JAPAN, NagaWhitCy
+0, Elf-Hirakata Park-JAPAN, ElfHirakat, https://rcdb.com/1304.htm
+0, Jupiter-Kijima Kogen-JAPAN, JupiterKij, https://rcdb.com/1254.htm
+0, Regina-Tobu Zoo-JAPAN, ReginaTobu, https://rcdb.com/1243.htm
+0, White Cyclone-Nagashima Spa Land-JAPAN, NagaWhitCy, https://rcdb.com/1174.htm
 
 * SOUTH KOREA *
-0, T Express-Everland-SKREA, TExpress
+0, T Express-Everland-SKREA, TExpress, https://rcdb.com/3938.htm
 
 
 
