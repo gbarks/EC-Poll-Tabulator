@@ -64,15 +64,17 @@ def main():
     multi = 1
     offset = 0.4
     manColors = { # fill colors for certain roller coaster manufacturers/designers
-        "CCI"            : PatternFill("solid", fgColor=phicolor(1, light, multi, offset)),
-        "GG"             : PatternFill("solid", fgColor=phicolor(2, light, multi, offset)),
-        "GCI"            : PatternFill("solid", fgColor=phicolor(3, light, multi, offset)),
-        "Intamin"        : PatternFill("solid", fgColor=phicolor(4, light, multi, offset)),
-        "PTC"            : PatternFill("solid", fgColor=phicolor(5, light, multi, offset)),
-        "Prior & Church" : PatternFill("solid", fgColor=phicolor(6, light, multi, offset)),
-        "RMC"            : PatternFill("solid", fgColor=phicolor(7, light, multi, offset)),
-        "Locally built"  : PatternFill("solid", fgColor=phicolor(8, light, multi, offset)),
-        "Other"          : PatternFill("solid", fgColor="bababa")
+        "Custom Coasters International, Inc."   : PatternFill("solid", fgColor=phicolor( 1, light, multi, offset)),
+        "Gravitykraft Corporation"              : PatternFill("solid", fgColor=phicolor( 2, light, multi, offset)),
+        "Great Coasters International"          : PatternFill("solid", fgColor=phicolor( 3, light, multi, offset)),
+        "Intamin Amusement Rides"               : PatternFill("solid", fgColor=phicolor( 4, light, multi, offset)),
+        "National Amusement Device Company"     : PatternFill("solid", fgColor=phicolor( 5, light, multi, offset)),
+        "Philadelphia Toboggan Coasters, Inc."  : PatternFill("solid", fgColor=phicolor( 6, light, multi, offset)),
+        "Rocky Mountain Construction"           : PatternFill("solid", fgColor=phicolor( 7, light, multi, offset)),
+        "Roller Coaster Corporation of America" : PatternFill("solid", fgColor=phicolor( 8, light, multi, offset)),
+        "S&S Worldwide"                         : PatternFill("solid", fgColor=phicolor( 9, light, multi, offset)),
+        "Vekoma"                                : PatternFill("solid", fgColor=phicolor(10, light, multi, offset)),
+        "Other"                                 : PatternFill("solid", fgColor="bababa")
     }
 
     # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
