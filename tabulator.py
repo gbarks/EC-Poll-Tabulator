@@ -55,6 +55,12 @@ if not os.path.isdir(args.ballotFolder) or len(os.listdir(args.ballotFolder)) < 
 if args.outfile[:-5] != ".xlsx":
     args.outfile += ".xlsx"
 
+
+
+# ==================================================
+#  onto main()!
+# ==================================================
+
 def main():
     # for each coaster, the number of people who rode it
     riders = {}
@@ -178,8 +184,8 @@ def getCoasterList(riders, totalWLT, masterlistws, preferredFixedWidthFont, manC
                     # break the line into its components: rank, full coaster name, abbreviation
                     words = [x.strip() for x in sline.split(',')]
 
-                    # make sure there are 3 'words' in each line
-                    if len(words) != 3:
+                    # make sure there are at least 3 'words' in each line
+                    if len(words) < 3:
                         print("Error in {0}, Line {1}: {2}".format(args.blankBallot, lineNum, line))
 
                     else:
