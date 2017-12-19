@@ -52,7 +52,7 @@ if not os.path.isdir(args.ballotFolder) or len(os.listdir(args.ballotFolder)) < 
     print('Ballot folder "{0}" does not exist or is empty; exiting...'.format(args.ballotFolder))
     sys.exit()
 
-if args.outfile[:-5] != ".xlsx":
+if args.outfile[-5:] != ".xlsx":
     args.outfile += ".xlsx"
 
 
@@ -147,7 +147,7 @@ def getCoasterDict(totalWLT, masterlistws, preferredFixedWidthFont, makeColors):
     masterlistws.column_dimensions['C'].width = 25.83
     masterlistws.column_dimensions['D'].width = 25.83
     masterlistws.column_dimensions['E'].width = 6.83
-    masterlistws.column_dimensions['F'].width = 11.83
+    masterlistws.column_dimensions['F'].width = 16.83
     masterlistws['B1'].font = preferredFixedWidthFont
     masterlistws['E1'].font = preferredFixedWidthFont
 
@@ -188,16 +188,14 @@ def getCoasterDict(totalWLT, masterlistws, preferredFixedWidthFont, makeColors):
                     else:
                         fullName = words[1]
                         abbrName = words[2]
+
                         coasterMake = ""
+
+                        # list of strings that will form a row in the spreadsheet
+                        rowVals = [fullName, abbrName]
 
                         # add the coaster to the dictionary of coasters on the ballot
                         coasterDict[fullName] = {}
-                        coasterDict[fullName]["Abbr"] = abbrName
-                        coasterDict[fullName]["Riders"] = 0
-                        if len(words) > 3:
-                            coasterDict[fullName]["RCDB"] = words[3]
-
-                        rowVals = [fullName, abbrName]
 
                         # extract park and state/country information from fullName
                         subwords = [x.strip() for x in fullName.split('-')]
@@ -212,21 +210,40 @@ def getCoasterDict(totalWLT, masterlistws, preferredFixedWidthFont, makeColors):
                             coasterDict[fullName]["Park"] = subwords[1]
                             coasterDict[fullName]["State"] = subwords[2]
 
+                        if len(words) > 3:
+                            coasterDict[fullName]["RCDB"] = words[3]
+                            rowVals.append('=HYPERLINK("{0}", "{1}")'.format(words[3], words[3][8:]))
+                            if args.botherRCDB:
+                                # TODO: retreive extra data from RCDB and append to rowVals, coaster
+                                coasterDict[fullName]["Make"] = coasterMake
+
+                        # final values associated with this coaster
+                        coasterDict[fullName]["Abbr"] = abbrName
+
+                        # variable values associated with this coaster
+                        coasterDict[fullName]["Riders"] = 0
+                        coasterDict[fullName]["Total Wins"] = 0
+                        coasterDict[fullName]["Total Losses"] = 0
+                        coasterDict[fullName]["Total Ties"] = 0
+                        coasterDict[fullName]["Total Contests"] = 0
+                        coasterDict[fullName]["Win Percentage"] = 0.0
+                        coasterDict[fullName]["Rank"] = 0
+                        coasterDict[fullName]["Ridership Rank"] = 0
+
                         # add an entry for the coaster in the dicts
                         totalWLT[fullName] = [0, 0, 0, 0]
-
-                        if args.botherRCDB:
-                            # TODO: retreive extra data from RCDB and append to rowVals, coaster
-                            coasterDict[fullName]["Make"] = coasterMake
 
                         masterlistws.append(rowVals)
                         masterlistws.cell(row=len(coasterDict)+1, column=5).font = preferredFixedWidthFont
                         masterlistws.cell(row=len(coasterDict)+1, column=2).font = preferredFixedWidthFont
+                        if "RCDB" in coasterDict[fullName].keys():
+                            masterlistws.cell(row=len(coasterDict)+1, column=6).style = "Hyperlink"
 
-                        if args.colorize and coasterMake and coasterMake in makeColors.keys():
-                            masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors[coasterMake]
-                        else:
-                            masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors["Other"]
+                        if args.colorize:
+                            if coasterMake and coasterMake in makeColors.keys():
+                                masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors[coasterMake]
+                            else:
+                                masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors["Other"]
 
     masterlistws.freeze_panes = masterlistws['A2']
     spinner.stop()
@@ -439,9 +456,7 @@ def calculateResults(coasterDict, totalWLT, winLossMatrix):
     # tallying up ALL the contests it had, not just the pairwise contests
     # this will give the total overall win percentage for each coaster, which will be used to determine
     # the final ranking of all the coasters
-    for coaster in coasterDict.keys():
-
-        x = coaster
+    for x in coasterDict.keys():
 
         if totalWLT[x][2] > 0 and totalWLT[x][3] > 0: # if numTies and numContests > 0
             winPercentage[x] = round((((totalWLT[x][0] + (totalWLT[x][2]/2)) / totalWLT[x][3])) * 100, 3)
