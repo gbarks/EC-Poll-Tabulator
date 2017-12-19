@@ -62,9 +62,6 @@ if args.outfile[:-5] != ".xlsx":
 # ==================================================
 
 def main():
-    # for each coaster, the number of people who rode it
-    riders = {}
-
     # for each coaster, a list of numbers of the form [wins, losses, ties, totalContests]
     totalWLT = {}
 
@@ -78,7 +75,7 @@ def main():
     light = 186
     multi = 1
     offset = 0.4
-    manColors = { # fill colors for certain roller coaster manufacturers/designers
+    makeColors = { # fill colors for certain roller coaster manufacturers/designers
         "Custom Coasters International, Inc."   : PatternFill("solid", fgColor=phicolor( 1, light, multi, offset)),
         "Gravitykraft Corporation"              : PatternFill("solid", fgColor=phicolor( 2, light, multi, offset)),
         "Great Coasters International"          : PatternFill("solid", fgColor=phicolor( 3, light, multi, offset)),
@@ -93,13 +90,13 @@ def main():
     }
 
     # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
-    coasterList = getCoasterList(riders, totalWLT, xlout.active, menlo, manColors)
+    coasterDict = getCoasterDict(totalWLT, xlout.active, menlo, makeColors)
 
     # list of ballot filepaths
     ballotList = getBallotFilepaths()
 
     # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
-    winLossMatrix = createMatrix(coasterList)
+    winLossMatrix = createMatrix(coasterDict)
 
     # loop through all the ballot filenames and process each ballot
     voterinfows = xlout.create_sheet("Voter Info (SENSITIVE)")
@@ -110,19 +107,19 @@ def main():
     for col in ['D','E','F','G']:
         voterinfows.column_dimensions[col].width = 12.83
     for filepath in ballotList:
-        voterInfo = processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix)
+        voterInfo = processBallot(filepath, coasterDict, totalWLT, winLossMatrix)
         if voterInfo:
             voterinfows.append(voterInfo)
     voterinfows.freeze_panes = voterinfows['A2']
 
     # for each coaster, its win percentage across all pairings
-    winPercentage = calculateResults(coasterList, totalWLT, winLossMatrix)
+    winPercentage = calculateResults(coasterDict, totalWLT, winLossMatrix)
 
-    # sorted lists of tuples of the form (rankedCoaster, relevantNumber)
-    finalResults, finalPairs, finalRiders = sortedLists(riders, totalWLT, winLossMatrix, winPercentage)
+    # sorted lists of tuples of the form (rankedCoaster, relevantNumbers)
+    finalResults, finalPairs, finalRiders = sortedLists(coasterDict, totalWLT, winLossMatrix, winPercentage)
 
     # write worksheets related to finalResults, finalPairs, finalRiders, and winLossMatrix
-    printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterList, menlo)
+    printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterDict, menlo)
 
     # save the Excel file
     print("Saving...", end=" ")
@@ -135,16 +132,16 @@ def main():
 
 
 # ==================================================
-#  populate list of coasters in the poll
+#  populate dictionary of coasters in the poll
 # ==================================================
 
-def getCoasterList(riders, totalWLT, masterlistws, preferredFixedWidthFont, manColors):
+def getCoasterDict(totalWLT, masterlistws, preferredFixedWidthFont, makeColors):
     print("Creating list of every coaster on the ballot...", end=" ")
     spinner = Spinner()
     spinner.start()
 
     # set up Coaster Masterlist worksheet
-    masterlistws.append(["Full Coaster Name","Abbrev.","Name","Park","State","Designer"])
+    masterlistws.append(["Full Coaster Name", "Abbrev.", "Name", "Park", "State", "RCDB Link"])
     masterlistws.column_dimensions['A'].width = 45.83
     masterlistws.column_dimensions['B'].width = 12.83
     masterlistws.column_dimensions['C'].width = 25.83
@@ -154,7 +151,7 @@ def getCoasterList(riders, totalWLT, masterlistws, preferredFixedWidthFont, manC
     masterlistws['B1'].font = preferredFixedWidthFont
     masterlistws['E1'].font = preferredFixedWidthFont
 
-    coasterList = [] # return value
+    coasterDict = {} # return value
 
     #open the blank ballot file
     with open(args.blankBallot) as f:
@@ -171,7 +168,7 @@ def getCoasterList(riders, totalWLT, masterlistws, preferredFixedWidthFont, manC
             if startProcessing == False and sline == startLine:
                 startProcessing = True
 
-            # add the coasters to coasterList and the masterlist worksheet
+            # add the coasters to coasterDict and the masterlist worksheet
             elif startProcessing == True:
 
                 if commentStr in sline: # skip comment lines (begin with "* ")
@@ -184,43 +181,57 @@ def getCoasterList(riders, totalWLT, masterlistws, preferredFixedWidthFont, manC
                     # break the line into its components: rank, full coaster name, abbreviation
                     words = [x.strip() for x in sline.split(',')]
 
-                    # make sure there are at least 3 'words' in each line
+                    # make sure there are at least 3 'words' in each line (rank, fullName, abbrName)
                     if len(words) < 3:
                         print("Error in {0}, Line {1}: {2}".format(args.blankBallot, lineNum, line))
 
                     else:
                         fullName = words[1]
                         abbrName = words[2]
+                        coasterMake = ""
 
-                        # add an entry for the coaster in the dicts
-                        riders[fullName] = 0
-                        totalWLT[fullName] = [0, 0, 0, 0]
-
-                        manufacturerName = ""
+                        # add the coaster to the dictionary of coasters on the ballot
+                        coasterDict[fullName] = {}
+                        coasterDict[fullName]["Abbr"] = abbrName
+                        coasterDict[fullName]["Riders"] = 0
                         if len(words) > 3:
-                            manufacturerName = words[3]
+                            coasterDict[fullName]["RCDB"] = words[3]
 
-                        # add the coaster to the list of coasters on the ballot
-                        coasterList.append((fullName, abbrName, manufacturerName))
+                        rowVals = [fullName, abbrName]
 
-                        # extract park and state/country information from fullName to write to worksheet
+                        # extract park and state/country information from fullName
                         subwords = [x.strip() for x in fullName.split('-')]
                         if len(subwords) != 3:
-                            masterlistws.append([fullName,abbrName,manufacturerName])
+                            rowVals.extend(["", "", ""])
+                            coasterDict[fullName]["Name"] = ""
+                            coasterDict[fullName]["Park"] = ""
+                            coasterDict[fullName]["State"] = ""
                         else:
-                            masterlistws.append([fullName,abbrName,subwords[0],subwords[1],subwords[2],manufacturerName])
-                            masterlistws.cell(row=len(coasterList)+1, column=5).font = preferredFixedWidthFont
-                        masterlistws.cell(row=len(coasterList)+1, column=2).font = preferredFixedWidthFont
+                            rowVals.extend([subwords[0], subwords[1], subwords[2]])
+                            coasterDict[fullName]["Name"] = subwords[0]
+                            coasterDict[fullName]["Park"] = subwords[1]
+                            coasterDict[fullName]["State"] = subwords[2]
 
-                        if manufacturerName and manufacturerName in manColors.keys():
-                            masterlistws.cell(row=len(coasterList)+1, column=6).fill = manColors[manufacturerName]
+                        # add an entry for the coaster in the dicts
+                        totalWLT[fullName] = [0, 0, 0, 0]
+
+                        if args.botherRCDB:
+                            # TODO: retreive extra data from RCDB and append to rowVals, coaster
+                            coasterDict[fullName]["Make"] = coasterMake
+
+                        masterlistws.append(rowVals)
+                        masterlistws.cell(row=len(coasterDict)+1, column=5).font = preferredFixedWidthFont
+                        masterlistws.cell(row=len(coasterDict)+1, column=2).font = preferredFixedWidthFont
+
+                        if args.colorize and coasterMake and coasterMake in makeColors.keys():
+                            masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors[coasterMake]
                         else:
-                            masterlistws.cell(row=len(coasterList)+1, column=6).fill = manColors["Other"]
+                            masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors["Other"]
 
     masterlistws.freeze_panes = masterlistws['A2']
     spinner.stop()
-    print("{0} coasters on the ballot.".format(len(coasterList)))
-    return coasterList
+    print("{0} coasters on the ballot.".format(len(coasterDict)))
+    return coasterDict
 
 
 
@@ -248,15 +259,15 @@ def getBallotFilepaths():
 #  create win/loss matrix
 # ==================================================
 
-def createMatrix(coasterList):
+def createMatrix(coasterDict):
     print("Creating the win/loss matrix...", end=" ")
     spinner = Spinner()
     spinner.start()
 
     winLossMatrix = {}
-    for row in coasterList:
-        for col in coasterList:
-            winLossMatrix[row[0],col[0]] = [0, 0, 0, 0.0]
+    for row in coasterDict.keys():
+        for col in coasterDict.keys():
+            winLossMatrix[row, col] = [0, 0, 0, 0.0]
 
     spinner.stop()
     print("{0} pairings.".format(len(winLossMatrix)))
@@ -270,7 +281,7 @@ def createMatrix(coasterList):
 #  you need a loop to call this function for each ballot filename
 # ================================================================
 
-def processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix):
+def processBallot(filepath, coasterDict, totalWLT, winLossMatrix):
     filename = os.path.basename(filepath)
     print("Processing ballot: {0}".format(filename))
 
@@ -333,9 +344,9 @@ def processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix):
                         continue
 
                     # check to make sure the coaster on the ballot is legit
-                    if [coasterName in x[0] for x in coasterList]:
+                    if coasterName  in coasterDict.keys():
                         creditNum += 1
-                        riders[coasterName] += 1
+                        coasterDict[coasterName]["Riders"] += 1
 
                         # add this voter's ranking of the coaster
                         coasterAndRank[coasterName] = coasterRank
@@ -393,17 +404,17 @@ def processBallot(filepath, coasterList, riders, totalWLT, winLossMatrix):
 #    numbers gathered when the ballots were processed
 # ========================================================
 
-def calculateResults(coasterList, totalWLT, winLossMatrix):
+def calculateResults(coasterDict, totalWLT, winLossMatrix):
     print("Calculating results...", end=" ")
     spinner = Spinner()
     spinner.start()
 
     # iterate through all the pairs in the matrix
-    for coasterA in coasterList:
-        for coasterB in coasterList:
+    for coasterA in coasterDict.keys():
+        for coasterB in coasterDict.keys():
 
-            x = coasterA[0]
-            y = coasterB[0]
+            x = coasterA
+            y = coasterB
 
             if x == y: # skip a coaster paired with itself
                 continue
@@ -428,9 +439,9 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
     # tallying up ALL the contests it had, not just the pairwise contests
     # this will give the total overall win percentage for each coaster, which will be used to determine
     # the final ranking of all the coasters
-    for coaster in coasterList:
+    for coaster in coasterDict.keys():
 
-        x = coaster[0]
+        x = coaster
 
         if totalWLT[x][2] > 0 and totalWLT[x][3] > 0: # if numTies and numContests > 0
             winPercentage[x] = round((((totalWLT[x][0] + (totalWLT[x][2]/2)) / totalWLT[x][3])) * 100, 3)
@@ -450,7 +461,7 @@ def calculateResults(coasterList, totalWLT, winLossMatrix):
 #    sorted list of coasters by pairwise win pct
 # ==================================================
 
-def sortedLists(riders, totalWLT, winLossMatrix, winPercentage):
+def sortedLists(coasterDict, totalWLT, winLossMatrix, winPercentage):
     print("Sorting the results...", end=" ")
     spinner = Spinner()
     spinner.start()
@@ -461,8 +472,8 @@ def sortedLists(riders, totalWLT, winLossMatrix, winPercentage):
 
     # iterate through the winPercentage dict by coasters
     for i in winPercentage.keys():
-        numRiders.append((i, riders[i]))
-        if int(riders[i]) >= args.minRiders:
+        numRiders.append((i, coasterDict[i]["Riders"]))
+        if int(coasterDict[i]["Riders"]) >= int(args.minRiders):
 
             # values are: "Rank", "Coaster", "Win %", "Total Wins", "Total Losses", "Total Ties"
             results.append((i, winPercentage[i], totalWLT[i][0], totalWLT[i][1], totalWLT[i][1]))
@@ -489,7 +500,7 @@ def sortedLists(riders, totalWLT, winLossMatrix, winPercentage):
 #  print everything to a file
 # ==================================================
 
-def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferredFixedWidthFont):
+def printToFile(xl, results, pairs, riders, winLossMatrix, coasterDict, preferredFixedWidthFont):
     print("Writing the results...", end=" ")
     spinner = Spinner()
     spinner.start()
@@ -534,23 +545,18 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterList, preferre
     # create and write Mitch Hawker-style mutual rider comparison worksheet
     hawkerWLTws = xl.create_sheet("Coaster vs Coaster Win-Loss-Tie")
     headerRow = ["Rank",""]
-    orderAbbr = []
     for coaster in results:
-        for abbr in coasterList:
-            if coaster[0] == abbr[0]:
-                headerRow.append(abbr[1])
-                orderAbbr.append((abbr[0], abbr[1])) # coasterList sorted by win% (as in resultws)
-                break
+        headerRow.append(coasterDict[coaster[0]]["Abbr"])
     hawkerWLTws.append(headerRow)
     hawkerWLTws.column_dimensions['A'].width = 4.83
     hawkerWLTws.column_dimensions['B'].width = 45.83
-    for col in range(3, len(orderAbbr)+3):
+    for col in range(3, len(results)+3):
         hawkerWLTws.column_dimensions[get_column_letter(col)].width = 12.83
-    for i in range(0, len(orderAbbr)):
-        resultRow = [i+1, orderAbbr[i][0]]
-        for j in range(0, len(orderAbbr)):
-            coasterA = orderAbbr[i][0]
-            coasterB = orderAbbr[j][0]
+    for i in range(0, len(results)):
+        resultRow = [i+1, results[i][0]]
+        for j in range(0, len(results)):
+            coasterA = results[i][0]
+            coasterB = results[j][0]
             cellStr = ""
             if coasterA != coasterB:
                 if winLossMatrix[coasterA, coasterB][0] > winLossMatrix[coasterA, coasterB][1]:
