@@ -26,9 +26,9 @@ Alternatively, the command line argument defaults are:
 
 Additional command line flags include:
 
-* `-c` - sets fill color of certain cells to reflect the make (manufacturer) of the coaster (partially implemented)
-* `-r` - bothers [rcdb.com](https://rcdb.com/) with requests to fill in coaster details (not yet implemented)
-* `-v` - prints data as it's processed to `stdout`
+* `-c` sets fill color of certain cells to reflect the make (manufacturer) of the coaster (partially implemented)
+* `-r` bothers [rcdb.com](https://rcdb.com/) with requests to fill in coaster details (not yet implemented)
+* `-v` prints data as it's processed to `stdout`
 
 ## Dependencies
 
