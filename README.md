@@ -13,7 +13,7 @@ To run an election where:
 
 Simply run:
 
-`python tabulator.py -m 10 -b "generic ballot.txt" -f ballots -o "Coaster Poll 20XX`
+`python tabulator.py -m 10 -b "generic ballot.txt" -f ballots -o "Coaster Poll 20XX"`
 
 And output will be saved to `Coaster Poll 20XX.xlsx`
 
@@ -23,6 +23,12 @@ Alternatively, the command line argument defaults are:
 * `-b blankballot2017.txt`
 * `-f ballots2017`
 * `-o "Poll Results.xlsx"`
+
+Additional command line flags include:
+
+* `-c` - sets fill color of certain cells to reflect the make (manufacturer) of the coaster (partially implemented)
+* `-r` - bothers [rcdb.com](https://rcdb.com/) with requests to fill in coaster details (not yet implemented)
+* `-v` - prints data as it's processed to `stdout`
 
 ## Dependencies
 
