@@ -62,9 +62,6 @@ if args.outfile[-5:] != ".xlsx":
 # ==================================================
 
 def main():
-    # for each coaster, a list of numbers of the form [wins, losses, ties, totalContests]
-    totalWLT = {}
-
     # create Excel workbook
     xlout = Workbook()
     xlout.active.title = "Coaster Masterlist"
@@ -90,7 +87,7 @@ def main():
     }
 
     # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
-    coasterDict = getCoasterDict(totalWLT, xlout.active, menlo, makeColors)
+    coasterDict = getCoasterDict(xlout.active, menlo, makeColors)
 
     # list of ballot filepaths
     ballotList = getBallotFilepaths()
@@ -107,16 +104,15 @@ def main():
     for col in ['D','E','F','G']:
         voterinfows.column_dimensions[col].width = 12.83
     for filepath in ballotList:
-        voterInfo = processBallot(filepath, coasterDict, totalWLT, winLossMatrix)
+        voterInfo = processBallot(filepath, coasterDict, winLossMatrix)
         if voterInfo:
             voterinfows.append(voterInfo)
     voterinfows.freeze_panes = voterinfows['A2']
 
-    # for each coaster, its win percentage across all pairings
-    winPercentage = calculateResults(coasterDict, totalWLT, winLossMatrix)
+    calculateResults(coasterDict, winLossMatrix)
 
     # sorted lists of tuples of the form (rankedCoaster, relevantNumbers)
-    finalResults, finalPairs, finalRiders = sortedLists(coasterDict, totalWLT, winLossMatrix, winPercentage)
+    finalResults, finalPairs, finalRiders = sortedLists(coasterDict, winLossMatrix)
 
     # write worksheets related to finalResults, finalPairs, finalRiders, and winLossMatrix
     printToFile(xlout, finalResults, finalPairs, finalRiders, winLossMatrix, coasterDict, menlo)
@@ -135,7 +131,7 @@ def main():
 #  populate dictionary of coasters in the poll
 # ==================================================
 
-def getCoasterDict(totalWLT, masterlistws, preferredFixedWidthFont, makeColors):
+def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
     print("Creating list of every coaster on the ballot...", end=" ")
     spinner = Spinner()
     spinner.start()
@@ -230,9 +226,6 @@ def getCoasterDict(totalWLT, masterlistws, preferredFixedWidthFont, makeColors):
                         coasterDict[fullName]["Rank"] = 0
                         coasterDict[fullName]["Ridership Rank"] = 0
 
-                        # add an entry for the coaster in the dicts
-                        totalWLT[fullName] = [0, 0, 0, 0]
-
                         masterlistws.append(rowVals)
                         masterlistws.cell(row=len(coasterDict)+1, column=5).font = preferredFixedWidthFont
                         masterlistws.cell(row=len(coasterDict)+1, column=2).font = preferredFixedWidthFont
@@ -298,7 +291,7 @@ def createMatrix(coasterDict):
 #  you need a loop to call this function for each ballot filename
 # ================================================================
 
-def processBallot(filepath, coasterDict, totalWLT, winLossMatrix):
+def processBallot(filepath, coasterDict, winLossMatrix):
     filename = os.path.basename(filepath)
     print("Processing ballot: {0}".format(filename))
 
@@ -383,22 +376,22 @@ def processBallot(filepath, coasterDict, totalWLT, winLossMatrix):
 
             # can't compare a coaster to itself
             if coasterA != coasterB:
-                totalWLT[coasterA][3] += 1 # increment number of contests
+                coasterDict[coasterA]["Total Contests"] += 1 # increment number of contests
 
                 # if the coasters have the same ranking, call it a tie
                 if coasterAndRank[coasterA] == coasterAndRank[coasterB]:
                     winLossMatrix[coasterA, coasterB][2] += 1
-                    totalWLT[coasterA][2] += 1
+                    coasterDict[coasterA]["Total Ties"] += 1
 
                 # if coasterA outranks coasterB (the rank's number is lower), call it a win for coasterA
                 elif coasterAndRank[coasterA] < coasterAndRank[coasterB]:
                     winLossMatrix[coasterA, coasterB][0] += 1
-                    totalWLT[coasterA][0] += 1
+                    coasterDict[coasterA]["Total Wins"] += 1
 
                 # if not a tie nor a win, it must be a loss
                 else:
                     winLossMatrix[coasterA, coasterB][1] += 1
-                    totalWLT[coasterA][1] += 1
+                    coasterDict[coasterA]["Total Losses"] += 1
 
     print(" ->", end=" ")
 
@@ -421,7 +414,7 @@ def processBallot(filepath, coasterDict, totalWLT, winLossMatrix):
 #    numbers gathered when the ballots were processed
 # ========================================================
 
-def calculateResults(coasterDict, totalWLT, winLossMatrix):
+def calculateResults(coasterDict, winLossMatrix):
     print("Calculating results...", end=" ")
     spinner = Spinner()
     spinner.start()
@@ -450,24 +443,23 @@ def calculateResults(coasterDict, totalWLT, winLossMatrix):
             elif numContests > 0:
                 winLossMatrix[x, y][3] = round(((wins / numContests)) * 100, 3)
 
-    winPercentage = {} # return value
-
     # all those calculations we just did for each pair of coasters, now do for each coaster by itself
     # tallying up ALL the contests it had, not just the pairwise contests
     # this will give the total overall win percentage for each coaster, which will be used to determine
     # the final ranking of all the coasters
     for x in coasterDict.keys():
+        numWins = coasterDict[x]["Total Wins"]
+        numTies = coasterDict[x]["Total Ties"]
+        numContests = coasterDict[x]["Total Contests"]
 
-        if totalWLT[x][2] > 0 and totalWLT[x][3] > 0: # if numTies and numContests > 0
-            winPercentage[x] = round((((totalWLT[x][0] + (totalWLT[x][2]/2)) / totalWLT[x][3])) * 100, 3)
+        if numTies > 0 and numContests > 0:
+            coasterDict[x]["Win Percentage"] = round((((numWins + (numTies/2)) / numContests)) * 100, 3)
 
-        elif totalWLT[x][3] > 0: # if numTies == 0 and numContests > 0
-            winPercentage[x] = round(((totalWLT[x][0] / totalWLT[x][3])) * 100, 3)
+        elif numContests > 0:
+            coasterDict[x]["Win Percentage"] = round(((numWins / numContests)) * 100, 3)
 
     spinner.stop()
     print(" ")
-
-    return winPercentage
 
 
 
@@ -476,7 +468,7 @@ def calculateResults(coasterDict, totalWLT, winLossMatrix):
 #    sorted list of coasters by pairwise win pct
 # ==================================================
 
-def sortedLists(coasterDict, totalWLT, winLossMatrix, winPercentage):
+def sortedLists(coasterDict, winLossMatrix):
     print("Sorting the results...", end=" ")
     spinner = Spinner()
     spinner.start()
@@ -485,19 +477,23 @@ def sortedLists(coasterDict, totalWLT, winLossMatrix, winPercentage):
     numRiders = []
     pairPercents = []
 
-    # iterate through the winPercentage dict by coasters
-    for i in winPercentage.keys():
-        numRiders.append((i, coasterDict[i]["Riders"]))
-        if int(coasterDict[i]["Riders"]) >= int(args.minRiders):
+    # iterate through coasterDict by coasters
+    for coasterName in coasterDict.keys():
+        numRiders.append((coasterName, coasterDict[coasterName]["Riders"]))
+        if int(coasterDict[coasterName]["Riders"]) >= int(args.minRiders):
+            results.append((coasterName,
+                            coasterDict[coasterName]["Win Percentage"],
+                            coasterDict[coasterName]["Total Wins"],
+                            coasterDict[coasterName]["Total Losses"],
+                            coasterDict[coasterName]["Total Ties"]))
 
-            # values are: "Rank", "Coaster", "Win %", "Total Wins", "Total Losses", "Total Ties"
-            results.append((i, winPercentage[i], totalWLT[i][0], totalWLT[i][1], totalWLT[i][1]))
-
-    # iterate through the winLossMatrix dict by coaster pairings
-    for i in winLossMatrix.keys():
-
-        # values are: "Rank", "coasterA", "coasterB", "Win %", "Wins", "Losses", "Ties"        
-        pairPercents.append((i, winLossMatrix[i][3], winLossMatrix[i][0], winLossMatrix[i][1], winLossMatrix[i][2]))
+    # iterate through winLossMatrix by coaster pairings
+    for coasterPair in winLossMatrix.keys():      
+        pairPercents.append((coasterPair,                    # "coasterA, coasterB"
+                             winLossMatrix[coasterPair][3],  # "Win Percentage"
+                             winLossMatrix[coasterPair][0],  # "Wins"
+                             winLossMatrix[coasterPair][1],  # "Losses"
+                             winLossMatrix[coasterPair][2])) # "Ties"
 
     # sort lists by win percentages and ridership
     sortedResults = sorted(results, key=lambda x: x[1], reverse=True)
