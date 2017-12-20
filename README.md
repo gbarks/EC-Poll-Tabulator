@@ -9,18 +9,20 @@ To run an election where:
 * The minimum number of a riders a coaster needs in order to be ranked is `10`
 * The default ballot is named `generic ballot.txt`
 * The folder containing submitted ballots is named `ballots`
+* The resulting output file should be named `Coaster Poll 20XX`
 
 Simply run:
 
-`python tabulator.py 10 "generic ballot.txt" ballots`
+`python tabulator.py -m 10 -b "generic ballot.txt" -f ballots -o "Coaster Poll 20XX`
 
-And output will be saved to `Poll Results.xlsx`
+And output will be saved to `Coaster Poll 20XX.xlsx`
 
 Alternatively, the command line argument defaults are:
 
-* `6`
-* `blankballot2017.txt`
-* `ballots2017`
+* `-m 6`
+* `-b blankballot2017.txt`
+* `-f ballots2017`
+* `-o "Poll Results.xlsx"`
 
 ## Dependencies
 
