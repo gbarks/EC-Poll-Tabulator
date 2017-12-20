@@ -41,6 +41,8 @@ parser.add_argument("-c", "--colorize", action="store_true",
                     help="color coaster labels by make in output spreadsheet")
 parser.add_argument("-r", "--botherRCDB", action="store_true",
                     help="bother RCDB to grab metadata from links in blankBallot")
+parser.add_argument("-v", "--verbose", action="store_true",
+                    help="print data as it's processed")
 
 args = parser.parse_args()
 
@@ -221,7 +223,6 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
                         coasterDict[fullName]["Total Wins"] = 0
                         coasterDict[fullName]["Total Losses"] = 0
                         coasterDict[fullName]["Total Ties"] = 0
-                        coasterDict[fullName]["Total Contests"] = 0
                         coasterDict[fullName]["Win Percentage"] = 0.0
                         coasterDict[fullName]["Rank"] = 0
                         coasterDict[fullName]["Ridership Rank"] = 0
@@ -275,9 +276,12 @@ def createMatrix(coasterDict):
     spinner.start()
 
     winLossMatrix = {}
-    for row in coasterDict.keys():
-        for col in coasterDict.keys():
-            winLossMatrix[row, col] = [0, 0, 0, 0.0]
+    for coasterA in coasterDict.keys():
+        for coasterB in coasterDict.keys():
+
+            # can't compare a coaster to itself
+            if coasterA != coasterB:
+                winLossMatrix[coasterA, coasterB] = [0, 0, 0, 0.0]
 
     spinner.stop()
     print("{0} pairings.".format(len(winLossMatrix)))
@@ -376,7 +380,6 @@ def processBallot(filepath, coasterDict, winLossMatrix):
 
             # can't compare a coaster to itself
             if coasterA != coasterB:
-                coasterDict[coasterA]["Total Contests"] += 1 # increment number of contests
 
                 # if the coasters have the same ranking, call it a tie
                 if coasterAndRank[coasterA] == coasterAndRank[coasterB]:
@@ -423,40 +426,36 @@ def calculateResults(coasterDict, winLossMatrix):
     for coasterA in coasterDict.keys():
         for coasterB in coasterDict.keys():
 
-            x = coasterA
-            y = coasterB
-
-            if x == y: # skip a coaster paired with itself
+            # skip a coaster paired with itself
+            if coasterA == coasterB:
                 continue
 
-            wins = winLossMatrix[x, y][0]
-            loss = winLossMatrix[x, y][1]
-            ties = winLossMatrix[x, y][2]
-            numContests = wins + loss + ties
+            pairWins = winLossMatrix[coasterA, coasterB][0]
+            pairLoss = winLossMatrix[coasterA, coasterB][1]
+            pairTies = winLossMatrix[coasterA, coasterB][2]
+            pairContests = pairWins + pairLoss + pairTies
 
-            # if this pair of coasters had mutual riders and there were ties, calculate with this formula
-            if ties != 0 and numContests > 0:
-                # formula: wins + half the ties divided by the number of times they competed against each other
-                # Multiply that by 100 to get the percentage, then round to three digits after the decimal
-                winLossMatrix[x, y][3] = round((((wins + (ties / 2)) / numContests)) * 100, 3)
-            # if this pair had mutual riders, but there were no ties, use this formula
-            elif numContests > 0:
-                winLossMatrix[x, y][3] = round(((wins / numContests)) * 100, 3)
+            if pairContests > 0:
+                winLossMatrix[coasterA, coasterB][3] = (((pairWins + float(pairTies / 2)) / pairContests)) * 100
 
-    # all those calculations we just did for each pair of coasters, now do for each coaster by itself
-    # tallying up ALL the contests it had, not just the pairwise contests
-    # this will give the total overall win percentage for each coaster, which will be used to determine
-    # the final ranking of all the coasters
+                if args.verbose:
+                    print("{0},{1},\tWins: {2},\tTies: {3},\t#Con: {4},\tWin%: {5}".format(
+                        coasterDict[coasterA]["Abbr"], coasterDict[coasterB]["Abbr"],
+                        pairWins, pairTies, pairContests, winLossMatrix[coasterA, coasterB][3]))
+
     for x in coasterDict.keys():
         numWins = coasterDict[x]["Total Wins"]
+        numLoss = coasterDict[x]["Total Losses"]
         numTies = coasterDict[x]["Total Ties"]
-        numContests = coasterDict[x]["Total Contests"]
+        numContests = numWins + numLoss + numTies
 
-        if numTies > 0 and numContests > 0:
-            coasterDict[x]["Win Percentage"] = round((((numWins + (numTies/2)) / numContests)) * 100, 3)
+        if  numContests > 0:
+            coasterDict[x]["Win Percentage"] = ((numWins + float(numTies/2)) / numContests) * 100
 
-        elif numContests > 0:
-            coasterDict[x]["Win Percentage"] = round(((numWins / numContests)) * 100, 3)
+            if args.verbose:
+                print("{0},\tWins: {1},\tTies: {2},\t#Con: {3},\tWin%: {4}".format(
+                    coasterDict[x]["Abbr"], numWins, numTies, numContests,
+                    coasterDict[x]["Win Percentage"]))
 
     spinner.stop()
     print(" ")
