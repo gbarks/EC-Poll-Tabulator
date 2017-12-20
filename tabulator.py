@@ -85,7 +85,8 @@ def main():
         "Roller Coaster Corporation of America" : PatternFill("solid", fgColor=phicolor( 8, light, multi, offset)),
         "S&S Worldwide"                         : PatternFill("solid", fgColor=phicolor( 9, light, multi, offset)),
         "Vekoma"                                : PatternFill("solid", fgColor=phicolor(10, light, multi, offset)),
-        "Other"                                 : PatternFill("solid", fgColor="bababa")
+        "Other Known Manufacturer"              : PatternFill("solid", fgColor=phicolor(11, light, multi, offset)),
+        ""                                      : PatternFill("solid", fgColor="bababa")
     }
 
     # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
@@ -224,7 +225,7 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
                         coasterDict[fullName]["Total Losses"] = 0
                         coasterDict[fullName]["Total Ties"] = 0
                         coasterDict[fullName]["Total Win Percentage"] = 0.0
-                        coasterDict[fullName]["Rank"] = 0
+                        coasterDict[fullName]["Overall Rank"] = 0
                         coasterDict[fullName]["Ridership Rank"] = 0
 
                         masterlistws.append(rowVals)
@@ -237,7 +238,7 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
                             if coasterMake and coasterMake in makeColors.keys():
                                 masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors[coasterMake]
                             else:
-                                masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors["Other"]
+                                masterlistws.cell(row=len(coasterDict)+1, column=6).fill = makeColors[""]
 
     masterlistws.freeze_panes = masterlistws['A2']
     spinner.stop()
@@ -286,6 +287,7 @@ def createMatrix(coasterDict):
                 winLossMatrix[coasterA, coasterB]["Losses"] = 0
                 winLossMatrix[coasterA, coasterB]["Ties"] = 0
                 winLossMatrix[coasterA, coasterB]["Win Percentage"] = 0.0
+                winLossMatrix[coasterA, coasterB]["Pairwise Rank"] = 0
 
     spinner.stop()
     print("{0} pairings.".format(len(winLossMatrix)))
@@ -482,24 +484,50 @@ def sortedLists(coasterDict, winLossMatrix):
     for coasterName in coasterDict.keys():
         numRiders.append((coasterName, coasterDict[coasterName]["Riders"]))
         if int(coasterDict[coasterName]["Riders"]) >= int(args.minRiders):
-            results.append((coasterName,
-                            coasterDict[coasterName]["Total Win Percentage"],
-                            coasterDict[coasterName]["Total Wins"],
-                            coasterDict[coasterName]["Total Losses"],
-                            coasterDict[coasterName]["Total Ties"]))
+            results.append((coasterName, coasterDict[coasterName]["Total Win Percentage"]))
 
     # iterate through winLossMatrix by coaster pairings
     for coasterPair in winLossMatrix.keys():      
-        pairPercents.append((coasterPair,                    # "coasterA, coasterB"
-                             winLossMatrix[coasterPair]["Win Percentage"],  # "Win Percentage"
-                             winLossMatrix[coasterPair]["Wins"],  # "Wins"
-                             winLossMatrix[coasterPair]["Losses"],  # "Losses"
-                             winLossMatrix[coasterPair]["Ties"])) # "Ties"
+        pairPercents.append((coasterPair, winLossMatrix[coasterPair]["Win Percentage"]))
 
     # sort lists by win percentages and ridership
     sortedResults = sorted(results, key=lambda x: x[1], reverse=True)
     sortedPairs = sorted(pairPercents, key=lambda x: x[1], reverse=True)
     sortedRiders = sorted(numRiders, key=lambda x: x[1], reverse=True)
+
+    # determine rankings including ties for all three lists
+    overallRank = 0
+    curRank = 0
+    curValue = 0.0
+    for x in sortedResults:
+        overallRank += 1
+        if x[1] != curValue:
+            curRank = overallRank
+            curValue = x[1]
+        coasterDict[x[0]]["Overall Rank"] = curRank
+        if args.verbose:
+            print("Rank: {0},\tVal: {1},\tCoaster: {2}".format(coasterDict[x[0]]["Overall Rank"], x[1], x[0]))
+
+    overallRank = 0
+    curRank = 0
+    curValue = 0.0
+    for x in sortedPairs:
+        overallRank += 1
+        if x[1] != curValue:
+            curRank = overallRank
+            curValue = x[1]
+        winLossMatrix[x[0][0], x[0][1]]["Pairwise Rank"] = curRank
+
+    overallRank = 0
+    curRank = 0
+    curValue = 0
+    for x in sortedRiders:
+        overallRank += 1
+        if x[1] != curValue:
+            curRank = overallRank
+            curValue = x[1]
+        coasterDict[x[0]]["Ridership Rank"] = curRank
+
 
     spinner.stop()
     print(" ")
@@ -526,8 +554,12 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterDict, preferre
     resultws.column_dimensions['D'].width = 8.83
     resultws.column_dimensions['E'].width = 9.83
     resultws.column_dimensions['F'].width = 7.83
-    for i in range(0, len(results)):
-        resultws.append([i+1, results[i][0], results[i][1], results[i][2], results[i][3], results[i][4]])
+    for x in results:
+        resultws.append([coasterDict[x[0]]["Overall Rank"], x[0],
+                         coasterDict[x[0]]["Total Win Percentage"],
+                         coasterDict[x[0]]["Total Wins"],
+                         coasterDict[x[0]]["Total Losses"],
+                         coasterDict[x[0]]["Total Ties"]])
     resultws.freeze_panes = resultws['A2']
 
     # create and write pairwise result worksheet
@@ -540,8 +572,12 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterDict, preferre
     pairws.column_dimensions['E'].width = 4.5
     pairws.column_dimensions['F'].width = 5.5
     pairws.column_dimensions['G'].width = 3.83
-    for i in range(0, len(pairs)):
-        pairws.append([i+1, pairs[i][0][0], pairs[i][0][1], pairs[i][1], pairs[i][2], pairs[i][3], pairs[i][4]])
+    for x in pairs:
+        pairws.append([winLossMatrix[x[0][0], x[0][1]]["Pairwise Rank"], x[0][0], x[0][1],
+                       winLossMatrix[x[0][0], x[0][1]]["Win Percentage"],
+                       winLossMatrix[x[0][0], x[0][1]]["Wins"],
+                       winLossMatrix[x[0][0], x[0][1]]["Losses"],
+                       winLossMatrix[x[0][0], x[0][1]]["Ties"]])
     pairws.freeze_panes = pairws['A2']
 
     # create and write ridership worksheet
@@ -550,8 +586,9 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterDict, preferre
     riderws.column_dimensions['A'].width = 4.83
     riderws.column_dimensions['B'].width = 45.83
     riderws.column_dimensions['C'].width = 13.83
-    for i in range(0, len(riders)):
-        riderws.append([i+1, riders[i][0], riders[i][1]])
+    for x in riders:
+        riderws.append([coasterDict[x[0]]["Ridership Rank"], x[0],
+                        coasterDict[x[0]]["Riders"]])
     riderws.freeze_panes = riderws['A2']
 
     # create and write Mitch Hawker-style mutual rider comparison worksheet
