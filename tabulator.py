@@ -18,7 +18,7 @@ try:
     from phicolor import phicolor
     from spinner import Spinner
 except:
-    print('Could not find "phicolor.py" and/or spinner.py"; exiting...')
+    print('Could not find "phicolor.py" and/or "spinner.py"; exiting...')
     sys.exit()
 
 # global strings for parsing ballots
@@ -227,6 +227,7 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
                         coasterDict[fullName]["Total Win Percentage"] = 0.0
                         coasterDict[fullName]["Overall Rank"] = 0
                         coasterDict[fullName]["Ridership Rank"] = 0
+                        coasterDict[fullName]["Tied Coasters"] = []
 
                         masterlistws.append(rowVals)
                         masterlistws.cell(row=len(coasterDict)+1, column=5).font = preferredFixedWidthFont
@@ -428,6 +429,9 @@ def calculateResults(coasterDict, winLossMatrix):
     spinner = Spinner()
     spinner.start()
 
+    if args.verbose:
+        print("")
+
     # iterate through all the pairs in the matrix
     for coasterA in coasterDict.keys():
         for coasterB in coasterDict.keys():
@@ -467,6 +471,43 @@ def calculateResults(coasterDict, winLossMatrix):
 
 
 # ==================================================
+#  add to "Tied Coasters" variable and print
+# ==================================================
+
+def markTies(coasterDict, winLossMatrix, tiedCoasters):
+    for coasterA in tiedCoasters:
+        coastersTiedWithA = []
+        for coasterB in tiedCoasters:
+            if coasterA != coasterB:
+                coastersTiedWithA.append(coasterB)
+        coasterDict[coasterA]["Tied Coasters"] = coastersTiedWithA
+    if args.verbose: # print Mitch Hawker-style pairwise matchups between tied coasters
+        print("  ===Tied===", end="\t")
+        for coaster in tiedCoasters:
+            print(" {0} ".format(coasterDict[coasterB]["Abbr"]), end="\t")
+        print("")
+        for coasterA in tiedCoasters:
+            print("  {0}".format(coasterDict[coasterA]["Abbr"]), end="\t")
+            for coasterB in tiedCoasters:
+                cellStr = " "
+                if coasterA != coasterB:
+                    if winLossMatrix[coasterA, coasterB]["Wins"] > winLossMatrix[coasterA, coasterB]["Losses"]:
+                        cellStr += "W "
+                    elif winLossMatrix[coasterA, coasterB]["Wins"] < winLossMatrix[coasterA, coasterB]["Losses"]:
+                        cellStr += "L "
+                    else:
+                        cellStr += "T "
+                    cellStr += str(winLossMatrix[coasterA, coasterB]["Wins"]) + "-"
+                    cellStr += str(winLossMatrix[coasterA, coasterB]["Losses"]) + "-"
+                    cellStr += str(winLossMatrix[coasterA, coasterB]["Ties"])
+                else:
+                    cellStr += "       "
+                print("{0}".format(cellStr), end="\t")
+            print("")
+
+
+
+# ==================================================
 #  create sorted list of coasters by win pct and
 #    sorted list of coasters by pairwise win pct
 # ==================================================
@@ -495,18 +536,28 @@ def sortedLists(coasterDict, winLossMatrix):
     sortedPairs = sorted(pairPercents, key=lambda x: x[1], reverse=True)
     sortedRiders = sorted(numRiders, key=lambda x: x[1], reverse=True)
 
+    if args.verbose:
+        print("")
+
     # determine rankings including ties for all three lists
     overallRank = 0
     curRank = 0
     curValue = 0.0
+    tiedCoasters = []
     for x in sortedResults:
         overallRank += 1
         if x[1] != curValue:
+            if len(tiedCoasters) > 1: # do stuff on complete list of tied coasters
+                markTies(coasterDict, winLossMatrix, tiedCoasters)
             curRank = overallRank
             curValue = x[1]
+            tiedCoasters = []
+        tiedCoasters.append(x[0])
         coasterDict[x[0]]["Overall Rank"] = curRank
         if args.verbose:
             print("Rank: {0},\tVal: {1},\tCoaster: {2}".format(coasterDict[x[0]]["Overall Rank"], x[1], x[0]))
+    if len(tiedCoasters) > 1: # in case last few coasters were tied
+        markTies(coasterDict, winLossMatrix, tiedCoasters)
 
     overallRank = 0
     curRank = 0
@@ -602,7 +653,7 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterDict, preferre
     for col in range(3, len(results)+3):
         hawkerWLTws.column_dimensions[get_column_letter(col)].width = 12.83
     for i in range(0, len(results)):
-        resultRow = [i+1, results[i][0]]
+        resultRow = [coasterDict[results[i][0]]["Overall Rank"], results[i][0]]
         for j in range(0, len(results)):
             coasterA = results[i][0]
             coasterB = results[j][0]
