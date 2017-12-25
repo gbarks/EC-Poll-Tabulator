@@ -81,22 +81,23 @@ def main():
     # preferred fixed-width font
     menlo = Font(name="Menlo")
 
-    div = 12
     light = 186
+    multi = 1
+    offset = 0.018034
     makeColors = { # fill colors for certain roller coaster manufacturers/designers
-        "Custom Coasters International, Inc."   : PatternFill("solid", fgColor=divcolor( 0, div, light)),
-        "Dinn Corporation"                      : PatternFill("solid", fgColor=divcolor( 1, div, light)),
-        "Gravitykraft Corporation"              : PatternFill("solid", fgColor=divcolor( 2, div, light)),
-        "The Gravity Group, LLC"                : PatternFill("solid", fgColor=divcolor( 3, div, light)),
-        "Great Coasters International"          : PatternFill("solid", fgColor=divcolor( 3, div, light)),
-        "Intamin Amusement Rides"               : PatternFill("solid", fgColor=divcolor( 4, div, light)),
-        "Martin & Vleminckx"                    : PatternFill("solid", fgColor=divcolor( 5, div, light)),
-        "National Amusement Device Company"     : PatternFill("solid", fgColor=divcolor( 6, div, light)),
-        "Philadelphia Toboggan Coasters, Inc."  : PatternFill("solid", fgColor=divcolor( 7, div, light)),
-        "Rocky Mountain Construction"           : PatternFill("solid", fgColor=divcolor( 8, div, light)),
-        "Roller Coaster Corporation of America" : PatternFill("solid", fgColor=divcolor( 9, div, light)),
-        "S&S Worldwide"                         : PatternFill("solid", fgColor=divcolor(10, div, light)),
-        "Vekoma"                                : PatternFill("solid", fgColor=divcolor(11, div, light)),
+        "Custom Coasters International, Inc."   : PatternFill("solid", fgColor=phicolor( 0, light, multi, offset)),
+        "Dinn Corporation"                      : PatternFill("solid", fgColor=phicolor( 1, light, multi, offset)),
+        "Gravitykraft Corporation"              : PatternFill("solid", fgColor=phicolor( 2, light, multi, offset)),
+        "The Gravity Group, LLC"                : PatternFill("solid", fgColor=phicolor( 2, light, multi, offset)),
+        "Great Coasters International"          : PatternFill("solid", fgColor=phicolor( 3, light, multi, offset)),
+        "Intamin Amusement Rides"               : PatternFill("solid", fgColor=phicolor( 4, light, multi, offset)),
+        "Martin & Vleminckx"                    : PatternFill("solid", fgColor=phicolor( 5, light, multi, offset)),
+        "National Amusement Device Company"     : PatternFill("solid", fgColor=phicolor( 6, light, multi, offset)),
+        "Philadelphia Toboggan Coasters, Inc."  : PatternFill("solid", fgColor=phicolor( 7, light, multi, offset)),
+        "Rocky Mountain Construction"           : PatternFill("solid", fgColor=phicolor( 8, light, multi, offset)),
+        "Roller Coaster Corporation of America" : PatternFill("solid", fgColor=phicolor( 9, light, multi, offset)),
+        "S&S Worldwide"                         : PatternFill("solid", fgColor=phicolor(10, light, multi, offset)),
+        "Vekoma"                                : PatternFill("solid", fgColor=phicolor(11, light, multi, offset)),
         "Other Known Manufacturer"              : PatternFill("solid", fgColor="cccccc"),
         ""                                      : PatternFill("solid", fgColor="eeeeee")
     }
