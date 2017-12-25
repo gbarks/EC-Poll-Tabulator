@@ -43,8 +43,8 @@ parser.add_argument("-i", "--includeVoterInfo", action="store_true",
                     help="include sensitive voter data in output spreadsheet")
 parser.add_argument("-r", "--botherRCDB", action="store_true",
                     help="bother RCDB to grab metadata from links in blankBallot")
-parser.add_argument("-v", "--verbose", action="store_true",
-                    help="print data as it's processed")
+parser.add_argument("-v", "--verbose", action="count", default=0,
+                    help="print data as it's processed; duplicate for more detail")
 
 args = parser.parse_args()
 
@@ -505,7 +505,7 @@ def calculateResults(coasterDict, winLossMatrix):
     spinner = Spinner()
     spinner.start()
 
-    if args.verbose:
+    if args.verbose > 0:
         print("")
 
     # iterate through all the pairs in the matrix
@@ -522,7 +522,7 @@ def calculateResults(coasterDict, winLossMatrix):
                 if pairContests > 0:
                     winLossMatrix[coasterA, coasterB]["Win Percentage"] = (((pairWins + float(pairTies / 2)) / pairContests)) * 100
 
-                    if args.verbose:
+                    if args.verbose > 1:
                         print("{0},{1},\tWins: {2},\tTies: {3},\t#Con: {4},\tWin%: {5}".format(
                             coasterDict[coasterA]["Abbr"], coasterDict[coasterB]["Abbr"],
                             pairWins, pairTies, pairContests, winLossMatrix[coasterA, coasterB]["Win Percentage"]))
@@ -536,7 +536,7 @@ def calculateResults(coasterDict, winLossMatrix):
         if  numContests > 0:
             coasterDict[x]["Total Win Percentage"] = ((numWins + float(numTies/2)) / numContests) * 100
 
-            if args.verbose:
+            if args.verbose > 0:
                 print("{0},\tWins: {1},\tTies: {2},\t#Con: {3},\tWin%: {4}".format(
                     coasterDict[x]["Abbr"], numWins, numTies, numContests,
                     coasterDict[x]["Total Win Percentage"]))
@@ -557,7 +557,7 @@ def markTies(coasterDict, winLossMatrix, tiedCoasters):
             if coasterA != coasterB:
                 coastersTiedWithA.append(coasterB)
         coasterDict[coasterA]["Tied Coasters"] = coastersTiedWithA
-    if args.verbose: # print Mitch Hawker-style pairwise matchups between tied coasters
+    if args.verbose > 0: # print Mitch Hawker-style pairwise matchups between tied coasters
         print("  ===Tied===", end="\t")
         for coaster in tiedCoasters:
             print(" {0} ".format(coasterDict[coasterB]["Abbr"]), end="\t")
@@ -612,7 +612,7 @@ def sortedLists(coasterDict, winLossMatrix):
     sortedPairs = sorted(pairPercents, key=lambda x: x[1], reverse=True)
     sortedRiders = sorted(numRiders, key=lambda x: x[1], reverse=True)
 
-    if args.verbose:
+    if args.verbose > 0:
         print("")
 
     # determine rankings including ties for all three lists
@@ -630,8 +630,8 @@ def sortedLists(coasterDict, winLossMatrix):
             tiedCoasters = []
         tiedCoasters.append(x[0])
         coasterDict[x[0]]["Overall Rank"] = curRank
-        if args.verbose:
-            print("Rank: {0},\tVal: {1},\tCoaster: {2}".format(coasterDict[x[0]]["Overall Rank"], x[1], x[0]))
+        if args.verbose > 0:
+            print("Rank: {0},\tVal: {1},  \tCoaster: {2}".format(coasterDict[x[0]]["Overall Rank"], x[1], x[0]))
     if len(tiedCoasters) > 1: # in case last few coasters were tied
         markTies(coasterDict, winLossMatrix, tiedCoasters)
 

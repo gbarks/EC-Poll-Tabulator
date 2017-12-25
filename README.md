@@ -29,7 +29,7 @@ Additional command line flags include:
 * `-c` sets fill color of certain cells to reflect the make (manufacturer) of the coaster
 * `-i` includes sensitive voter data in a spreadsheet in the output file
 * `-r` bothers [rcdb.com](https://rcdb.com/) with requests to fill in coaster details
-* `-v` prints data as it's processed to `stdout`
+* `-v` prints data as it's processed; `-vv` prints even more
 
 ## Dependencies
 
