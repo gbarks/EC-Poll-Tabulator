@@ -53,3 +53,6 @@ def getcolor(f, i=128, multiplier=1.0, offset = 0.0):
 def phicolor(n, lightness=128, multiplier=1.0, offset=0.0):
     phi = float((1 + sqrt(5)) / 2)
     return getcolor(float(n * phi), lightness, multiplier, offset)
+
+def divcolor(n, division, lightness=128, multiplier=1.0, offset=0.0):
+    return getcolor(float(n / division), lightness, multiplier, offset)
