@@ -171,7 +171,7 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
     # set up Coaster Masterlist worksheet
     headerRow = ["Full Coaster Name", "Abbrev.", "Name", "Park", "State", "RCDB Link"]
     if args.botherRCDB:
-        headerRow.extend(["Make"])
+        headerRow.extend(["Make", "Year"])
     masterlistws.append(headerRow)
     masterlistws.column_dimensions['A'].width = 45.83
     masterlistws.column_dimensions['B'].width = 12.83
@@ -183,6 +183,7 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
     masterlistws['E1'].font = preferredFixedWidthFont
     if args.botherRCDB:
         masterlistws.column_dimensions['G'].width = 25.83
+        masterlistws.column_dimensions['H'].width = 4.83
 
     coasterDict = {} # return value
 
@@ -245,6 +246,7 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
 
                         coasterDict[fullName]["RCDB"] = ""
                         coasterDict[fullName]["Make"] = ""
+                        coasterDict[fullName]["Year"] = ""
                         if len(words) > 3:
                             coasterDict[fullName]["RCDB"] = words[3]
                             rowVals.append('=HYPERLINK("{0}", "{1}")'.format(words[3], words[3][8:]))
@@ -260,8 +262,22 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, makeColors):
                                         if "Model: " in subtext:
                                             subtext = subtext.split("Model: ", 1)[0]
                                         coasterDict[fullName]["Make"] = subtext
+                                        break
                                 rowVals.append(coasterDict[fullName]["Make"])
-                                print("{0},  \t{1}".format(abbrName, coasterDict[fullName]["Make"]))
+
+                                for x in soup.body.findAll(True):
+                                    if "Operating since " in x.text:
+                                        subtext = x.text.split("Operating since ", 1)[1][:10].split('/')[-1][:4]
+                                        coasterDict[fullName]["Year"] = int(subtext)
+                                        break
+                                    elif "Operated from " in x.text:
+                                        subtext = x.text.split("Operated from ", 1)[1].split(' ')[0].split('/')[-1]
+                                        coasterDict[fullName]["Year"] = int(subtext)
+                                        break
+                                rowVals.append(coasterDict[fullName]["Year"])
+
+                                print("{0},  \t{1},\t{2}".format(
+                                    abbrName, coasterDict[fullName]["Year"], coasterDict[fullName]["Make"]))
 
                         # final values associated with this coaster
                         coasterDict[fullName]["Abbr"] = abbrName
