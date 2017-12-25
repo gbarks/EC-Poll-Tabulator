@@ -26,13 +26,14 @@ Alternatively, the command line argument defaults are:
 
 Additional command line flags include:
 
-* `-c` sets fill color of certain cells to reflect the make (manufacturer) of the coaster (partially implemented)
-* `-r` bothers [rcdb.com](https://rcdb.com/) with requests to fill in coaster details (not yet implemented)
+* `-c` sets fill color of certain cells to reflect the make (manufacturer) of the coaster
+* `-i` includes sensitive voter data in a spreadsheet in the output file
+* `-r` bothers [rcdb.com](https://rcdb.com/) with requests to fill in coaster details
 * `-v` prints data as it's processed to `stdout`
 
 ## Dependencies
 
-The script should work with Python 2 or 3 and requires [openpyxl](https://openpyxl.readthedocs.io/en/default/).
+The script should work with Python 2 or 3 and requires [openpyxl](https://openpyxl.readthedocs.io/en/default/). Scraping data from [rcdb.com](https://rcdb.com/) with the `-r` flag requires Python 3, [lxml](http://lxml.de/), and [beautifulsoup4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/).
 
 ## More Info
 
