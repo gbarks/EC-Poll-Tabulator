@@ -39,6 +39,8 @@ parser.add_argument("-o", "--outfile", default="Poll Results.xlsx",
                     help="specify name of output .xlsx file")
 parser.add_argument("-c", "--colorize", action="store_true",
                     help="color coaster labels by make in output spreadsheet")
+parser.add_argument("-i", "--includeVoterInfo", action="store_true",
+                    help="include sensitive voter data in output spreadsheet")
 parser.add_argument("-r", "--botherRCDB", action="store_true",
                     help="bother RCDB to grab metadata from links in blankBallot")
 parser.add_argument("-v", "--verbose", action="store_true",
@@ -123,18 +125,20 @@ def main():
     winLossMatrix = createMatrix(coasterDict)
 
     # loop through all the ballot filenames and process each ballot
-    voterinfows = xlout.create_sheet("Voter Info (SENSITIVE)")
-    voterinfows.append(["Ballot Filename","Name","Email","City","State/Province","Country","Coasters Ridden"])
-    voterinfows.column_dimensions['A'].width = 24.83
-    voterinfows.column_dimensions['B'].width = 16.83
-    voterinfows.column_dimensions['C'].width = 24.83
-    for col in ['D','E','F','G']:
-        voterinfows.column_dimensions[col].width = 12.83
+    if args.includeVoterInfo:
+        voterinfows = xlout.create_sheet("Voter Info (SENSITIVE)")
+        voterinfows.append(["Ballot Filename","Name","Email","City","State/Province","Country","Coasters Ridden"])
+        voterinfows.column_dimensions['A'].width = 24.83
+        voterinfows.column_dimensions['B'].width = 16.83
+        voterinfows.column_dimensions['C'].width = 24.83
+        for col in ['D','E','F','G']:
+            voterinfows.column_dimensions[col].width = 12.83
     for filepath in ballotList:
         voterInfo = processBallot(filepath, coasterDict, winLossMatrix)
-        if voterInfo:
+        if args.includeVoterInfo and voterInfo:
             voterinfows.append(voterInfo)
-    voterinfows.freeze_panes = voterinfows['A2']
+    if args.includeVoterInfo:
+        voterinfows.freeze_panes = voterinfows['A2']
 
     calculateResults(coasterDict, winLossMatrix)
 
