@@ -33,7 +33,9 @@ Additional command line flags include:
 
 ## Dependencies
 
-The script should work with Python 2 or 3 and requires [openpyxl](https://openpyxl.readthedocs.io/en/default/). Scraping data from [rcdb.com](https://rcdb.com/) with the `-r` flag requires Python 3, [lxml](http://lxml.de/), and [beautifulsoup4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/).
+The script should work with Python 2 or 3 and requires [openpyxl](https://openpyxl.readthedocs.io/en/default/).
+
+Scraping data from [rcdb.com](https://rcdb.com/) with the `-r` flag requires Python 3, [lxml](http://lxml.de/), and [beautifulsoup4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/).
 
 ## More Info
 
