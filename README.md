@@ -19,7 +19,7 @@ And output will be saved to `Coaster Poll 20XX.xlsx`
 
 Alternatively, the command line argument defaults are:
 
-* `-m 6`
+* `-m 9`
 * `-b blankballot2017.txt`
 * `-f ballots2017`
 * `-o "Poll Results.xlsx"`
