@@ -33,7 +33,7 @@ parser.add_argument("-b", "--blankBallot", default="blankballot2017.txt",
                     help="specify blank ballot file")
 parser.add_argument("-f", "--ballotFolder", default="ballots2017",
                     help="specify folder containing filled ballots")
-parser.add_argument("-m", "--minRiders", type=int, default=6,
+parser.add_argument("-m", "--minRiders", type=int, default=9,
                     help="specify minimum number of riders for a coaster to rank")
 parser.add_argument("-o", "--outfile", default="Poll Results.xlsx",
                     help="specify name of output .xlsx file")
@@ -58,6 +58,14 @@ if not os.path.isdir(args.ballotFolder) or len(os.listdir(args.ballotFolder)) < 
 
 if args.outfile[-5:] != ".xlsx":
     args.outfile += ".xlsx"
+
+# === REMOVE THESE LINES FOR STANDARD PERFORMANCE ===
+args.minRiders = 9
+args.colorize = True
+args.includeVoterInfo = True
+args.botherRCDB = True
+args.verbose = 1
+# === REMOVE THESE LINES FOR STANDARD PERFORMANCE ===
 
 if args.botherRCDB and sys.version_info >= (3,0):
     import lxml
@@ -674,20 +682,26 @@ def printToFile(xl, results, pairs, riders, winLossMatrix, coasterDict, preferre
 
     # create and write primary results worksheet
     resultws = xl.create_sheet("Ranked Results")
-    resultws.append(["Rank","Coaster","Total Win Percentage","Total Wins","Total Losses","Total Ties"])
+    resultws.append(["Rank","Coaster","Total Win Percentage","Total Wins","Total Losses","Total Ties","Number of Riders","Make","Year"])
     resultws.column_dimensions['A'].width = 4.83
     resultws.column_dimensions['B'].width = 45.83
     resultws.column_dimensions['C'].width = 16.83
     resultws.column_dimensions['D'].width = 8.83
     resultws.column_dimensions['E'].width = 9.83
     resultws.column_dimensions['F'].width = 7.83
+    resultws.column_dimensions['G'].width = 13.83
+    resultws.column_dimensions['H'].width = 23.83
+    resultws.column_dimensions['I'].width = 8.83
     i = 2
     for x in results:
         resultws.append([coasterDict[x[0]]["Overall Rank"], x[0],
                          coasterDict[x[0]]["Total Win Percentage"],
                          coasterDict[x[0]]["Total Wins"],
                          coasterDict[x[0]]["Total Losses"],
-                         coasterDict[x[0]]["Total Ties"]])
+                         coasterDict[x[0]]["Total Ties"],
+                         coasterDict[x[0]]["Riders"],
+                         coasterDict[x[0]]["Make"],
+                         coasterDict[x[0]]["Year"]])
         if args.colorize:
             if coasterDict[x[0]]["Make"]:
                 if coasterDict[x[0]]["Make"] in makeColors.keys():
