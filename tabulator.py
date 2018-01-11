@@ -14,12 +14,11 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 
+useSpinner = True
 try:
-    from phicolor import phicolor, divcolor
     from spinner import Spinner
 except:
-    print('Could not find "phicolor.py" and/or "spinner.py"; exiting...')
-    sys.exit()
+    useSpinner = False
 
 # global strings for parsing ballots
 commentStr = "* "
@@ -33,7 +32,7 @@ parser.add_argument("-b", "--blankBallot", default="blankballot2017.txt",
                     help="specify blank ballot file")
 parser.add_argument("-f", "--ballotFolder", default="ballots2017",
                     help="specify folder containing filled ballots")
-parser.add_argument("-m", "--minRiders", type=int, default=9,
+parser.add_argument("-m", "--minRiders", type=int, default=10,
                     help="specify minimum number of riders for a coaster to rank")
 parser.add_argument("-o", "--outfile", default="Poll Results.xlsx",
                     help="specify name of output .xlsx file")
@@ -82,24 +81,20 @@ def main():
     # preferred fixed-width font
     menlo = Font(name="Menlo")
 
-    light = 186
-    multi = 1
-    offset = 0.018034
     manuColors = { # fill colors for certain roller coaster manufacturers/designers
-        "Custom Coasters International, Inc."   : PatternFill("solid", fgColor=phicolor( 0, light, multi, offset)),
-        "Dinn Corporation"                      : PatternFill("solid", fgColor=phicolor( 1, light, multi, offset)),
-        "Gravitykraft Corporation"              : PatternFill("solid", fgColor=phicolor( 2, light, multi, offset)),
-        "The Gravity Group, LLC"                : PatternFill("solid", fgColor=phicolor( 2, light, multi, offset)),
-        "Great Coasters International"          : PatternFill("solid", fgColor=phicolor( 3, light, multi, offset)),
-        "Intamin Amusement Rides"               : PatternFill("solid", fgColor=phicolor( 4, light, multi, offset)),
-        "National Amusement Device Company"     : PatternFill("solid", fgColor=phicolor( 5, light, multi, offset)),
-        "Philadelphia Toboggan Coasters, Inc."  : PatternFill("solid", fgColor=phicolor( 6, light, multi, offset)),
-        "Rocky Mountain Construction"           : PatternFill("solid", fgColor=phicolor( 7, light, multi, offset)),
-        "Roller Coaster Corporation of America" : PatternFill("solid", fgColor=phicolor( 8, light, multi, offset)),
-        "S&S Worldwide"                         : PatternFill("solid", fgColor=phicolor( 9, light, multi, offset)),
-        "Vekoma"                                : PatternFill("solid", fgColor=phicolor(10, light, multi, offset)),
-        "Other Known Manufacturer"              : PatternFill("solid", fgColor="cccccc"),
-        ""                                      : PatternFill("solid", fgColor="eeeeee")
+        "Custom Coasters International, Inc."   : PatternFill("solid", fgColor="fdb2b3"), # red
+        "Dinn Corporation"                      : PatternFill("solid", fgColor="fed185"), # orange
+        "The Gravity Group, LLC"                : PatternFill("solid", fgColor="fffd87"), # yellow
+        "Great Coasters International"          : PatternFill("solid", fgColor="cde4cd"), # green
+        "Intamin Amusement Rides"               : PatternFill("solid", fgColor="b2b4fd"), # blue
+        "National Amusement Device Company"     : PatternFill("solid", fgColor="c9b3d8"), # purple
+        "Philadelphia Toboggan Coasters, Inc."  : PatternFill("solid", fgColor="fecdfe"), # pink
+        "Rocky Mountain Construction"           : PatternFill("solid", fgColor="ceffff"), # cyan
+        "Roller Coaster Corporation of America" : PatternFill("solid", fgColor="e8d9c6"), # light brown
+        "S&S Worldwide"                         : PatternFill("solid", fgColor="cb999a"), # dark brown
+        "Vekoma"                                : PatternFill("solid", fgColor="fefe9e"), # amber
+        "Other Known Manufacturer"              : PatternFill("solid", fgColor="cccccc"), # dark gray
+        ""                                      : PatternFill("solid", fgColor="eeeeee") # light gray
     }
 
     # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
@@ -150,11 +145,32 @@ def main():
 
     # save the Excel file
     print("Saving...", end=" ")
-    spinner = Spinner()
-    spinner.start()
+    if useSpinner:
+        spinner = Spinner()
+        spinner.start()
     xlout.save(args.outfile)
-    spinner.stop()
+    if useSpinner:
+        spinner.stop()
     print('output saved to "Poll Results.xlsx".')
+
+
+
+# ==================================================
+#  function for getting manufacturer's color
+# ==================================================
+
+def colorizeRow(worksheet, rowNum, colList, coasterDict, coaster, colorDict):
+    if args.colorize:
+        if coasterDict[coaster]["Manufacturer"]:
+            if coasterDict[coaster]["Manufacturer"] in colorDict.keys():
+                for c in colList:
+                    worksheet.cell(row=rowNum, column=c).fill = colorDict[coasterDict[coaster]["Manufacturer"]]
+            else:
+                for c in colList:
+                    worksheet.cell(row=rowNum, column=c).fill = colorDict["Other Known Manufacturer"]
+        else:
+            for c in colList:
+                    worksheet.cell(row=rowNum, column=c).fill = colorDict[""]
 
 
 
@@ -165,8 +181,9 @@ def main():
 def getCoasterDict(masterlistws, preferredFixedWidthFont, manuColors):
     if not args.botherRCDB:
         print("Creating list of every coaster on the ballot...", end=" ")
-        spinner = Spinner()
-        spinner.start()
+        if useSpinner:
+            spinner = Spinner()
+            spinner.start()
 
     # set up Coaster Masterlist worksheet
     headerRow = ["Full Coaster Name", "Abbrev.", "Name", "Park", "State", "RCDB Link"]
@@ -292,6 +309,10 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, manuColors):
                                                 coasterDict[fullName]["Manufacturer"] = subtext
                                             break
 
+                                # exception for Gravity Group, who has two names on RCDB for some reason
+                                if coasterDict[fullName]["Manufacturer"] == "Gravitykraft Corporation":
+                                    coasterDict[fullName]["Manufacturer"] = "The Gravity Group, LLC"
+
                                 rowVals.append(coasterDict[fullName]["Manufacturer"])
 
                                 # find an opening year if available
@@ -320,6 +341,8 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, manuColors):
                         coasterDict[fullName]["Total Losses"] = 0
                         coasterDict[fullName]["Total Ties"] = 0
                         coasterDict[fullName]["Total Win Percentage"] = 0.0
+                        coasterDict[fullName]["Average Win Percentage"] = 0.0
+                        coasterDict[fullName]["Win Percentages"] = []
                         coasterDict[fullName]["Overall Rank"] = 0
                         coasterDict[fullName]["Tied Coasters"] = []
 
@@ -330,26 +353,10 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, manuColors):
                         if coasterDict[fullName]["RCDB"]:
                             masterlistws.cell(row=len(coasterDict)+1, column=6).style = "Hyperlink"
 
-                        if args.colorize:
-                            manuCell = masterlistws.cell(row=len(coasterDict)+1, column=7)
-                            nameCell = masterlistws.cell(row=len(coasterDict)+1, column=1)
-                            abbrCell = masterlistws.cell(row=len(coasterDict)+1, column=2)
-                            if coasterDict[fullName]["Manufacturer"]:
-                                if coasterDict[fullName]["Manufacturer"] in manuColors.keys():
-                                    manuCell.fill = manuColors[coasterDict[fullName]["Manufacturer"]]
-                                    nameCell.fill = manuColors[coasterDict[fullName]["Manufacturer"]]
-                                    abbrCell.fill = manuColors[coasterDict[fullName]["Manufacturer"]]
-                                else:
-                                    manuCell.fill = manuColors["Other Known Manufacturer"]
-                                    nameCell.fill = manuColors["Other Known Manufacturer"]
-                                    abbrCell.fill = manuColors["Other Known Manufacturer"]
-                            else:
-                                manuCell.fill = manuColors[""]
-                                nameCell.fill = manuColors[""]
-                                abbrCell.fill = manuColors[""]
+                        colorizeRow(masterlistws, len(coasterDict)+1, [1,2,7], coasterDict, fullName, manuColors)
 
     masterlistws.freeze_panes = masterlistws['A2']
-    if not args.botherRCDB:
+    if useSpinner and not args.botherRCDB:
         spinner.stop()
     print("{0} coasters on the ballot.".format(len(coasterDict)))
     return coasterDict
@@ -362,15 +369,17 @@ def getCoasterDict(masterlistws, preferredFixedWidthFont, manuColors):
 
 def getBallotFilepaths():
     print("Getting the filepaths of submitted ballots...", end=" ")
-    spinner = Spinner()
-    spinner.start()
+    if useSpinner:
+        spinner = Spinner()
+        spinner.start()
 
     ballotList = []
     for file in os.listdir(args.ballotFolder):
         if file.endswith(".txt"):
             ballotList.append(os.path.join(args.ballotFolder, file))
 
-    spinner.stop()
+    if useSpinner:
+        spinner.stop()
     print("{0} ballots submitted.".format(len(ballotList)))
     return ballotList
 
@@ -382,8 +391,9 @@ def getBallotFilepaths():
 
 def createMatrix(coasterDict):
     print("Creating the win/loss matrix...", end=" ")
-    spinner = Spinner()
-    spinner.start()
+    if useSpinner:
+        spinner = Spinner()
+        spinner.start()
 
     winLossMatrix = {}
     for coasterA in coasterDict.keys():
@@ -398,7 +408,8 @@ def createMatrix(coasterDict):
                 winLossMatrix[coasterA, coasterB]["Win Percentage"] = 0.0
                 winLossMatrix[coasterA, coasterB]["Pairwise Rank"] = 0
 
-    spinner.stop()
+    if useSpinner:
+        spinner.stop()
     print("{0} pairings.".format(len(winLossMatrix)))
     return winLossMatrix
 
@@ -534,8 +545,9 @@ def processBallot(filepath, coasterDict, winLossMatrix):
 
 def calculateResults(coasterDict, winLossMatrix):
     print("Calculating results...", end=" ")
-    spinner = Spinner()
-    spinner.start()
+    if useSpinner:
+        spinner = Spinner()
+        spinner.start()
 
     if args.verbose > 0:
         print("")
@@ -553,6 +565,7 @@ def calculateResults(coasterDict, winLossMatrix):
 
                 if pairContests > 0:
                     winLossMatrix[coasterA, coasterB]["Win Percentage"] = (((pairWins + float(pairTies / 2)) / pairContests)) * 100
+                    coasterDict[coasterA]["Win Percentages"].append(winLossMatrix[coasterA, coasterB]["Win Percentage"])
 
                     # only print pairwise results with '-vv' flag
                     if args.verbose > 1:
@@ -568,14 +581,16 @@ def calculateResults(coasterDict, winLossMatrix):
 
         if  numContests > 0:
             coasterDict[x]["Total Win Percentage"] = ((numWins + float(numTies/2)) / numContests) * 100
+            coasterDict[x]["Average Win Percentage"] = sum(coasterDict[x]["Win Percentages"]) / len(coasterDict[x]["Win Percentages"])
 
             # print singular results with just a '-v' flag
             if args.verbose > 0:
-                print("{0},\tWins: {1},\tTies: {2},\t#Con: {3},\tWin%: {4}".format(
+                print("{0},\tWins: {1},\tTies: {2},\t#Con: {3},\tWin%: {4}, \tAvgWin%: {5}".format(
                     coasterDict[x]["Abbr"], numWins, numTies, numContests,
-                    coasterDict[x]["Total Win Percentage"]))
+                    coasterDict[x]["Total Win Percentage"], coasterDict[x]["Average Win Percentage"]))
 
-    spinner.stop()
+    if useSpinner:
+        spinner.stop()
     print(" ")
 
 
@@ -626,8 +641,9 @@ def markTies(coasterDict, winLossMatrix, tiedCoasters):
 
 def sortedLists(coasterDict, winLossMatrix):
     print("Sorting the results...", end=" ")
-    spinner = Spinner()
-    spinner.start()
+    if useSpinner:
+        spinner = Spinner()
+        spinner.start()
 
     results = []
     pairPercents = []
@@ -635,7 +651,9 @@ def sortedLists(coasterDict, winLossMatrix):
     # iterate through coasterDict by coasters
     for coasterName in coasterDict.keys():
         if int(coasterDict[coasterName]["Riders"]) >= int(args.minRiders):
-            results.append((coasterName, coasterDict[coasterName]["Total Win Percentage"]))
+            results.append((coasterName,
+                            coasterDict[coasterName]["Total Win Percentage"],
+                            coasterDict[coasterName]["Average Win Percentage"]))
 
     # iterate through winLossMatrix by coaster pairings
     for coasterPair in winLossMatrix.keys():      
@@ -679,7 +697,8 @@ def sortedLists(coasterDict, winLossMatrix):
             curValue = x[1]
         winLossMatrix[x[0][0], x[0][1]]["Pairwise Rank"] = curRank
 
-    spinner.stop()
+    if useSpinner:
+        spinner.stop()
     print(" ")
 
     return sortedResults, sortedPairs
@@ -692,67 +711,68 @@ def sortedLists(coasterDict, winLossMatrix):
 
 def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWidthFont, manuColors):
     print("Writing the results...", end=" ")
-    spinner = Spinner()
-    spinner.start()
+    if useSpinner:
+        spinner = Spinner()
+        spinner.start()
 
     # create and write primary results worksheet
     resultws = xl.create_sheet("Ranked Results")
-    resultws.append(["Rank","Coaster","Total Win Percentage","Total Wins","Total Losses","Total Ties",
-                     "Number of Riders","Designer/Manufacturer","Year"])
+    headerRow = ["Rank","Coaster","Total Win Percentage","Average Win Percentage",
+                 "Total Wins","Total Losses","Total Ties","Number of Riders"]
+    if args.botherRCDB:
+        headerRow.extend(["Designer/Manufacturer", "Year"])
+    resultws.append(headerRow)
     resultws.column_dimensions['A'].width = 4.83
     resultws.column_dimensions['B'].width = 45.83
     resultws.column_dimensions['C'].width = 16.83
-    resultws.column_dimensions['D'].width = 8.83
-    resultws.column_dimensions['E'].width = 9.83
-    resultws.column_dimensions['F'].width = 7.83
-    resultws.column_dimensions['G'].width = 13.83
-    resultws.column_dimensions['H'].width = 23.83
-    resultws.column_dimensions['I'].width = 8.83
+    resultws.column_dimensions['D'].width = 18.83
+    resultws.column_dimensions['E'].width = 8.83
+    resultws.column_dimensions['F'].width = 9.83
+    resultws.column_dimensions['G'].width = 7.83
+    resultws.column_dimensions['H'].width = 13.83
+    resultws.column_dimensions['I'].width = 23.83
+    resultws.column_dimensions['J'].width = 8.83
     i = 2
     for x in results:
         resultws.append([coasterDict[x[0]]["Overall Rank"], x[0],
                          coasterDict[x[0]]["Total Win Percentage"],
+                         coasterDict[x[0]]["Average Win Percentage"],
                          coasterDict[x[0]]["Total Wins"],
                          coasterDict[x[0]]["Total Losses"],
                          coasterDict[x[0]]["Total Ties"],
                          coasterDict[x[0]]["Riders"],
                          coasterDict[x[0]]["Manufacturer"],
                          coasterDict[x[0]]["Year"]])
-        if args.colorize:
-            if coasterDict[x[0]]["Manufacturer"]:
-                if coasterDict[x[0]]["Manufacturer"] in manuColors.keys():
-                    resultws.cell(row=i, column=2).fill = manuColors[coasterDict[x[0]]["Manufacturer"]]
-                    resultws.cell(row=i, column=8).fill = manuColors[coasterDict[x[0]]["Manufacturer"]]
-                else:
-                    resultws.cell(row=i, column=2).fill = manuColors["Other Known Manufacturer"]
-                    resultws.cell(row=i, column=8).fill = manuColors["Other Known Manufacturer"]
-            else:
-                resultws.cell(row=i, column=2).fill = manuColors[""]
-                resultws.cell(row=i, column=8).fill = manuColors[""]
+        colorizeRow(resultws, i, [2,9], coasterDict, x[0], manuColors)
         i += 1
     resultws.freeze_panes = resultws['A2']
 
     # append coasters that weren't ranked to the bottom of results worksheet
     for x in coasterDict.keys():
         if x not in [y[0] for y in results] and coasterDict[x]["Riders"] > 0:
-            resultws.append(["N/A", x, "Insufficient Riders",
+            resultws.append(["N/A", x,
+                             "Insufficient Riders, {0}".format(coasterDict[x]["Total Win Percentage"]),
+                             "Insufficient Riders, {0}".format(coasterDict[x]["Average Win Percentage"]),
                              coasterDict[x]["Total Wins"],
                              coasterDict[x]["Total Losses"],
                              coasterDict[x]["Total Ties"],
                              coasterDict[x]["Riders"],
                              coasterDict[x]["Manufacturer"],
                              coasterDict[x]["Year"]])
-            if args.colorize:
-                if coasterDict[x]["Manufacturer"]:
-                    if coasterDict[x]["Manufacturer"] in manuColors.keys():
-                        resultws.cell(row=i, column=2).fill = manuColors[coasterDict[x]["Manufacturer"]]
-                        resultws.cell(row=i, column=8).fill = manuColors[coasterDict[x]["Manufacturer"]]
-                    else:
-                        resultws.cell(row=i, column=2).fill = manuColors["Other Known Manufacturer"]
-                        resultws.cell(row=i, column=8).fill = manuColors["Other Known Manufacturer"]
-                else:
-                    resultws.cell(row=i, column=2).fill = manuColors[""]
-                    resultws.cell(row=i, column=8).fill = manuColors[""]
+            colorizeRow(resultws, i, [2,9], coasterDict, x, manuColors)
+            i += 1
+
+    # append coasters that weren't ridden to the bottom of results worksheet
+    for x in coasterDict.keys():
+        if x not in [y[0] for y in results] and coasterDict[x]["Riders"] == 0:
+            resultws.append(["N/A", x, "No Riders", "No Riders",
+                             coasterDict[x]["Total Wins"],
+                             coasterDict[x]["Total Losses"],
+                             coasterDict[x]["Total Ties"],
+                             coasterDict[x]["Riders"],
+                             coasterDict[x]["Manufacturer"],
+                             coasterDict[x]["Year"]])
+            colorizeRow(resultws, i, [2,9], coasterDict, x, manuColors)
             i += 1
 
     # create and write pairwise result worksheet
@@ -772,21 +792,8 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                        winLossMatrix[x[0][0], x[0][1]]["Wins"],
                        winLossMatrix[x[0][0], x[0][1]]["Losses"],
                        winLossMatrix[x[0][0], x[0][1]]["Ties"]])
-        if args.colorize:
-            if coasterDict[x[0][0]]["Manufacturer"]:
-                if coasterDict[x[0][0]]["Manufacturer"] in manuColors.keys():
-                    pairws.cell(row=i, column=2).fill = manuColors[coasterDict[x[0][0]]["Manufacturer"]]
-                else:
-                    pairws.cell(row=i, column=2).fill = manuColors["Other Known Manufacturer"]
-            else:
-                pairws.cell(row=i, column=2).fill = manuColors[""]
-            if coasterDict[x[0][1]]["Manufacturer"]:
-                if coasterDict[x[0][1]]["Manufacturer"] in manuColors.keys():
-                    pairws.cell(row=i, column=3).fill = manuColors[coasterDict[x[0][1]]["Manufacturer"]]
-                else:
-                    pairws.cell(row=i, column=3).fill = manuColors["Other Known Manufacturer"]
-            else:
-                pairws.cell(row=i, column=3).fill = manuColors[""]
+        colorizeRow(pairws, i, [2], coasterDict, x[0][0], manuColors)
+        colorizeRow(pairws, i, [3], coasterDict, x[0][1], manuColors)
         i += 1
     pairws.freeze_panes = pairws['A2']
 
@@ -800,14 +807,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     hawkerWLTws.column_dimensions['B'].width = 45.83
     for col in range(3, len(results)+3):
         hawkerWLTws.column_dimensions[get_column_letter(col)].width = 12.83
-        if args.colorize:
-            if coasterDict[results[col-3][0]]["Manufacturer"]:
-                if coasterDict[results[col-3][0]]["Manufacturer"] in manuColors.keys():
-                    hawkerWLTws.cell(row=1, column=col).fill = manuColors[coasterDict[results[col-3][0]]["Manufacturer"]]
-                else:
-                    hawkerWLTws.cell(row=1, column=col).fill = manuColors["Other Known Manufacturer"]
-            else:
-                hawkerWLTws.cell(row=1, column=col).fill = manuColors[""]
+        colorizeRow(hawkerWLTws, 1, [col], coasterDict, results[col-3][0], manuColors)
     for i in range(0, len(results)):
         resultRow = [coasterDict[results[i][0]]["Overall Rank"], results[i][0]]
         for j in range(0, len(results)):
@@ -826,20 +826,77 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                 cellStr += str(winLossMatrix[coasterA, coasterB]["Ties"])
             resultRow.append(cellStr)
         hawkerWLTws.append(resultRow)
-        if args.colorize:
-            if coasterDict[results[i][0]]["Manufacturer"]:
-                if coasterDict[results[i][0]]["Manufacturer"] in manuColors.keys():
-                    hawkerWLTws.cell(row=i+2, column=2).fill = manuColors[coasterDict[results[i][0]]["Manufacturer"]]
-                else:
-                    hawkerWLTws.cell(row=i+2, column=2).fill = manuColors["Other Known Manufacturer"]
-            else:
-                hawkerWLTws.cell(row=i+2, column=2).fill = manuColors[""]
+        colorizeRow(hawkerWLTws, i+2, [2], coasterDict, results[i][0], manuColors)
     hawkerWLTws.freeze_panes = hawkerWLTws['C2']
     for col in hawkerWLTws.iter_cols(min_col=3):
         for cell in col:
             cell.font = preferredFixedWidthFont
 
-    spinner.stop()
+    # create and write Mitch Hawker-style mutual rider comparison worksheet sorted by Avg Win Percentage
+    resortedResults = sorted(results, key=lambda x: x[2], reverse=True)
+    hawkerWLT2 = xl.create_sheet("CvC Win-Loss-Tie by AvgWin%")
+    headerRow = ["Rank",""]
+    for coaster in resortedResults:
+        headerRow.append(coasterDict[coaster[0]]["Abbr"])
+    hawkerWLT2.append(headerRow)
+    hawkerWLT2.column_dimensions['A'].width = 4.83
+    hawkerWLT2.column_dimensions['B'].width = 45.83
+    for col in range(3, len(resortedResults)+3):
+        hawkerWLT2.column_dimensions[get_column_letter(col)].width = 12.83
+        colorizeRow(hawkerWLT2, 1, [col], coasterDict, resortedResults[col-3][0], manuColors)
+    for i in range(0, len(resortedResults)):
+        resultRow = [coasterDict[resortedResults[i][0]]["Overall Rank"], resortedResults[i][0]]
+        for j in range(0, len(resortedResults)):
+            coasterA = resortedResults[i][0]
+            coasterB = resortedResults[j][0]
+            cellStr = ""
+            if coasterA != coasterB:
+                if winLossMatrix[coasterA, coasterB]["Wins"] > winLossMatrix[coasterA, coasterB]["Losses"]:
+                    cellStr += "W "
+                elif winLossMatrix[coasterA, coasterB]["Wins"] < winLossMatrix[coasterA, coasterB]["Losses"]:
+                    cellStr += "L "
+                else:
+                    cellStr += "T "
+                cellStr += str(winLossMatrix[coasterA, coasterB]["Wins"]) + "-"
+                cellStr += str(winLossMatrix[coasterA, coasterB]["Losses"]) + "-"
+                cellStr += str(winLossMatrix[coasterA, coasterB]["Ties"])
+            resultRow.append(cellStr)
+        hawkerWLT2.append(resultRow)
+        colorizeRow(hawkerWLT2, i+2, [2], coasterDict, resortedResults[i][0], manuColors)
+    hawkerWLT2.freeze_panes = hawkerWLT2['C2']
+    for col in hawkerWLT2.iter_cols(min_col=3):
+        for cell in col:
+            cell.font = preferredFixedWidthFont
+
+    # create and write sheet to compare where coasters would have ranked if sorted by AvgWin%
+    comparisonws = xl.create_sheet("TotalWin% vs AvgWin% Rankings")
+    comparisonws.append(["Coaster","TotalWin% Rank","AvgWin% Rank","Difference"])
+    comparisonws.column_dimensions['A'].width = 45.83
+    comparisonws.column_dimensions['B'].width = 12.83
+    comparisonws.column_dimensions['C'].width = 12.83
+    for i in range(0, len(resortedResults)):
+        coaster = resortedResults[i][0]
+        oldRank = coasterDict[coaster]["Overall Rank"]
+        newRank = i+1
+        diff = oldRank - newRank
+        if diff == 0:
+            comparisonws.append([coaster, oldRank, newRank, ""])
+        else:
+            comparisonws.append([coaster, oldRank, newRank, diff])
+            if diff <= -16:
+                diffColor = "ff0000" # maximum red
+            elif diff < 0:
+                diffColor = "ff{0}{0}".format(hex(256 + 16 * diff)[2:]) # gradual red
+            elif diff < 16:
+                diffColor = "{0}ff{0}".format(hex(256 - 16 * diff)[2:]) # gradual green
+            else:
+                diffColor = "00ff00" # maximum green
+            comparisonws.cell(row=i+2, column=4).fill = PatternFill("solid", fgColor=diffColor)
+        colorizeRow(comparisonws, i+2, [1], coasterDict, coaster, manuColors)
+    comparisonws.freeze_panes = comparisonws['A2']
+
+    if useSpinner:
+        spinner.stop()
     print(" ")
 
 
