@@ -524,7 +524,13 @@ def calculateResults(coasterDict, winLossMatrix):
 
                 if pairContests > 0:
                     winLossMatrix[coasterA, coasterB]["Win Percentage"] = (((pairWins + float(pairTies / 2)) / pairContests)) * 100
-                    coasterDict[coasterA].winPercentages.append(winLossMatrix[coasterA, coasterB]["Win Percentage"])
+                    
+                    if pairWins == pairLoss:
+                        coasterDict[coasterA].pairwiseTies += 1
+                    elif pairWins > pairLoss:
+                        coasterDict[coasterA].pairwiseWins += 1
+                    else:
+                        coasterDict[coasterA].pairwiseLosses += 1
 
                     # only print pairwise results with '-vv' flag
                     if args.verbose > 1:
@@ -533,20 +539,25 @@ def calculateResults(coasterDict, winLossMatrix):
                             pairWins, pairTies, pairContests, winLossMatrix[coasterA, coasterB]["Win Percentage"]))
 
     for x in coasterDict.keys():
-        numWins = coasterDict[x].totalWins
-        numLoss = coasterDict[x].totalLosses
-        numTies = coasterDict[x].totalTies
-        numContests = numWins + numLoss + numTies
+        totalWins = coasterDict[x].totalWins
+        totalLoss = coasterDict[x].totalLosses
+        totalTies = coasterDict[x].totalTies
+        totalContests = totalWins + totalLoss + totalTies
 
-        if  numContests > 0:
-            coasterDict[x].totalWinPercentage = ((numWins + float(numTies/2)) / numContests) * 100
-            coasterDict[x].averageWinPercentage = sum(coasterDict[x].winPercentages) / len(coasterDict[x].winPercentages)
+        pairWins = coasterDict[x].pairwiseWins
+        pairLoss = coasterDict[x].pairwiseLosses
+        pairTies = coasterDict[x].pairwiseTies
+        pairContests = pairWins + pairLoss + pairTies
+
+        if  totalContests > 0:
+            coasterDict[x].totalWinPercentage = ((totalWins + float(totalTies/2)) / totalContests) * 100
+            coasterDict[x].pairwiseWinPercentage = ((pairWins + float(pairTies/2)) / pairContests) * 100
 
             # print singular results with just a '-v' flag
             if args.verbose > 0:
-                print("{0},\tWins: {1},\tTies: {2},\t#Con: {3},\tWin%: {4}, \tAvgWin%: {5}".format(
-                    coasterDict[x].abbr, numWins, numTies, numContests,
-                    coasterDict[x].totalWinPercentage, coasterDict[x].averageWinPercentage))
+                print("{0},\tWins:{1},{2}\tTies:{3},{4}\t#Con:{5},{6}\tWin%: {7}, \tPairWin%: {8}".format(
+                    coasterDict[x].abbr, totalWins, pairWins, totalTies, pairTies, totalContests, pairContests,
+                    round(coasterDict[x].totalWinPercentage, 3), round(coasterDict[x].pairwiseWinPercentage, 3)))
 
     if useSpinner:
         spinner.stop()
@@ -612,7 +623,7 @@ def sortedLists(coasterDict, winLossMatrix):
         if int(coasterDict[coasterName].riders) >= int(args.minRiders):
             results.append((coasterName,
                             coasterDict[coasterName].totalWinPercentage,
-                            coasterDict[coasterName].averageWinPercentage))
+                            coasterDict[coasterName].pairwiseWinPercentage))
 
     # iterate through winLossMatrix by coaster pairings
     for coasterPair in winLossMatrix.keys():      
@@ -676,7 +687,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
 
     # create and write primary results worksheet
     resultws = xl.create_sheet("Ranked Results")
-    headerRow = ["Rank","Coaster","Total Win Percentage","Average Win Percentage",
+    headerRow = ["Rank","Coaster","Total Win Percentage","Pairwise Win Percentage",
                  "Total Wins","Total Losses","Total Ties","Number of Riders"]
     if args.botherRCDB:
         headerRow.extend(["Designer/Manufacturer", "Year"])
@@ -695,7 +706,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     for x in results:
         resultws.append([coasterDict[x[0]].overallRank, x[0],
                          coasterDict[x[0]].totalWinPercentage,
-                         coasterDict[x[0]].averageWinPercentage,
+                         coasterDict[x[0]].pairwiseWinPercentage,
                          coasterDict[x[0]].totalWins,
                          coasterDict[x[0]].totalLosses,
                          coasterDict[x[0]].totalTies,
@@ -711,7 +722,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
         if x not in [y[0] for y in results] and coasterDict[x].riders > 0:
             resultws.append(["N/A", x,
                              "Insufficient Riders, {0}".format(coasterDict[x].totalWinPercentage),
-                             "Insufficient Riders, {0}".format(coasterDict[x].averageWinPercentage),
+                             "Insufficient Riders, {0}".format(coasterDict[x].pairwiseWinPercentage),
                              coasterDict[x].totalWins,
                              coasterDict[x].totalLosses,
                              coasterDict[x].totalTies,
@@ -799,12 +810,16 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
         for cell in col:
             cell.font = preferredFixedWidthFont
 
-    # create and write Mitch Hawker-style mutual rider comparison worksheet sorted by Avg Win Percentage
+    # create and write Mitch Hawker-style mutual rider comparison worksheet sorted by Pairwise Win Percentage
     resortedResults = sorted(results, key=lambda x: x[2], reverse=True)
-    hawkerWLT2 = xl.create_sheet("CvC Win-Loss-Tie by AvgWin%")
+    hawkerWLT2 = xl.create_sheet("CvC Win-Loss-Tie by PairWin%")
     headerRow = ["Rank",""]
-    for coaster in resortedResults:
-        headerRow.append(coasterDict[coaster[0]].abbr)
+    if args.verbose > 0:
+        print(" ")
+    for x in resortedResults:
+        headerRow.append(coasterDict[x[0]].abbr)
+        if args.verbose > 0:
+            print("Rank: {0},\tVal: {1},  \tCoaster: {2}".format(coasterDict[x[0]].overallRank, x[2], x[0]))
     hawkerWLT2.append(headerRow)
     hawkerWLT2.column_dimensions['A'].width = 4.83
     hawkerWLT2.column_dimensions['B'].width = 45.83
@@ -835,9 +850,9 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
         for cell in col:
             cell.font = preferredFixedWidthFont
 
-    # create and write sheet to compare where coasters would have ranked if sorted by AvgWin%
-    comparisonws = xl.create_sheet("TotalWin% vs AvgWin% Rankings")
-    comparisonws.append(["Coaster","TotalWin% Rank","AvgWin% Rank","Difference"])
+    # create and write sheet to compare where coasters would have ranked if sorted by PairWin%
+    comparisonws = xl.create_sheet("TotalWin% vs PairWin% Rankings")
+    comparisonws.append(["Coaster","TotalWin% Rank","PairWin% Rank","Difference"])
     comparisonws.column_dimensions['A'].width = 45.83
     comparisonws.column_dimensions['B'].width = 12.83
     comparisonws.column_dimensions['C'].width = 12.83

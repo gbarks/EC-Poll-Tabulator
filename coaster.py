@@ -27,8 +27,10 @@ class Coaster:
     totalLosses = 0
     totalTies = 0
     totalWinPercentage = 0.0
-    averageWinPercentage = 0.0
-    winPercentages = []
+    pairwiseWins = 0
+    pairwiseLosses = 0
+    pairwiseTies = 0
+    pairwiseWinPercentage = 0.0
     overallRank = 0
     tiedCoasters = []
 
