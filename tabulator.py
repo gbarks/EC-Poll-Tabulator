@@ -1,14 +1,22 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # ==========================================================
 #  ElloCoaster poll tabulator
-#  Contributions from Jim Winslett, Dave Wong, Grant Barker
+#  Author: Grant Barker
+#  Contributions from Dave Wong, Jim Winslett
+#
+#  Requires Python 3
 # ==========================================================
 
-from __future__ import print_function # for Python 2.x users
+from __future__ import print_function
+
+import sys
+
+if sys.version_info[0] < 3:
+    print("Program requires Python 3; running {0}.{1}".format(sys.version_info[0], sys.version_info[1]))
+    sys.exit()
 
 import os
-import sys
 import argparse
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
@@ -67,11 +75,6 @@ if not os.path.isdir(args.ballotFolder) or len(os.listdir(args.ballotFolder)) < 
 
 if args.outfile[-5:] != ".xlsx":
     args.outfile += ".xlsx"
-
-# bothering RCDB requires HTML tools that only work with Python 3
-if args.botherRCDB and sys.version_info < (3,0):
-    print("Bothering RCDB requires Python 3; ignoring '-r' flag...")
-    args.botherRCDB = False
 
 # import the correct set of designers/manufacturers
 if args.designset.lower() == "wood":

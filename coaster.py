@@ -1,16 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # ==========================================================
 #  ElloCoaster poll tabulator: coaster class definitions
 #  Author: Grant Barker
+#
+#  Requires Python 3 for webpage crawling
 # ==========================================================
 
-# these HTML tools don't work in Python 2.x
 import sys
-if sys.version_info >= (3,0):
-    import lxml
-    from bs4 import BeautifulSoup
-    from urllib.request import urlopen
+import lxml
+from bs4 import BeautifulSoup
+from urllib.request import urlopen
 
 class Coaster:
     name = ""
