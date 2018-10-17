@@ -7,6 +7,7 @@ import re
 import sys
 import lxml
 import argparse
+import datetime
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
@@ -17,10 +18,12 @@ parser.add_argument("-i", "--rcdblink", action="append", required=True,
                     help="RCDB input url (required) - can use multiple -i args")
 parser.add_argument("-o", "--outfile", default="rcdb_stats.csv",
                     help="specify name of output .csv file")
-parser.add_argument("-d", "--sortbydate", action="store_true",
+parser.add_argument("-s", "--sortbydate", action="store_true",
                     help="ensure RCDB pages are sorted chronologically")
 parser.add_argument("-u", "--skipunknown", action="store_true",
                     help="skip all coasters named 'unknown'")
+parser.add_argument("-d", "--skipnodate", action="store_true",
+                    help="skip all coasters with nonspecific opening date")
 parser.add_argument("-k", "--skipkiddie", action="store_true",
                     help="skip all kiddie coasters")
 parser.add_argument("-v", "--verbose", action="count", default=0,
@@ -30,6 +33,8 @@ args = parser.parse_args()
 
 if args.outfile[-4:] != ".csv":
     args.outfile += ".csv"
+
+this_year = str(datetime.datetime.now().year)
 
 def main():
     coasters = []
@@ -87,7 +92,7 @@ def main():
 
         # handle pages that are (presumably) individual coasters
         else:
-            c = parse_rcdb_page(url)
+            c = parse_rcdb_page(rcdblink[i])
             if c is not None:
                 coasters.append(c)
 
@@ -147,7 +152,49 @@ def parse_rcdb_page(url):
     location = title.text[title.text.find("(")+1:title.text.find(")")]
     c["location"] = "\"" + location + "\""
 
+    if args.skipunknown is True and name == "unknown":
+        if args.verbose > 0:
+            print("--Skipping \"unknown\" at " + park + " - " + location)
+        return None
+
     # get opening date and closing date
+    feature = csoup.find('div', attrs={'id':'feature'})
+    datestr = feature.text[feature.text.find(")")+1:]
+    if "Mountain Coaster" in datestr:
+        datestr = datestr[:datestr.find("Mountain Coaster")]
+    elif "Powered Coaster" in datestr:
+        datestr = datestr[:datestr.find("Powered Coaster")]
+    else:
+        datestr = datestr[:datestr.find("Roller Coaster")]
+    datestr = datestr.replace("\n", "")
+    if datestr == "Operating" or datestr == "Removed" or "SBNO" in datestr or "In Storage" in datestr:
+        if args.skipnodate:
+            if args.verbose > 0:
+                print("--Skipping " + name + " at " + park + " (unknown opening date)")
+            return None
+    elif " or earlier" in datestr:
+        if args.skipnodate:
+            if args.verbose > 0:
+                print("--Skipping " + name + " at " + park + " (nonspecific opening date)")
+            return None
+    elif "Operating since " in datestr:
+        datestr = datestr.split("Operating since ", 1)[1]
+        datestr = re.sub(r'[^\d/]+', '', datestr)
+        c["date"] = datestr
+    else:
+        if datestr[-4:] == this_year:
+            if "Removed, Operated from " in datestr:
+                datestr = datestr.split("Removed, Operated from ", 1)[1]
+                closing = datestr.split(" ")[-1]
+                closing = re.sub(r'[^\d/]+', '', closing)
+                c["closing"] = closing
+                datestr = datestr.split(" ")[0]
+                datestr = re.sub(r'[^\d/]+', '', datestr)
+                c["date"] = datestr
+        else:
+            if args.verbose > 0:
+                print("--Skipping " + name + " at " + park + " (removed before " + this_year + ")")
+            return None
 
     # get thrill scale
 
@@ -176,6 +223,24 @@ def parse_rcdb_page(url):
     # def get_submodel(text):
     #     return substring
 
+    if args.verbose > 0:
+        # print(name + ", " + park + ", " + date, end="")
+        print(name, end="")
+        if "altname" in c:
+            print(" (AKA " + altname + ")", end="")
+        print(", " + park, end="")
+        if args.verbose > 2:
+            print(" - " + location)
+        else:
+            print("")
+        if args.verbose > 3:
+            if "date" in c:
+                print("    " + datestr, end="")
+                if "closing" in c:
+                    print(" (closed " + c["closing"] + ")")
+                else:
+                    print("")
+
     def get_stat_val(stat, unit, text):
         if stat in text:
             substring = text.split(stat, 1)[1]
@@ -194,17 +259,6 @@ def parse_rcdb_page(url):
             substring = text.split("Duration", 1)[1][:5]
             substring = re.sub(r'[^\d:]+', '', substring)
             return substring
-
-    if args.verbose > 0:
-        # print(name + ", " + park + ", " + date, end="")
-        print(name, end="")
-        if "altname" in c:
-            print(" (AKA " + altname + ")", end="")
-        print(", " + park, end="")
-        if args.verbose > 2:
-            print(" - " + location)
-        else:
-            print("")
 
     # scrape stats data
     for x in csoup.body.find_all('table', attrs={'id':'statTable'}):
