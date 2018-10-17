@@ -197,6 +197,8 @@ def parse_rcdb_page(url):
             return None
 
     # get thrill scale
+    linkrow = feature.find('span', attrs={'class':'link_row'})
+    print("    " + linkrow.text)
 
     # get make
 
