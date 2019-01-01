@@ -1,0 +1,380 @@
+* WOOD COASTER POLL 2017 *
+* ellocoaster.com *
+* For more information on filling out your ballot, visit ellocoaster.com and click Wood Coaster Poll
+
+-Replace this line with your name or leave this line as-is
+-Replace this line with your email *MANDATORY* (it will not be shared)
+-Replace this line with your city or leave this line as-is
+-Replace this line with your state/province/territory or leave this line as-is
+-Replace this line with your country or leave this line as-is
+
+* Only wood coasters that operated in 2017 are listed on the ballot
+
+* You may delete all these * STARRED LINES * as well as the lines for any coasters you haven’t ridden.
+* If you do not want to delete lines, simply leave the rank as 0 for coasters you haven't ridden. 
+* Deleting lines is completely optional, but it may make it easier to work with your ballot, especially if your ride list is long.
+
+* To rank your coasters, replace the 0 at the beginning of the line with the number of your ranking.
+* Please leave the comma after the number.
+* Your favourite coaster will get ranked 1, your second-favourite coaster will get ranked 2, etc
+* Rank in whole numbers only. Do not use fractions or decimal points.
+* Ties are allowed.
+* Continue until you've ranked every coaster that you've ridden.
+
+* DO NOT RANK coasters that you have not ridden
+
+* You may also re-order the lines on your ballot so that your ballot reads
+* from best to worst, if that makes it easier to visualize.
+* This is fine, as long as you don't change any character in the coaster's name.
+* If the coaster name on your ballot doesn't match the original
+* text exactly, that coaster will be discarded and not counted (but the rest of your ballot will still be counted.)
+
+* When you are finished, save your ballot with the filename of your choosing
+* (the file must be saved in the same format as it was downloaded - .txt for text, docx for Word, etc)
+* Then email it as an attachment to:
+* editor@ellocoaster.com
+* Use the subject line "2017 Wood Coaster Poll"
+
+* PLEASE NOTE *
+* RMC Topper Track coasters are listed on this poll as wood coasters
+* If you do not count those as woodies, simply delete them from your ballot or leave the ranking at "0"
+* DO NOT give them a low ranking as a 'protest vote.' That is childish and immature. Don't be that person. ;-)
+
+* Also, some people count racing coasters as single entities, others count each side as a separate coaster.
+* Whichever camp you fall into, it doesn't matter.
+* The sides are listed separately if you wish to assign separate rankings (yes, even the möbius ones).
+* If you consider it a single ride, simply give each side the same rank... 
+* But unless you've only ridden one side, please give both sides a ranking.
+* Now, on to the ballot!
+
+
+! DO NOT CHANGE OR DELETE THIS LINE !
+
+
+
+* NORTH AMERICA *
+* Canada * 
+0, Coaster-PNE Playland-CANDA	
+0, Ghoster Coaster-Canadas Wonderland-CANDA
+0, Mighty Canadian Minebuster-Canadas Wonderland-CANDA
+0, Wild Beast-Canadas Wonderland-CANDA		
+0, Roller Coaster-Upper Clements Park-CANDA		
+0, Monstre (left)-LaRonde-CANDA
+0, Monstre (right)-LaRonde-CANDA
+
+* MEXICO *
+0, Montana Rusa (Left)-La Feria Chapultepec Magico-MEXCO
+0, Montana Rusa (Right)-La Feria Chapultepec Magico-MEXCO
+		
+* UNITED STATES *		
+* Alabama *
+0, Cannonball-Waterville USA-USAAL
+0, Rampage-Alabama Splash Adventure-USAAL
+		
+* ARKANSAS *
+0, Arkansas Twister-Magic Springs-USAAR
+
+* CALIFORNIA *
+0, Ghost Rider-Knott’s Berry Farm-USACA
+0, Giant Dipper-Belmont Park-USACA
+0, Giant Dipper-Santa Cruz Beach Boardwalk-USACA
+0, Gold Striker-Californias Great America-USACA
+0, Grizzly-Californias Great America-USACA		
+0, Apocalypse-SF Magic Mountain-USACA
+
+* COLORADO *
+0, Cyclone-Lakeside-USACO
+0, Twister II-Elitch Gardens-USACO
+
+* CONNECTICUT *
+0, Boulder Dash-Lake Compounce-USACT
+0, Wildcat-Lake Compounce-USACT
+0, Wooden Warrior-Quassy-USACT
+
+* FLORIDA *
+0, Coastersaurus-Legoland Florida-USAFL
+0, Mine Blower-Fun Spot America-USAFL
+0, White Lightning-Fun Spot America-USAFL
+
+* GEORGIA *
+0, Georgia Cyclone-SF Over Georgia-USAGA
+0, Great American Scream Machine-SF Over Georgia-USAGA
+0, Cannon Ball-Lake Winnepesaukah-USAGA
+0, Cheetah-Wild Adventures-USAGA
+
+* IDAHO *
+0, Timber Terror-Silverwood-USAID
+0, Tremors-Silverwood-USAID
+
+* ILLINOIS *	
+0, American Eagle (Red)-SF Great America-USAIL
+0, American Eagle (Blue)-SF Great America-USAIL
+0, Goliath-SF Great America-USAIL
+0, Little Dipper-SF Great America-USAIL
+0, Viper-SF Great America-USAIL
+
+* INDIANA *
+0, Cornball Express-Indiana Beach-USAIN
+0, Hoosier Hurricane-Indiana Beach-USAIN
+0, Lost Coaster of Superstition Mtn-Indiana Beach-USAIN
+0, Legend-Holiday World-USAIN
+0, Raven-Holiday World-USAIN
+0, Voyage-Holiday World-USAIN
+
+* IOWA *
+0, Outlaw-Adventureland-USAIA
+0, Tornado-Adventureland-USAIA
+0, Underground-Adventureland-USAIA
+0, Legend-Arnolds Park-USAIA
+
+* KENTUCKY *
+0, Kentucky Rumbler-Beech Bend-USAKY
+0, Thunder Run-Kentucky Kingdom-USAKY
+
+* MAINE *
+0, Excalibur-Funtown-USAME
+
+* MARYLAND *
+0, Roar-SF America-USAMD
+0, Wild One-SF America-USAMD
+
+* MASSACHUSETTS *
+0, Thunderbolt-SF New England-USAMA
+
+* MICHIGAN *
+0, Shivering Timbers-Michigans Adventure-USAMI
+0, Wolverine Wildcat-Michigans Adventure-USAMI
+0, Zachs Zoomer-Michigans Adventure-USAMI
+
+* MINNESOTA *	
+0, High Roller-Valleyfair-USAMN
+0, Renegade-Valleyfair-USAMN
+
+* MISSOURI *
+0, Outlaw Run-Silver Dollar City-USAMO
+0, American Thunder-SF StLouis-USAMO
+0, Boss-SF StLouis-USAMO
+0, Screamin Eagle-SF StLouis-USAMO		
+0, Prowler-Worlds of Fun-USAMO
+0, Timber Wolf-Worlds of Fun-USAMO
+
+* NEW HAMPSHIRE *
+0, Roar O Saurus-Story Land-USANH
+0, Yankee Cannonball-Canobie Lake Park-USANH
+
+* NEW JERSEY *
+0, Hell Cat-Clementon Park-USANJ
+0, El Toro-SF Great Adventure-USANJ		
+0, Great White-Moreys Piers-USANJ
+
+* NEW MEXICO *
+0, New Mexico Rattler-Cliffs-USANM
+
+* NEW YORK *
+0, Comet-Great Escape-USANY
+0, Cyclone-Luna Park-USANY
+0, Dragon Coaster-Rye Playland-USANY
+0, Kiddy Coaster-Rye Playnald-USANY
+0, Jack Rabbit-Seabreeze-USANY
+0, Predator-Darien Lake-USANY
+0, Silver Comet-Martin’s Fantasy Island-USANY
+
+* NORTH CAROLINA *
+0, Hurler-Carowinds-USANC
+0, Woodstock Express-Carowinds-USANC
+
+* OHIO *
+0, Blue Streak-Cedar Point-USAOH
+0, Beast-Kings Island-USAOH
+0, Mystic Timbers-Kings Island-USAOH
+0, Racer (Red)-Kings Island-USAOH
+0, Racer (Blue)-Kings Island-USAOH
+0, Woodstock Express-Kings Island-USAOH
+0, Sea Dragon-Colombus Zoo-USAOH
+0, Teddy Bear-Strickers Grove-USAOH
+0, Tornado-Strickers Grove-USAOH
+
+* OKLAHOMA *
+0, Wildcat-Frontier City-USAOK
+
+* PENNSYLVANIA *
+0, Blue Streak-Conneaut Lake-USAPA
+0, Devils Den-Conneaut Lake-USAPA
+0, Thunderhawk-Dorney-USAPA
+0, Kingdom Coaster-Dutch Wonderland-USAPA
+0, Rollo Coaster-Idlewild-USAPA
+0, Jack Rabbit-Kennywood-USAPA
+0, Racer (Left)-Kennywood-USAPA
+0, Racer (Right)-Kennywood-USAPA
+0, Thunderbolt-Kennywood-USAPA		
+0, Comet-HersheyPark-USAPA
+0, Lightning Racer (Lightning)-HersheyPark-USAPA
+0, Lightning Racer (Thunder)-HersheyPark-USAPA
+0, Wildcat-HersheyPark-USAPA
+0, Flying Turns-Knoebels-USAPA
+0, Phoenix-Knoebels-USAPA
+0, Twister-Knoebels-USAPA
+0, Comet-Waldameer-USAPA
+0, Ravine Flyer II-Waldameer-USAPA
+
+* SOUTH CAROLINA *
+0, Swamp Fox-Family Kingdom-USASC
+
+* TENNESSEE *
+0, Lightning Rod-Dollywood-USATN
+0, Thunderhead-Dollywood-USATN
+		
+* TEXAS *
+0, Boardwalk Bullet-Kemah Boardwalk-USATX
+0, Judge Roy Scream-SF Over Texas-USATX
+0, Switchback-ZDTs-USATX
+
+* UTAH *
+0, Roller Coaster-Lagoon-USAUT
+
+* VIRGINIA *	
+0, Grizzly-Kings Dominion-USAVA
+0, Rebel Yell (Red)-Kings Dominion-USAVA
+0, Rebel Yell (Blue)-Kings Dominion-USAVA
+0, Woodstock Express-Kings Dominion-USAVA
+0, InvadR-Busch Gardens-USAVA
+
+* WASHINGTON *
+0, Classic Coaster-Washington State Fair-USAWA
+0, Timberhawk Ride of Prey-Wild Waves-USAWA
+
+* WEST VIRGINIA *
+0, Big Dipper-Camden-USAWV
+0, Hawnted House-Camden-USAWV
+0, Lil Dipper-Camden-USAWV
+
+* WISCONSIN *
+0, Zippin Pippin-Bay Beach-USAWI
+0, Cyclops-Mt Olympus-USAWI
+0, Hades360-Mt Olympus-USAWI
+0, Pegasus-Mt Olympus-USAWI
+0, Zeus-Mt Olympus-USAWI
+0, Meteor-Little Amerricka-USAWI
+0, Avalanche-Timber Falls-USAWI
+
+* SOUTH AMERICA *
+* BRAZIL *
+0, Montezum-Hopi Hari-BRAZL
+
+* EUROPE AND THE UK *
+* AUSTRIA *
+0, Auto BergBahn-WienerPrater-AUSTA
+0, Hochschaubahn-WienerPrater-AUSTA
+
+* BELGIUM *
+0, Heidi The Ride-Plopsaland-BELGM
+0, LoupGarou-Walibi Belgium-BELGM
+
+* DENMARK *
+0, Falken-Farup Sommerland-DENMK
+0, Rutschebanan-Bakken-DENMK
+0, Rutschebanan-Tivoli Gardens-DENMK
+
+* ENGLAND *
+0, Antelope-Gullivers Warrington-ENGLD
+0, Scenic Railway-Dreamland-ENGLD
+0, Big Dipper-Blackpool-ENGLD
+0, Blue Flyer-Blackpool-ENGLD
+0, Grand National (left)-Blackpool-ENGLD
+0, Grand National (right)-Blackpool-ENGLD
+0, Nickelodeon Streak-Blackpool-ENGLD
+0, Wild Mouse-Blackpool-ENGLD
+0, Roller Coaster-Great Yarmouth Pleasure Beach-ENGLD
+0, Tyrolean Tubtwist-Joyland-ENGLD
+
+* FINLAND *
+0, Thunderbird-PowerLand-FINLD
+0, Vuoristorata-Linnanmaki-FINLD
+
+* FRANCE *
+0, Anaconda-Walygator Parc-FRANC
+0, Timber-Walibi Rhone Alpes-FRANC
+0, Tonnere de Zeus-Parc Asterix-FRANC
+
+* GERMANY *
+0, Bandit-MoviePark-GMANY
+0, El Toro-Freizeitpark Plohn-GMANY
+0, Mammut-Eriebnispark Tripsdrill-GMANY
+0, Wodan Timburcoaster-EuropaPark-GMANY
+
+* IRELAND *
+0, Cu Chulainn-Tayto Park-IRLND
+
+* NETHERLANDS *
+0, Joris en de Draak (water)-Efteling-NTHRL
+0, Joris en de Draak (vuur)-Efteling-NTHRL
+0, Robin Hood-Walibi Holland-NTHRL
+0, Troy-Toverland-NTHRL
+
+* NORWAY *
+0, Thundercoaster-TusenFryd-NORWY
+
+* SPAIN *
+0, Coaster Express-Parque Warner Madrid-SPAIN
+0, Stampida (left)-PortAventura-SPAIN
+0, Stampida (right)-PortAventura-SPAIN
+0, Tomahawk-PortAventura-SPAIN
+
+* SWEDEN *
+0, Wildfire-Kolmården-SWDEN
+0, Balder-Liseberg-SWDEN
+0, Twister-Grona Lund-SWDEN
+
+* WALES *
+0, Megaphobia-Oakwood-WALES
+
+* AUSTRALIA *
+0, Wild Mouse-Luna Park-AUSTL
+0, Scenic Railway-Luna Park-AUSTL
+
+* ASIA *
+* CHINA *
+0, Fjord Flying Dragon-Happy Valley Dongli-CHINA
+0, Dauling Dragon (red)-Happy Valley Hongshan-CHINA
+0, Dauling Dragon (blue)-Happy Valley Hongshan-CHINA
+0, Great Desert Rally-Happy Valley Jinniu-CHINA
+0, Jungle Dragon-Happy Valley Yubei-CHINA
+0, Jungle Trailblazer-Fantawild Dreamland Shifeng-CHINA
+0, Jungle Trailblazer-Fantawild Dreamland Zhongmu-CHINA
+0, Jungle Trailblazer-Oriental Heritage Cixi-CHINA
+0, Jungle Trailblazer-Oriental Heritage Huaiyin-CHINA
+0, Jungle Trailblazer-Oriental Heritage Juijiang-CHINA
+0, Jungle Trailblazer-Oriental Heritage Tong an-CHINA
+0, Python in Bamboo Forest-Nanchang Wanda Park-CHINA
+0, Time Travel-Hot Go Park Happy Jungle World-CHINA
+0, Wood Coaster-Knight Valley-CHINA
+0, Wooden Coaster Fireball-Happy Valley Dongli-CHINA
+
+* INDIA *
+0, Cyclone-Nicco Park-INDIA
+0, Zipper Dipper-EsselWorld-INDIA
+
+* INDONESIA *
+0, Animal Coaster-Jawa Timur Park 2-INDSA
+0, Crazy Car Coaster-Wisata Bahari Lamongan-INDSA
+
+* JAPAN *
+0, Elf-Hirakata Park-JAPAN
+0, Jupiter-Kijima Kogen-JAPAN
+0, Regina-Tobu Zoo-JAPAN
+0, White Cyclone-Nagashima Spa Land-JAPAN
+
+* SOUTH KOREA *
+0, T Express-Everland-SKREA
+
+
+
+* Save your ballot with the filename of your choosing
+* (the file must be saved in the same format it was downloaded in: .txt for text, .docx for Word, etc)
+* Then email it as an attachment to:
+* editor@ellocoaster.com
+* Use the subject line "2017 Wood Coaster Poll"
+
+* Thank you for voting! *
+* Voting ends Dec 31, 2017
+* Results will be posted in January at ellocoaster.com
