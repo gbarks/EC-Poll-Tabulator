@@ -706,7 +706,8 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     # create and write primary results worksheet
     resultws = xl.create_sheet("Ranked Results")
     headerRow = ["Rank","Coaster","Total Win Percentage","Pairwise Win Percentage",
-                 "Total Wins","Total Losses","Total Ties","Number of Riders"]
+                 "Total Wins","Total Losses","Total Ties","Pair Wins","Pair Losses",
+                 "Pair Ties","Number of Riders"]
     if args.botherRCDB:
         headerRow.extend(["Designer/Manufacturer", "Year"])
     resultws.append(headerRow)
@@ -717,9 +718,13 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     resultws.column_dimensions['E'].width = 8.83
     resultws.column_dimensions['F'].width = 9.83
     resultws.column_dimensions['G'].width = 7.83
-    resultws.column_dimensions['H'].width = 13.83
-    resultws.column_dimensions['I'].width = 23.83
-    resultws.column_dimensions['J'].width = 8.83
+    resultws.column_dimensions['H'].width = 8.33
+    resultws.column_dimensions['I'].width = 9.33
+    resultws.column_dimensions['J'].width = 7.33
+    resultws.column_dimensions['K'].width = 13.83
+    if args.botherRCDB:
+        resultws.column_dimensions['L'].width = 23.83
+        resultws.column_dimensions['M'].width = 8.83
     i = 2
     for x in results:
         resultws.append([coasterDict[x[0]].overallRank, x[0],
@@ -728,6 +733,9 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                          coasterDict[x[0]].totalWins,
                          coasterDict[x[0]].totalLosses,
                          coasterDict[x[0]].totalTies,
+                         coasterDict[x[0]].pairwiseWins,
+                         coasterDict[x[0]].pairwiseLosses,
+                         coasterDict[x[0]].pairwiseTies,
                          coasterDict[x[0]].riders,
                          coasterDict[x[0]].designer,
                          coasterDict[x[0]].year])
