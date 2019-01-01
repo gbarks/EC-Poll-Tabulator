@@ -752,6 +752,9 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                              coasterDict[x].totalWins,
                              coasterDict[x].totalLosses,
                              coasterDict[x].totalTies,
+                             coasterDict[x].pairWins,
+                             coasterDict[x].pairLosses,
+                             coasterDict[x].pairTies,
                              coasterDict[x].riders,
                              coasterDict[x].designer,
                              coasterDict[x].year])
@@ -765,6 +768,9 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                              coasterDict[x].totalWins,
                              coasterDict[x].totalLosses,
                              coasterDict[x].totalTies,
+                             coasterDict[x].pairWins,
+                             coasterDict[x].pairLosses,
+                             coasterDict[x].pairTies,
                              coasterDict[x].riders,
                              coasterDict[x].designer,
                              coasterDict[x].year])
