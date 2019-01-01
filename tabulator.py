@@ -53,15 +53,15 @@ parser.add_argument("-m", "--minRiders", type=int, default=10,
 parser.add_argument("-o", "--outfile", default="Poll Results.xlsx",
                     help="specify name of output .xlsx file")
 parser.add_argument("-c", "--colorize", action="store_true",
-                    help="color coaster labels by designer in output spreadsheet")
+                    help="color coaster designers in spreadsheet (requires -r)")
 parser.add_argument("-d", "--designset", default="wood",
                     help="specify design/manufacturer dictionary (wood or steel)")
 parser.add_argument("-i", "--includeExtraInfo", action="count", default=0,
-                    help="include voter data/misc info; duplicate for more detail")
+                    help="include voter data/misc info; duplicate for more info")
 parser.add_argument("-r", "--botherRCDB", action="store_true",
                     help="bother RCDB to grab metadata from links in blankBallot")
 parser.add_argument("-v", "--verbose", action="count", default=0,
-                    help="print data as it's processed; duplicate for more detail")
+                    help="print data as it's processed; duplicate for more info")
 
 args = parser.parse_args()
 
@@ -89,6 +89,10 @@ elif args.designset.lower() == "steel":
 else:
     print("Wood and steel are the only valid design/manufacturer dictionaries; exiting...")
     sys.exit()
+
+# colorizing coasters by designer requires fetching RCDB data
+if args.colorize and not args.botherRCDB:
+    args.colorize = False
 
 
 
@@ -141,7 +145,7 @@ def main():
     xlout.save(args.outfile)
     if useSpinner:
         spinner.stop()
-    print('output saved to "Poll Results.xlsx".')
+    print('output saved to "{0}".'.format(args.outfile))
 
 
 
@@ -321,7 +325,8 @@ def createMatrix(coasterDict):
 
 def processBallot(filepath, coasterDict, winLossMatrix):
     filename = os.path.basename(filepath)
-    print("Processing ballot: {0}".format(filename))
+    if args.verbose > 0:
+        print("Processing ballot: {0}".format(filename))
 
     voterInfo = [filename, "", "", "", "", ""] # return item 1
     coasterAndRank = {} # return item 2
@@ -366,10 +371,14 @@ def processBallot(filepath, coasterDict, winLossMatrix):
 
                 # make sure there are at least 2 'words' in each line
                 elif len(words) < 2:
+                    if args.verbose == 0:
+                        print("Processing ballot: {0}".format(filename))
                     print("Error in {0}, Line {1}: {2}".format(args.blankBallot, lineNum, line))
 
                 # make sure the ranking is a number
                 elif not words[0].isdigit():
+                    if args.verbose == 0:
+                        print("Processing ballot: {0}".format(filename))
                     print("Error in reading {0}, Line {1}: Rank must be an int.".format(filename, lineNum))
                     error = True
 
@@ -390,11 +399,15 @@ def processBallot(filepath, coasterDict, winLossMatrix):
                         coasterAndRank[coasterName] = coasterRank
 
                     else: # it's not a legit coaster!
+                        if args.verbose == 0:
+                            print("Processing ballot: {0}".format(filename))
                         print("Error in reading {0}, Line {1}: Unknown coaster {2}".format(filename, lineNum, coasterName))
                         error = True
 
     # don't tally the ballot if there were any errors, don't return voter info
     if error:
+        if args.verbose == 0:
+            print("Processing ballot: {0}".format(filename))
         print("Error encountered. File {0} not added.".format(filename))
         return [], {}
 
@@ -420,13 +433,14 @@ def processBallot(filepath, coasterDict, winLossMatrix):
                     winLossMatrix[coasterA, coasterB]["Losses"] += 1
                     coasterDict[coasterA].totalLosses += 1
 
-    print(" ->", end=" ")
+    if args.verbose > 0:
+        print(" ->", end=" ")
 
-    for i in range(1,len(voterInfo)):
-        if voterInfo[i] != "":
-            print("{0},".format(voterInfo[i]), end=" ")
+        for i in range(1,len(voterInfo)):
+            if voterInfo[i] != "":
+                print("{0},".format(voterInfo[i]), end=" ")
 
-    print("CC: {0}".format(creditNum))
+        print("CC: {0}".format(creditNum))
 
     voterInfo.append(creditNum)
 
@@ -485,7 +499,8 @@ def processAllBallots(xl, coasterDict, winLossMatrix):
                 rowVals1 = [voterInfo[0]]
                 rowVals2 = [voterInfo[0]]
                 for coasterAndRank in sorted(ballotRanks.items(), key=lambda x: x[1]):
-                    print("{0}.\t{1}".format(coasterAndRank[1], coasterAndRank[0]))
+                    if args.verbose > 2:
+                        print("{0}.\t{1}".format(coasterAndRank[1], coasterAndRank[0]))
                     rowVals1.extend([coasterAndRank[1], coasterAndRank[0]])
                     rowVals2.append(coasterAndRank[0])
                 ballotws1.append(rowVals1)
@@ -535,8 +550,8 @@ def calculateResults(coasterDict, winLossMatrix):
                     else:
                         coasterDict[coasterA].pairwiseLosses += 1
 
-                    # only print pairwise results with '-vv' flag
-                    if args.verbose > 1:
+                    # only print pairwise results with '-vvvv' flag
+                    if args.verbose > 3:
                         print("{0},{1},\tWins: {2},\tTies: {3},\t#Con: {4},\tWin%: {5}".format(
                             coasterDict[coasterA].abbr, coasterDict[coasterB].abbr,
                             pairWins, pairTies, pairContests, winLossMatrix[coasterA, coasterB]["Win Percentage"]))
