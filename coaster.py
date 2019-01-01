@@ -97,12 +97,15 @@ class Coaster:
                 self.designer = "The Gravity Group, LLC"
 
             # find an opening year if available
-            for x in soup.body.findAll(True):
-                if "Operating since " in x.text:
-                    subtext = x.text.split("Operating since ", 1)[1][:10].split('/')[-1][:4]
-                    self.year = int(subtext)
-                    break
-                elif "Operated from " in x.text:
-                    subtext = x.text.split("Operated from ", 1)[1].split(' ')[0].split('/')[-1]
-                    self.year = int(subtext)
-                    break
+            d = soup.body.find('time')
+            if d.has_attr('datetime'):
+                self.year = d['datetime'][:4]
+                # if "Operating since " in x.text:
+                #     subtext = x.text.split("Operating since ", 1)[1][:10].split('/')[-1][:4]
+                #     print(x.text)
+                #     self.year = int(subtext)
+                #     break
+                # elif "Operated from " in x.text:
+                #     subtext = x.text.split("Operated from ", 1)[1].split(' ')[0].split('/')[-1]
+                #     self.year = int(subtext)
+                #     break
