@@ -299,27 +299,11 @@ Wood Coaster Poll
 
 * ASIA *
 * CHINA *
-0, Fjord Flying Dragon-Happy Valley Dongli-CHINA, FjordFDrag, https://rcdb.com/10353.htm
-0, Dauling Dragon (red)-Happy Valley Hongshan-CHINA, DaulDragoR, https://rcdb.com/3775.htm
-0, Dauling Dragon (blue)-Happy Valley Hongshan-CHINA, DaulDragoB, https://rcdb.com/3775.htm
-0, Great Desert Rally-Happy Valley Jinniu-CHINA, GrDesRally, https://rcdb.com/13657.htm
-0, Jungle Dragon-Happy Valley Yubei-CHINA, JungleDrag, https://rcdb.com/13833.htm
-0, Jungle Trailblazer-Fantawild Dreamland Shifeng-CHINA, JTraFanShi, https://rcdb.com/11601.htm
-0, Jungle Trailblazer-Fantawild Dreamland Zhongmu-CHINA, JTraFanZho, https://rcdb.com/12393.htm
-0, Jungle Trailblazer-Oriental Heritage Cixi-CHINA, JTraOriCix, https://rcdb.com/12236.htm
-0, Jungle Trailblazer-Oriental Heritage Huaiyin-CHINA, JTraOriHua, https://rcdb.com/11604.htm
-0, Jungle Trailblazer-Oriental Heritage Juijiang-CHINA, JTraOriJui, https://rcdb.com/11602.htm
-0, Jungle Trailblazer-Oriental Heritage Tong an-CHINA, JTraOriTon, https://rcdb.com/13453.htm
-0, Python in Bamboo Forest-Nanchang Wanda Park-CHINA, PythonBamb, https://rcdb.com/11608.htm
-0, Time Travel-Hot Go Park Happy Jungle World-CHINA, TimTravHGP, https://rcdb.com/11606.htm
-0, Wood Coaster-Knight Valley-CHINA, WoodCoasKV, https://rcdb.com/9039.htm
-0, Wooden Coaster Fireball-Happy Valley Dongli-CHINA, WCFireball, https://rcdb.com/4150.htm
-
 0, 峡湾飞龙-天津欢乐谷Fjord Flying Dragon-Happy Valley Tianjin-CHINA, FjordFDrag, https://rcdb.com/10353.htm
 0, 木翼双龙（红）-武汉欢乐谷Dauling Dragon (red)-Happy Valley Wuhan-CHINA, DaulDragoR, https://rcdb.com/3775.htm
-0, 木翼双龙（蓝）-武汉欢乐谷Dauling Dragon (blue)-Happy Valley Wuhan -CHINA, DaulDragoB, https://rcdb.com/3775.htm
+0, 木翼双龙（蓝）-武汉欢乐谷Dauling Dragon (blue)-Happy Valley Wuhan-CHINA, DaulDragoB, https://rcdb.com/3775.htm
 0, 大漠拉力赛-成都欢乐谷Great Desert Rally-Happy Valley Chengdu-CHINA, https://rcdb.com/13657.htm
-0, 丛林飞龙-重庆欢乐谷Jungle Dragon-Happy Valley Chongqiong-CHINA, https://rcdb.com/13833.htm
+0, 丛林飞龙-重庆欢乐谷Jungle Dragon-Happy Valley Chongqing-CHINA, https://rcdb.com/13833.htm
 0, 丛林飞龙- 方特东盟神画 Jungle Trailblazer-Fantawild Asian Legends-Nanning-CHINA, JTraAsiLeg, https://rcdb.com/14714.htm
 0, 丛林飞龙-株洲方特梦幻王国Jungle Trailblazer-Fantawild Dreamland Zhuzhou-CHINA, JTraFanZhu, https://rcdb.com/11601.htm
 0, 丛林飞龙-郑州方特梦幻王国Jungle Trailblazer-Fantawild Dreamland Zhengzhou-CHINA, JTraFanZhe, https://rcdb.com/12393.htm

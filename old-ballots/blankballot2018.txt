@@ -300,9 +300,9 @@ Wood Coaster Poll
 CHINA *
 0, 峡湾飞龙-天津欢乐谷Fjord Flying Dragon-Happy Valley Tianjin-CHINA
 0, 木翼双龙（红）-武汉欢乐谷Dauling Dragon (red)-Happy Valley Wuhan-CHINA
-0, 木翼双龙（蓝）-武汉欢乐谷Dauling Dragon (blue)-Happy Valley Wuhan -CHINA
+0, 木翼双龙（蓝）-武汉欢乐谷Dauling Dragon (blue)-Happy Valley Wuhan-CHINA
 0, 大漠拉力赛-成都欢乐谷Great Desert Rally-Happy Valley Chengdu-CHINA
-0, 丛林飞龙-重庆欢乐谷Jungle Dragon-Happy Valley Chongqiong-CHINA
+0, 丛林飞龙-重庆欢乐谷Jungle Dragon-Happy Valley Chongqing-CHINA
 0, 丛林飞龙- 方特东盟神画 Jungle Trailblazer-Fantawild Asian Legends-Nanning-CHINA
 0, 丛林飞龙-株洲方特梦幻王国Jungle Trailblazer-Fantawild Dreamland Zhuzhou-CHINA
 0, 丛林飞龙-郑州方特梦幻王国Jungle Trailblazer-Fantawild Dreamland Zhengzhou-CHINA
