@@ -302,8 +302,8 @@ Wood Coaster Poll
 0, 峡湾飞龙-天津欢乐谷Fjord Flying Dragon-Happy Valley Tianjin-CHINA, FjordFDrag, https://rcdb.com/10353.htm
 0, 木翼双龙（红）-武汉欢乐谷Dauling Dragon (red)-Happy Valley Wuhan-CHINA, DaulDragoR, https://rcdb.com/3775.htm
 0, 木翼双龙（蓝）-武汉欢乐谷Dauling Dragon (blue)-Happy Valley Wuhan-CHINA, DaulDragoB, https://rcdb.com/3775.htm
-0, 大漠拉力赛-成都欢乐谷Great Desert Rally-Happy Valley Chengdu-CHINA, https://rcdb.com/13657.htm
-0, 丛林飞龙-重庆欢乐谷Jungle Dragon-Happy Valley Chongqing-CHINA, https://rcdb.com/13833.htm
+0, 大漠拉力赛-成都欢乐谷Great Desert Rally-Happy Valley Chengdu-CHINA, GrDesRally, https://rcdb.com/13657.htm
+0, 丛林飞龙-重庆欢乐谷Jungle Dragon-Happy Valley Chongqing-CHINA, JungDragon, https://rcdb.com/13833.htm
 0, 丛林飞龙- 方特东盟神画 Jungle Trailblazer-Fantawild Asian Legends-Nanning-CHINA, JTraAsiLeg, https://rcdb.com/14714.htm
 0, 丛林飞龙-株洲方特梦幻王国Jungle Trailblazer-Fantawild Dreamland Zhuzhou-CHINA, JTraFanZhu, https://rcdb.com/11601.htm
 0, 丛林飞龙-郑州方特梦幻王国Jungle Trailblazer-Fantawild Dreamland Zhengzhou-CHINA, JTraFanZhe, https://rcdb.com/12393.htm
