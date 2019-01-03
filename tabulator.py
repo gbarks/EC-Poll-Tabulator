@@ -116,12 +116,17 @@ def main():
         coasterdesignerws = xlout.create_sheet("Coaster Designer Color Key")
         i = 1
         for designer in sorted(designers.keys()):
-            if designer:
+            if designer != "" and designer != "Other Known Manufacturer":
                 coasterdesignerws.append([designer])
-            else:
-                coasterdesignerws.append(["Other [Unknown]"])
-            coasterdesignerws.cell(row=i, column=1).fill = designers[designer]
+                coasterdesignerws.cell(row=i, column=1).fill = designers[designer]
+                i += 1
+        if "Other Known Manufacturer" in designers.keys():
+            coasterdesignerws.append(["Other Known Manufacturer"])
+            coasterdesignerws.cell(row=i, column=1).fill = designers["Other Known Manufacturer"]
             i += 1
+        if "" in designers.keys():
+            coasterdesignerws.append(["Other [Unknown]"])
+            coasterdesignerws.cell(row=i, column=1).fill = designers[""]
         coasterdesignerws.column_dimensions['A'].width = 30.83
 
     # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
@@ -739,7 +744,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                          coasterDict[x[0]].riders,
                          coasterDict[x[0]].designer,
                          coasterDict[x[0]].year])
-        colorizeRow(resultws, i, [2,9], coasterDict, x[0], manuColors)
+        colorizeRow(resultws, i, [2,12], coasterDict, x[0], manuColors)
         i += 1
     resultws.freeze_panes = resultws['A2']
 
@@ -758,7 +763,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                              coasterDict[x].riders,
                              coasterDict[x].designer,
                              coasterDict[x].year])
-            colorizeRow(resultws, i, [2,9], coasterDict, x, manuColors)
+            colorizeRow(resultws, i, [2,12], coasterDict, x, manuColors)
             i += 1
 
     # append coasters that weren't ridden to the bottom of results worksheet
@@ -774,7 +779,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                              coasterDict[x].riders,
                              coasterDict[x].designer,
                              coasterDict[x].year])
-            colorizeRow(resultws, i, [2,9], coasterDict, x, manuColors)
+            colorizeRow(resultws, i, [2,12], coasterDict, x, manuColors)
             i += 1
 
     # create and write pairwise result worksheet
