@@ -45,7 +45,7 @@ def main():
     j = len(rcdblink)
 
     while i < j:
-        if args.verbose > 1:
+        if args.verbose > 0:
             print("<<< Now checking " + rcdblink[i] + " >>>")
 
         # handle pages that are lists of coasters
@@ -140,7 +140,8 @@ def parse_rcdb_page(url):
     csoup = BeautifulSoup(chtml, 'lxml')
 
     # get name, alt name, park, and location
-    title = csoup.find('div', attrs={'class':'scroll'})
+    feature = csoup.find('div', attrs={'id':'feature'})
+    title = feature.find('div', attrs={'class':'scroll'})
     name = title.find('h1').text
     if " / " in name:
         altname = name.split(" / ", 1)[1]
@@ -158,7 +159,6 @@ def parse_rcdb_page(url):
         return None
 
     # get opening date and closing date
-    feature = csoup.find('div', attrs={'id':'feature'})
     datestr = feature.text[feature.text.find(")")+1:]
     if "Mountain Coaster" in datestr:
         datestr = datestr[:datestr.find("Mountain Coaster")]
@@ -198,11 +198,37 @@ def parse_rcdb_page(url):
 
     # get thrill scale
     linkrow = feature.find('span', attrs={'class':'link_row'})
-    print("    " + linkrow.text)
+    if "Kiddie" in linkrow.text:
+        if args.skipkiddie:
+            if args.verbose > 0:
+                print("--Skipping " + name + " at " + park + " (\"Kiddie\" designation)")
+            return None
+        c["scale"] = "Kiddie"
+    elif "Family" in linkrow.text:
+        c["scale"] = "Family"
+    elif "Extreme" in linkrow.text:
+        c["scale"] = "Thrill"
+    elif "Extreme" in linkrow.text:
+        c["scale"] = "Extreme"
 
-    # get make
+    # get make and model
+    makemodellist = feature.find_all('div', attrs={'class':'scroll'})
+    if len(makemodellist) > 1:
+        makemodel = makemodellist[1].text
+        if "Make: " in makemodel:
+            make = makemodel.split("Make: ", 1)[1]
+            if "Model: " in makemodel:
+                model = make.split("Model: ", 1)[1]
+                make = make.split("Model: ", 1)[0]
+                if " / " in model:
+                    c["submodel"] = model.split(" / ", 1)[1]
+                    model = model.split(" / ", 1)[0]
+                c["model"] = model
+            c["make"] = make
+        elif "Model: " in makemodel:
+            print("WTF THIS DOESN'T MAKE SENSE!!!!")
+            print(c)
 
-    # get model
 
     # def get_coaster_name(text):
     #     return substring
@@ -225,7 +251,7 @@ def parse_rcdb_page(url):
     # def get_submodel(text):
     #     return substring
 
-    if args.verbose > 0:
+    if args.verbose > 1:
         # print(name + ", " + park + ", " + date, end="")
         print(name, end="")
         if "altname" in c:
@@ -237,11 +263,21 @@ def parse_rcdb_page(url):
             print("")
         if args.verbose > 3:
             if "date" in c:
-                print("    " + datestr, end="")
+                print("    Opened: " + c["date"], end="")
                 if "closing" in c:
                     print(" (closed " + c["closing"] + ")")
                 else:
                     print("")
+        if args.verbose > 4:
+            if "scale" in c:
+                print("    Scale:  " + c["scale"])
+            if "make" in c:
+                print("    Make:   " + c["make"])
+            if "model" in c:
+                if "submodel" in c:
+                    print("    Model:  " + c["model"] + " / " + c["submodel"])
+                else:
+                    print("    Model:  " + c["model"])
 
     def get_stat_val(stat, unit, text):
         if stat in text:
