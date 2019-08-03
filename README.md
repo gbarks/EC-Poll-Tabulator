@@ -20,22 +20,23 @@ And output will be saved to `Coaster Poll 20XX.xlsx`
 Alternatively, the command line argument defaults are:
 
 * `-m 9`
-* `-b blankballot2017.txt`
-* `-f ballots2017`
+* `-b blankballot2019.txt`
+* `-f ballots2019`
 * `-o "Poll Results.xlsx"`
 
 Additional command line flags include:
 
 * `-c` sets fill color of certain cells to reflect the make (manufacturer) of the coaster
-* `-i` includes sensitive voter data in a spreadsheet in the output file
+* `-d wood/steel` specifies what set of designers to reference (default: `wood`)
+* `-i` includes sensitive voter data in a spreadsheet in the output file; `-ii` includes more
 * `-r` bothers [rcdb.com](https://rcdb.com/) with requests to fill in coaster details
 * `-v` prints data as it's processed; `-vv` prints even more
 
 ## Dependencies
 
-The script should work with Python 2 or 3 and requires [openpyxl](https://openpyxl.readthedocs.io/en/default/).
+The script requires with Python 3 and [openpyxl](https://openpyxl.readthedocs.io/en/default/).
 
-Scraping data from [rcdb.com](https://rcdb.com/) with the `-r` flag requires Python 3, [lxml](http://lxml.de/), and [beautifulsoup4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/).
+Scraping data from [rcdb.com](https://rcdb.com/) with the `-r` flag requires [lxml](http://lxml.de/) and [beautifulsoup4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/).
 
 ## More Info
 

@@ -44,9 +44,9 @@ startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 # command line arguments
 parser = argparse.ArgumentParser(description='Process Mitch Hawker-style coaster poll.')
 
-parser.add_argument("-b", "--blankBallot", default="blankballot2017.txt",
+parser.add_argument("-b", "--blankBallot", default="blankballot2019.txt",
                     help="specify blank ballot file")
-parser.add_argument("-f", "--ballotFolder", default="ballots2017",
+parser.add_argument("-f", "--ballotFolder", default="ballots2019",
                     help="specify folder containing filled ballots")
 parser.add_argument("-m", "--minRiders", type=int, default=10,
                     help="specify minimum number of riders for a coaster to rank")
