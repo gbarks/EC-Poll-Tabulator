@@ -1,10 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+# ==========================================================
+#  Multithreaded console loading spinner, stolen from:
+#   https://gist.github.com/anonymous/c4ad2bbe2d5552af05c2
+# ==========================================================
 
 import itertools
 import sys
 import time
 import threading
-
 
 class Spinner(object):
     spinner_cycle = itertools.cycle(['|', '/', '-', '\\'])
