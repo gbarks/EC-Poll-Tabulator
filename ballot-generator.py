@@ -173,10 +173,11 @@ def parse_rcdb_page(url):
     c["location"] = "\"" + location + "\""
     country = location[location.rindex(",")+1:].strip()
     c["country"] = "\"" + country + "\""
-    state = location[:location.rindex(",")].strip()
-    city = state[:state.rindex(",")].strip()
-    state = state[state.rindex(",")+1:].strip()
+    fullcity = location[:location.rindex(",")].strip()
+    c["fullcity"] = "\"" + fullcity + "\""
+    state = fullcity[fullcity.rindex(",")+1:].strip()
     c["state"] = "\"" + state + "\""
+    city = fullcity[:fullcity.rindex(",")].strip()   
     c["city"] = "\"" + city + "\""
 
     if args.skipunknown is True and name == "unknown":
