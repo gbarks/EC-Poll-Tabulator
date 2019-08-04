@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 
-# Experiments in pulling length, height, and speed data for generic RCDB lists
-# Author: Grant Barker
+# ==========================================================
+#  ElloCoaster ballot generator
+#  Author: Grant Barker
+#
+#  Requires Python 3
+# ==========================================================
+
+from __future__ import print_function
+
+import sys
+
+if sys.version_info[0] < 3:
+    print("Program requires Python 3; running {0}.{1}".format(sys.version_info[0], sys.version_info[1]))
+    sys.exit()
 
 import re
-import sys
 import lxml
 import argparse
 import datetime
@@ -12,12 +23,14 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
 # command line arguments
-parser = argparse.ArgumentParser(description='Pull coaster stats from RCDB list into .csv')
+parser = argparse.ArgumentParser(description='Pull coaster info from RCDB list into .csv ballot')
 
 parser.add_argument("-i", "--rcdblink", action="append", required=True,
                     help="RCDB input url (required) - can use multiple -i args")
-parser.add_argument("-o", "--outfile", default="rcdb_stats.csv",
-                    help="specify name of output .csv file")
+parser.add_argument("-o", "--outballot", default="rcdb_ballot.csv",
+                    help="specify name of output [ballot].csv file")
+parser.add_argument("-O", "--outdetails", default="rcdb_ballot_details.csv",
+                    help="specify name of output [details].csv file")
 parser.add_argument("-s", "--sortbydate", action="store_true",
                     help="ensure RCDB pages are sorted chronologically")
 parser.add_argument("-u", "--skipunknown", action="store_true",
@@ -31,8 +44,14 @@ parser.add_argument("-v", "--verbose", action="count", default=0,
 
 args = parser.parse_args()
 
-if args.outfile[-4:] != ".csv":
-    args.outfile += ".csv"
+# format output filenames
+if args.outballot != "rcdb_ballot.csv":
+    if args.outballot[-4:] != ".csv":
+        args.outballot += ".csv"
+    if args.outdetails == "rcdb_ballot_details.csv":
+        args.outdetails = args.outballot[:-4] + "_details.csv"
+if args.outdetails[-4:] != ".csv":
+    args.outdetails += ".csv"
 
 this_year = str(datetime.datetime.now().year)
 
