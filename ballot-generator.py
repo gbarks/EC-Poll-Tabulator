@@ -25,6 +25,13 @@ from urllib.request import urlopen
 # command line arguments
 parser = argparse.ArgumentParser(description='Pull coaster info from RCDB list into .csv ballot')
 
+def valid_year(s):
+    try:
+        return datetime.datetime.strptime(s, "%Y").strftime("%Y")
+    except ValueError:
+        msg = "Not a valid year: '{0}'.".format(s)
+        raise argparse.ArgumentTypeError(msg)
+
 parser.add_argument("-i", "--rcdblink", action="append", required=True,
                     help="RCDB input url (required) - can use multiple -i args")
 parser.add_argument("-o", "--outballot", default="rcdb_ballot.csv",
@@ -37,6 +44,10 @@ parser.add_argument("-u", "--skipunknown", action="store_true",
                     help="skip all coasters named 'unknown'")
 parser.add_argument("-d", "--skipnodate", action="store_true",
                     help="skip all coasters with nonspecific opening date")
+parser.add_argument("-y", "--skipwrongyear", action="store_true",
+                    help="skip all coasters that did not operate in given year")
+parser.add_argument("-Y", "--setyear", default=str(datetime.datetime.now().year),
+                    help="set year for -y; defaults to current year", type=valid_year)
 parser.add_argument("-k", "--skipkiddie", action="store_true",
                     help="skip all kiddie coasters")
 parser.add_argument("-v", "--verbose", action="count", default=0,
@@ -52,8 +63,6 @@ if args.outballot != "rcdb_ballot.csv":
         args.outdetails = args.outballot[:-4] + "_details.csv"
 if args.outdetails[-4:] != ".csv":
     args.outdetails += ".csv"
-
-this_year = str(datetime.datetime.now().year)
 
 def main():
     coasters = []
@@ -171,30 +180,67 @@ def parse_rcdb_page(url):
     c["park"] = "\"" + park + "\""
     location = title.text[title.text.find("(")+1:title.text.find(")")]
     c["location"] = "\"" + location + "\""
-    country = location[location.rindex(",")+1:].strip()
-    c["country"] = "\"" + country + "\""
-    fullcity = location[:location.rindex(",")].strip()
-    c["fullcity"] = "\"" + fullcity + "\""
-    state = fullcity[fullcity.rindex(",")+1:].strip()
-    c["state"] = "\"" + state + "\""
-    city = fullcity[:fullcity.rindex(",")].strip()   
-    c["city"] = "\"" + city + "\""
+    # print(name + " at " + park + " - " + location)
+    c["country"] = None
+    c["fullcity"] = None
+    c["state"] = None
+    c["city"] = None
+    if "," in location:
+        country = location[location.rindex(",")+1:].strip()
+        c["country"] = "\"" + country + "\""
+        fullcity = location[:location.rindex(",")].strip()
+        c["fullcity"] = "\"" + fullcity + "\""
+        if "," in fullcity:
+            state = fullcity[fullcity.rindex(",")+1:].strip()
+            c["state"] = "\"" + state + "\""
+            city = fullcity[:fullcity.rindex(",")].strip()
+            c["city"] = "\"" + city + "\""
 
     if args.skipunknown is True and name == "unknown":
         if args.verbose > 0:
             print("--Skipping \"unknown\" at " + park + " - " + location)
         return None
 
+    # dates = feature.find_all('time')
+    # for d in dates:
+    #     print(d['datetime'])
+
     # get opening date and closing date
+    dates = feature.find_all('time')
     datestr = feature.text[feature.text.find(")")+1:]
     if "Mountain Coaster" in datestr:
         datestr = datestr[:datestr.find("Mountain Coaster")]
+        c["type"] = "\"Mountain Coaster\""
     elif "Powered Coaster" in datestr:
         datestr = datestr[:datestr.find("Powered Coaster")]
+        c["type"] = "\"Powered Coaster\""
     else:
         datestr = datestr[:datestr.find("Roller Coaster")]
-    datestr = datestr.replace("\n", "")
+        c["type"] = "\"Roller Coaster\""
+
+    c["opendate"] = None
+    c["closedate"] = None
+    if "Operating" in datestr:
+        c["status"] = "\"Operating\""
+        if "Operating since" in datestr:
+            c["opendate"] = "\"" + dates[0]['datetime'] + "\""
+        elif args.skipnodate:
+            if args.verbose > 0:
+                print("--Skipping " + name + " at " + park + " (operating with unknown opening date)")
+            return None
+    elif "Removed" in datestr:
+        c["status"] = "\"Removed\""
+        if "Operated from" in datestr:
+            c["opendate"] = "\"" + dates[0]['datetime'] + "\""
+    elif "SBNO" in datestr:
+        c["status"] = "\"SBNO\""
+    elif "In Storage" in datestr:
+        c["status"] = "\"In Storage\""
+    elif "Under Construction" in datestr:
+        c["status"] = "\"Under Construction\""
+
     if datestr == "Operating" or datestr == "Removed" or "SBNO" in datestr or "In Storage" in datestr:
+        print("--Skipping " + name + " at " + park + " (unknown opening date)")
         if args.skipnodate:
             if args.verbose > 0:
                 print("--Skipping " + name + " at " + park + " (unknown opening date)")
@@ -209,7 +255,7 @@ def parse_rcdb_page(url):
         datestr = re.sub(r'[^\d/]+', '', datestr)
         c["date"] = datestr
     else:
-        if datestr[-4:] == this_year:
+        if datestr[-4:] == args.setyear:
             if "Removed, Operated from " in datestr:
                 datestr = datestr.split("Removed, Operated from ", 1)[1]
                 closing = datestr.split(" ")[-1]
@@ -220,7 +266,7 @@ def parse_rcdb_page(url):
                 c["date"] = datestr
         else:
             if args.verbose > 0:
-                print("--Skipping " + name + " at " + park + " (removed before " + this_year + ")")
+                print("--Skipping " + name + " at " + park + " (removed before " + args.setyear + ")")
             return None
 
     # get thrill scale
@@ -335,6 +381,7 @@ def parse_rcdb_page(url):
         c["inver"] = get_inver_val(x.text)
         c["dur"] = get_dur_val(x.text)
 
+    print(c["length"])
     return c
 
 if __name__ == "__main__": # allows us to put main at the beginning
