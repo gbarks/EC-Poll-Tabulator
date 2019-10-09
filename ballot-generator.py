@@ -539,46 +539,6 @@ def parse_rcdb_page(url):
     else:
         c["id"] = "r" + url.split("/")[-1].split(".")[0]
 
-    # # scrape stats data
-    # c["length"] = None
-    # c["height"] = None
-    # c["drop"]   = None
-    # c["speed"]  = None
-    # c["vert"]   = None
-    # c["inver"] = None
-    # c["dur"] = None
-
-    # for x in csoup.body.find_all('table', attrs={'id':'statTable'}):
-    #     c["length"] = get_stat_val("Length", " ft", x.text)
-    #     c["height"] = get_stat_val("Height", " ft", x.text)
-    #     c["drop"]   = get_stat_val("Drop", " ft", x.text)
-    #     c["speed"]  = get_stat_val("Speed", " mph", x.text)
-    #     c["vert"]   = get_stat_val("Vertical Angle", "°", x.text)
-    #     c["inver"] = get_inver_val(x.text)
-    #     c["dur"] = get_dur_val(x.text)
-
-
-    # def get_coaster_name(text):
-    #     return substring
-
-    # def get_park_name(text):
-    #     return substring
-
-    # def get_location(text):
-    #     return substring
-
-    # def get_opening_date(text):
-    #     return substring
-
-    # def get_make(text):
-    #     return substring
-
-    # def get_model(text):
-    #     return substring
-
-    # def get_submodel(text):
-    #     return substring
-
     # verbose print info per coaster
     if args.verbose > 1: # -vv = coaster name
         print(name, end="")
@@ -625,25 +585,6 @@ def parse_rcdb_page(url):
         return c
     else:
         return d
-
-# def get_stat_val(stat, unit, text):
-#     if stat in text:
-#         substring = text.split(stat, 1)[1]
-#         substring = substring.split(unit, 1)[0]
-#         substring = substring.replace(',', '')
-#         return substring
-
-# def get_inver_val(text):
-#     if "Inversions" in text:
-#         substring = text.split("Inversions", 1)[1][:2]
-#         substring = re.sub(r'[^\d]+', '', substring)
-#         return substring
-
-# def get_dur_val(text):
-#     if "Duration" in text:
-#         substring = text.split("Duration", 1)[1][:5]
-#         substring = re.sub(r'[^\d:]+', '', substring)
-#         return substring
 
 if __name__ == "__main__": # allows us to put main at the beginning
     main()
