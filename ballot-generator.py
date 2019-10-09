@@ -43,7 +43,7 @@ parser.add_argument("-s", "--sortbydate", action="store_true",
 parser.add_argument("-u", "--skipunknown", action="store_true",
                     help="skip all coasters named 'unknown'")
 parser.add_argument("-d", "--skipnodate", action="store_true",
-                    help="skip all coasters with nonspecific opening date")
+                    help="skip all coasters with nonspecific open/close date")
 parser.add_argument("-y", "--skipwrongyear", action="store_true",
                     help="skip all coasters that did not operate in given year")
 parser.add_argument("-Y", "--setyear", default=str(datetime.datetime.now().year),
@@ -167,7 +167,7 @@ def parse_rcdb_page(url):
     chtml = cresponse.read()
     csoup = BeautifulSoup(chtml, 'lxml')
 
-    # get name, alt name, park, and location
+    # get name, alt name (for native language users), park, and location
     feature = csoup.find('div', attrs={'id':'feature'})
     title = feature.find('div', attrs={'class':'scroll'})
     name = title.find('h1').text
@@ -180,7 +180,8 @@ def parse_rcdb_page(url):
     c["park"] = "\"" + park + "\""
     location = title.text[title.text.find("(")+1:title.text.find(")")]
     c["location"] = "\"" + location + "\""
-    # print(name + " at " + park + " - " + location)
+
+    # get individual city name from the location string
     c["country"] = None
     c["fullcity"] = None
     c["state"] = None
@@ -196,78 +197,284 @@ def parse_rcdb_page(url):
             city = fullcity[:fullcity.rindex(",")].strip()
             c["city"] = "\"" + city + "\""
 
+    # skip coasters named "Unknown" (-u arg)
     if args.skipunknown is True and name == "unknown":
         if args.verbose > 0:
             print("--Skipping \"unknown\" at " + park + " - " + location)
         return None
 
-    # dates = feature.find_all('time')
-    # for d in dates:
-    #     print(d['datetime'])
-
-    # get opening date and closing date
+    # get opening date and closing date (and extract coaster type from date string)
     dates = feature.find_all('time')
     datestr = feature.text[feature.text.find(")")+1:]
     if "Mountain Coaster" in datestr:
         datestr = datestr[:datestr.find("Mountain Coaster")]
-        c["type"] = "\"Mountain Coaster\""
+        c["type"] = "Mountain Coaster"
     elif "Powered Coaster" in datestr:
         datestr = datestr[:datestr.find("Powered Coaster")]
-        c["type"] = "\"Powered Coaster\""
+        c["type"] = "Powered Coaster"
     else:
         datestr = datestr[:datestr.find("Roller Coaster")]
-        c["type"] = "\"Roller Coaster\""
+        c["type"] = "Roller Coaster"
 
     c["opendate"] = None
     c["closedate"] = None
+
     if "Operating" in datestr:
-        c["status"] = "\"Operating\""
+        c["status"] = "Operating"
         if "Operating since" in datestr:
-            c["opendate"] = "\"" + dates[0]['datetime'] + "\""
+            if "?" in datestr and args.skipnodate:
+                if args.verbose > 0:
+                    print("--Skipping " + name + " at " + park + " (operating, '?' opening date)")
+                return None
+            elif " - " in datestr:
+                c["opendate"] = dates[0]['datetime'] + " - " + dates[1]['datetime']
+            elif "≤" in datestr:
+                c["opendate"] = "≤ " + dates[0]['datetime']
+            elif "≥" in datestr:
+                c["opendate"] = "≥ " + dates[0]['datetime']
+            else:
+                c["opendate"] = dates[0]['datetime']
+            if args.skipwrongyear and len(dates) > 0:
+                if int(dates[0]['datetime'][:4]) > int(args.setyear):
+                    if args.verbose > 0:
+                        print("--Skipping " + name + " at " + park + " (opened after " + args.setyear + ")")
+                    return None
         elif args.skipnodate:
             if args.verbose > 0:
-                print("--Skipping " + name + " at " + park + " (operating with unknown opening date)")
+                print("--Skipping " + name + " at " + park + " (operating, unknown opening date)")
             return None
-    elif "Removed" in datestr:
-        c["status"] = "\"Removed\""
-        if "Operated from" in datestr:
-            c["opendate"] = "\"" + dates[0]['datetime'] + "\""
-    elif "SBNO" in datestr:
-        c["status"] = "\"SBNO\""
-    elif "In Storage" in datestr:
-        c["status"] = "\"In Storage\""
-    elif "Under Construction" in datestr:
-        c["status"] = "\"Under Construction\""
 
-    if datestr == "Operating" or datestr == "Removed" or "SBNO" in datestr or "In Storage" in datestr:
-        print("--Skipping " + name + " at " + park + " (unknown opening date)")
-        if args.skipnodate:
+    elif "Removed" in datestr:
+        c["status"] = "Removed"
+        if "Operated from" in datestr:
+
+            # apologies for the spaghetti code; too many edge cases to check
+            minopendate = None
+            maxclosedate = None
+            if "from ? to" in datestr:
+                if args.skipnodate:
+                    if args.verbose > 0:
+                        print("--Skipping " + name + " at " + park + " (removed, '?' opening date)")
+                    return None
+                c["opendate"] = "?"
+                if " - " in datestr:
+                    c["closedate"] =  dates[0]['datetime'] + " - " + dates[1]['datetime']
+                    maxclosedate = int(dates[1]['datetime'][:4])
+                elif "≤" in datestr:
+                    c["closedate"] = "≤ " + dates[0]['datetime']
+                elif "≥" in datestr:
+                    c["closedate"] = "≥ " + dates[0]['datetime']
+                else:
+                    c["closedate"] = dates[0]['datetime']
+                if maxclosedate is None:
+                    maxclosedate = int(dates[0]['datetime'][:4])
+            elif "to ?" in datestr:
+                c["closedate"] = "?"
+                if " - " in datestr:
+                    c["opendate"] = dates[0]['datetime'] + " - " + dates[1]['datetime']
+                elif "≤" in datestr:
+                    c["opendate"] = "≤ " + dates[0]['datetime']
+                elif "≥" in datestr:
+                    c["opendate"] = "≥ " + dates[0]['datetime']
+                else:
+                    c["opendate"] = dates[0]['datetime']
+                minopendate = int(dates[0]['datetime'][:4])
+            elif "from  -  to" in datestr:
+                c["opendate"] = dates[0]['datetime'] + " - " + dates[1]['datetime']
+                minopendate = int(dates[0]['datetime'][:4])
+                if "to  - " in datestr:
+                    c["closedate"] =  dates[2]['datetime'] + " - " + dates[3]['datetime']
+                    maxclosedate = int(dates[3]['datetime'][:4])
+                elif "≤" in datestr:
+                    c["closedate"] = "≤ " + dates[2]['datetime']
+                elif "≥" in datestr:
+                    c["closedate"] = "≥ " + dates[2]['datetime']
+                else:
+                    c["closedate"] = dates[2]['datetime']
+                if maxclosedate is None:
+                    maxclosedate = int(dates[2]['datetime'][:4])
+            elif "from ≤  to" in datestr:
+                c["opendate"] = "≤ " + dates[0]['datetime']
+                minopendate = int(dates[0]['datetime'][:4])
+                if " - " in datestr:
+                    c["closedate"] =  dates[1]['datetime'] + " - " + dates[2]['datetime']
+                    maxclosedate = int(dates[2]['datetime'][:4])
+                elif "≤" in datestr:
+                    c["closedate"] = "≤ " + dates[1]['datetime']
+                elif "≥" in datestr:
+                    c["closedate"] = "≥ " + dates[1]['datetime']
+                else:
+                    c["closedate"] = dates[1]['datetime']
+                if maxclosedate is None:
+                    maxclosedate = int(dates[1]['datetime'][:4])
+            elif "from ≥  to" in datestr:
+                c["opendate"] = "≥ " + dates[0]['datetime']
+                minopendate = int(dates[0]['datetime'][:4])
+                if " - " in datestr:
+                    c["closedate"] =  dates[1]['datetime'] + " - " + dates[2]['datetime']
+                    maxclosedate = int(dates[2]['datetime'][:4])
+                elif "≤" in datestr:
+                    c["closedate"] = "≤ " + dates[1]['datetime']
+                elif "≥" in datestr:
+                    c["closedate"] = "≥ " + dates[1]['datetime']
+                else:
+                    c["closedate"] = dates[1]['datetime']
+                if maxclosedate is None:
+                    maxclosedate = int(dates[1]['datetime'][:4])
+            elif "from  to" in datestr:
+                c["opendate"] = dates[0]['datetime']
+                minopendate = int(dates[0]['datetime'][:4])
+                if " - " in datestr:
+                    c["closedate"] =  dates[1]['datetime'] + " - " + dates[2]['datetime']
+                    maxclosedate = int(dates[2]['datetime'][:4])
+                elif "≤" in datestr:
+                    c["closedate"] = "≤ " + dates[1]['datetime']
+                elif "≥" in datestr:
+                    c["closedate"] = "≥ " + dates[1]['datetime']
+                else:
+                    c["closedate"] = dates[1]['datetime']
+                if maxclosedate is None:
+                    maxclosedate = int(dates[1]['datetime'][:4])
+            else:
+                c["opendate"] = dates[0]['datetime']
+                minopendate = int(dates[0]['datetime'][:4])
+                if len(dates) > 1:
+                    print("Something went wrong in the open/close date parsing...")
+
+            # determine if the ride operated in the given year (if -y arg is used)
+            if args.skipwrongyear:
+                if minopendate is not None and minopendate > int(args.setyear):
+                    if args.verbose > 0:
+                        print("--Skipping " + name + " at " + park + " (opened after " + args.setyear + ")")
+                    return None
+                if maxclosedate is not None and maxclosedate < int(args.setyear):
+                    if args.verbose > 0:
+                        print("--Skipping " + name + " at " + park + " (removed before " + args.setyear + ")")
+                    return None
+                if minopendate is None:
+                    if args.verbose > 0:
+                        print("--Skipping " + name + " at " + park + " (removed, unknown opening year)")
+                    return None
+                if maxclosedate is None:
+                    if args.verbose > 0:
+                        print("--Skipping " + name + " at " + park + " (removed, unknown closing year)")
+                    return None
+        elif args.skipnodate:
             if args.verbose > 0:
-                print("--Skipping " + name + " at " + park + " (unknown opening date)")
+                print("--Skipping " + name + " at " + park + " (removed, unknown opening date)")
             return None
-    elif " or earlier" in datestr:
-        if args.skipnodate:
-            if args.verbose > 0:
-                print("--Skipping " + name + " at " + park + " (nonspecific opening date)")
-            return None
-    elif "Operating since " in datestr:
-        datestr = datestr.split("Operating since ", 1)[1]
-        datestr = re.sub(r'[^\d/]+', '', datestr)
-        c["date"] = datestr
-    else:
-        if datestr[-4:] == args.setyear:
-            if "Removed, Operated from " in datestr:
-                datestr = datestr.split("Removed, Operated from ", 1)[1]
-                closing = datestr.split(" ")[-1]
-                closing = re.sub(r'[^\d/]+', '', closing)
-                c["closing"] = closing
-                datestr = datestr.split(" ")[0]
-                datestr = re.sub(r'[^\d/]+', '', datestr)
-                c["date"] = datestr
-        else:
-            if args.verbose > 0:
-                print("--Skipping " + name + " at " + park + " (removed before " + args.setyear + ")")
-            return None
+
+    elif "SBNO" in datestr: # not as robust as "Operating" or "Removed" date checks; low priority
+        c["status"] = "SBNO"
+        for tr in csoup.find_all('table', attrs={'class':'objDemoBox'})[-1].find_all('tr'):
+            if "Former status" in tr.text:
+                td = tr.find_all('td')[-1]
+                tdates = td.find_all('time')
+                tdtext = re.split('Operate|SBN', td.text)[1:] # hacky text operations incoming
+                minopendate = None
+                maxclosedate = None
+
+                # check first line of "Operated from" for closing date
+                if "d" is tdtext[0][0]:
+                    if "to ?" in tdtext[0]:
+                        c["closedate"] = "?"
+                    elif "to" in tdtext[0] and tdtext[0].count('-') > 1:
+                        c["closedate"] = tdates[2]['datetime'] + " - " + tdates[3]['datetime']
+                        maxclosedate = int(tdates[3]['datetime'][:4])
+                    elif "to" in tdtext[0] and tdtext[0].count('-') > 0:
+                        if " -  to" in tdtext[0]:
+                            if "to ≤" in tdtext[0]:
+                                c["closedate"] = "≤ " + tdates[2]['datetime']
+                            elif "to ≥" in tdtext[0]:
+                                c["closedate"] = "≥ " + tdates[2]['datetime']
+                            else:
+                                c["closedate"] = tdates[2]['datetime']
+                        else:
+                            c["closedate"] = tdates[1]['datetime'] + " - " + tdates[2]['datetime']
+                        maxclosedate = int(tdates[2]['datetime'][:4])
+                    elif "to ≤" in tdtext[0]:
+                        c["closedate"] = "≤ " + tdates[1]['datetime']
+                        maxclosedate = int(tdates[1]['datetime'][:4])
+                    elif "to ≥" in tdtext[0]:
+                        c["closedate"] = "≥ " + tdates[1]['datetime']
+                        maxclosedate = int(tdates[1]['datetime'][:4])
+                    elif "to" in tdtext[0]:
+                        c["closedate"] = tdates[1]['datetime']
+                        maxclosedate = int(tdates[1]['datetime'][:4])
+
+                # check last line of "Operated from" for opening date
+                if "d" is tdtext[-1][0]:
+                    if "from ? to" in tdtext[-1]:
+                        if args.skipnodate:
+                            if args.verbose > 0:
+                                print("--Skipping " + name + " at " + park + " (SBNO, '?' opening date)")
+                            return None
+                        c["opendate"] = "?"
+                    elif "from  -  to" in tdtext[-1]:
+                        if "to  - " in tdtext[-1]:
+                            c["opendate"] = tdates[-4]['datetime'] + " - " + tdates[-3]['datetime']
+                            minopendate = int(tdates[-4]['datetime'][:4])
+                        else:
+                            c["opendate"] = tdates[-3]['datetime'] + " - " + tdates[-2]['datetime']
+                            minopendate = int(tdates[-3]['datetime'][:4])
+                    elif "from ≤" in tdtext[-1]:
+                        if "to  - " in tdtext[-1]:
+                            c["opendate"] = "≤ " + tdates[-3]['datetime']
+                            minopendate = int(tdates[-3]['datetime'][:4])
+                        else:
+                            c["opendate"] = "≤ " + tdates[-2]['datetime']
+                            minopendate = int(tdates[-2]['datetime'][:4])
+                    elif "from ≥" in tdtext[-1]:
+                        if "to  - " in tdtext[-1]:
+                            c["opendate"] = "≥ " + tdates[-3]['datetime']
+                            minopendate = int(tdates[-3]['datetime'][:4])
+                        else:
+                            c["opendate"] = "≥ " + tdates[-2]['datetime']
+                            minopendate = int(tdates[-2]['datetime'][:4])
+                    elif "to" in tdtext[-1]:
+                        if "to  - " in tdtext[-1]:
+                            c["opendate"] = tdates[-3]['datetime']
+                            minopendate = int(tdates[-3]['datetime'][:4])
+                        else:
+                            c["opendate"] = tdates[-2]['datetime']
+                            minopendate = int(tdates[-2]['datetime'][:4])
+                    else:
+                        if "-" in tdtext[-1]:
+                            c["opendate"] = tdates[-2]['datetime'] + " - " + tdates[-1]['datetime']
+                            minopendate = int(tdates[-2]['datetime'][:4])
+                        else:
+                            c["opendate"] = tdates[-1]['datetime']
+                            minopendate = int(tdates[-1]['datetime'][:4])
+
+                # determine if the ride operated in the given year (if -y arg is used)
+                if args.skipwrongyear:
+                    if minopendate is not None and minopendate > int(args.setyear):
+                        if args.verbose > 0:
+                            print("--Skipping " + name + " at " + park + " (opened after " + args.setyear + ")")
+                        return None
+                    if maxclosedate is not None and maxclosedate < int(args.setyear):
+                        if args.verbose > 0:
+                            print("--Skipping " + name + " at " + park + " (SBNO before " + args.setyear + ")")
+                        return None
+                    if minopendate is None:
+                        if args.verbose > 0:
+                            print("--Skipping " + name + " at " + park + " (SBNO, unknown opening year)")
+                        return None
+                    if maxclosedate is None:
+                        if args.verbose > 0:
+                            print("--Skipping " + name + " at " + park + " (SBNO, unknown closing year)")
+                        return None
+
+                break
+
+    elif "In Storage" in datestr:
+        c["status"] = "In Storage"
+        return None # don't care about coasters in storage, for now
+                    # very few are listed, see https://rcdb.com/r.htm?st=312&ot=2
+
+    elif "Under Construction" in datestr:
+        c["status"] = "Under Construction"
+        return None # don't care about rides that have yet to be constructed
 
     # get thrill scale
     linkrow = feature.find('span', attrs={'class':'link_row'})
@@ -324,54 +531,48 @@ def parse_rcdb_page(url):
     # def get_submodel(text):
     #     return substring
 
-    if args.verbose > 1:
-        # print(name + ", " + park + ", " + date, end="")
+    # verbose print info per coaster
+    if args.verbose > 1: # -vv = coaster name
         print(name, end="")
         if "altname" in c:
             print(" (AKA " + altname + ")", end="")
         print(", " + park, end="")
-        if args.verbose > 2:
-            print(" - " + location)
-        else:
-            print("")
-        if args.verbose > 3:
-            if "date" in c:
-                print("    Opened: " + c["date"], end="")
-                if "closing" in c:
-                    print(" (closed " + c["closing"] + ")")
-                else:
-                    print("")
-        if args.verbose > 4:
-            if "scale" in c:
-                print("    Scale:  " + c["scale"])
-            if "make" in c:
-                print("    Make:   " + c["make"])
-            if "model" in c:
-                if "submodel" in c:
-                    print("    Model:  " + c["model"] + " / " + c["submodel"])
-                else:
-                    print("    Model:  " + c["model"])
-
-    def get_stat_val(stat, unit, text):
-        if stat in text:
-            substring = text.split(stat, 1)[1]
-            substring = substring.split(unit, 1)[0]
-            substring = substring.replace(',', '')
-            return substring
-
-    def get_inver_val(text):
-        if "Inversions" in text:
-            substring = text.split("Inversions", 1)[1][:2]
-            substring = re.sub(r'[^\d]+', '', substring)
-            return substring
-
-    def get_dur_val(text):
-        if "Duration" in text:
-            substring = text.split("Duration", 1)[1][:5]
-            substring = re.sub(r'[^\d:]+', '', substring)
-            return substring
+        if args.verbose > 2: # -vvv = coaster location (same line as coaster name)
+            print(" - " + location, end="")
+        print("")
+        if args.verbose > 3: # -vvvv = coaster status + opening/closing dates
+            if "status" in c:
+                print("    Status: " + c["status"], end="")
+                if "opendate" in c and c["opendate"] is not None:
+                    if c["status"] is "Operating":
+                        print(" since " + c["opendate"], end="")
+                    elif c["status"] is "Removed" or "SBNO":
+                        print(", Operated from " + c["opendate"], end="")
+                    else:
+                        print(", ", end="")
+                    if "closedate" in c and c["closedate"] is not None:
+                        print(" to " + c["closedate"], end="")
+                print("")
+            if args.verbose > 4: # -vvvvv = coaster scale + make/model
+                if "scale" in c:
+                    print("    Scale:  " + c["scale"])
+                if "make" in c:
+                    print("    Make:   " + c["make"])
+                if "model" in c:
+                    if "submodel" in c:
+                        print("    Model:  " + c["model"] + " / " + c["submodel"])
+                    else:
+                        print("    Model:  " + c["model"])
 
     # scrape stats data
+    c["length"] = None
+    c["height"] = None
+    c["drop"]   = None
+    c["speed"]  = None
+    c["vert"]   = None
+    c["inver"] = None
+    c["dur"] = None
+
     for x in csoup.body.find_all('table', attrs={'id':'statTable'}):
         c["length"] = get_stat_val("Length", " ft", x.text)
         c["height"] = get_stat_val("Height", " ft", x.text)
@@ -381,8 +582,26 @@ def parse_rcdb_page(url):
         c["inver"] = get_inver_val(x.text)
         c["dur"] = get_dur_val(x.text)
 
-    print(c["length"])
     return c
+
+def get_stat_val(stat, unit, text):
+    if stat in text:
+        substring = text.split(stat, 1)[1]
+        substring = substring.split(unit, 1)[0]
+        substring = substring.replace(',', '')
+        return substring
+
+def get_inver_val(text):
+    if "Inversions" in text:
+        substring = text.split("Inversions", 1)[1][:2]
+        substring = re.sub(r'[^\d]+', '', substring)
+        return substring
+
+def get_dur_val(text):
+    if "Duration" in text:
+        substring = text.split("Duration", 1)[1][:5]
+        substring = re.sub(r'[^\d:]+', '', substring)
+        return substring
 
 if __name__ == "__main__": # allows us to put main at the beginning
     main()
