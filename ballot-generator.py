@@ -40,6 +40,8 @@ parser.add_argument("-O", "--outdetails", default="rcdb_ballot_details.csv",
                     help="specify name of output [details].csv file")
 parser.add_argument("-s", "--sortbydate", action="store_true",
                     help="ensure RCDB pages are sorted chronologically")
+parser.add_argument("-c", "--combineTracks", action="store_true",
+                    help="don't make separate coaster entries for multi-tracks")
 parser.add_argument("-u", "--skipunknown", action="store_true",
                     help="skip all coasters named 'unknown'")
 parser.add_argument("-d", "--skipnodate", action="store_true",
@@ -109,7 +111,11 @@ def main():
 
                 c = parse_rcdb_page(url)
                 if c is not None:
-                    coasters.append(c)
+                    if isinstance(c, list):
+                        for item in c:
+                            coasters.append(item)
+                    else:
+                        coasters.append(c)
 
             # check if there's another list page to scrape in the footer
             rfoot = soup.find('div', attrs={'id':'rfoot'})
@@ -122,7 +128,11 @@ def main():
         else:
             c = parse_rcdb_page(rcdblink[i])
             if c is not None:
-                coasters.append(c)
+                if isinstance(c, list):
+                    for item in c:
+                        coasters.append(item)
+                else:
+                    coasters.append(c)
 
         # increment while loop counter
         i += 1
@@ -364,7 +374,7 @@ def parse_rcdb_page(url):
                 print("--Skipping " + name + " at " + park + " (removed, unknown opening date)")
             return None
 
-    elif "SBNO" in datestr: # not as robust as "Operating" or "Removed" date checks; low priority
+    elif "SBNO" in datestr:
         c["status"] = "SBNO"
         for tr in csoup.find_all('table', attrs={'class':'objDemoBox'})[-1].find_all('tr'):
             if "Former status" in tr.text:
@@ -486,7 +496,7 @@ def parse_rcdb_page(url):
         c["scale"] = "Kiddie"
     elif "Family" in linkrow.text:
         c["scale"] = "Family"
-    elif "Extreme" in linkrow.text:
+    elif "Thrill" in linkrow.text:
         c["scale"] = "Thrill"
     elif "Extreme" in linkrow.text:
         c["scale"] = "Extreme"
@@ -508,6 +518,44 @@ def parse_rcdb_page(url):
         elif "Model: " in makemodel:
             print("WTF THIS DOESN'T MAKE SENSE!!!!")
             print(c)
+
+    # get number of tracks; write new tracks to separate coaster entries
+    stats = csoup.body.find('table', attrs={'id':'statTable'})
+    numTracks = len(stats.find('tr').find_all('td'))
+    c["tracks"] = str(numTracks)
+    trackNames = []
+    d = []
+    if numTracks > 1 and args.combineTracks is False:
+        if stats.find('th').text == "Name":
+            for x in stats.find('tr').find_all('td'):
+                trackNames.append(x.text)
+        for i in range(numTracks):
+            c["id"] = chr(ord('a')+i) + url.split("/")[-1].split(".")[0]
+            if len(trackNames) > 1:
+                c["name"] = "\"" + name + " (" + trackNames[i] + ")\""
+            else:
+                c["name"] = "\"" + name + " (" + chr(ord('a')+i) + ")\""
+            d.append(c.copy())
+    else:
+        c["id"] = "r" + url.split("/")[-1].split(".")[0]
+
+    # # scrape stats data
+    # c["length"] = None
+    # c["height"] = None
+    # c["drop"]   = None
+    # c["speed"]  = None
+    # c["vert"]   = None
+    # c["inver"] = None
+    # c["dur"] = None
+
+    # for x in csoup.body.find_all('table', attrs={'id':'statTable'}):
+    #     c["length"] = get_stat_val("Length", " ft", x.text)
+    #     c["height"] = get_stat_val("Height", " ft", x.text)
+    #     c["drop"]   = get_stat_val("Drop", " ft", x.text)
+    #     c["speed"]  = get_stat_val("Speed", " mph", x.text)
+    #     c["vert"]   = get_stat_val("Vertical Angle", "°", x.text)
+    #     c["inver"] = get_inver_val(x.text)
+    #     c["dur"] = get_dur_val(x.text)
 
 
     # def get_coaster_name(text):
@@ -553,6 +601,15 @@ def parse_rcdb_page(url):
                     if "closedate" in c and c["closedate"] is not None:
                         print(" to " + c["closedate"], end="")
                 print("")
+                if numTracks > 1:
+                    print("    Tracks: " + str(numTracks), end="")
+                    if len(trackNames) > 1:
+                        print(" - ", end="")
+                        for i in range(len(trackNames)):
+                            print(trackNames[i], end="")
+                            if i < len(trackNames) - 1:
+                                print(", ", end="")
+                    print("")
             if args.verbose > 4: # -vvvvv = coaster scale + make/model
                 if "scale" in c:
                     print("    Scale:  " + c["scale"])
@@ -564,44 +621,29 @@ def parse_rcdb_page(url):
                     else:
                         print("    Model:  " + c["model"])
 
-    # scrape stats data
-    c["length"] = None
-    c["height"] = None
-    c["drop"]   = None
-    c["speed"]  = None
-    c["vert"]   = None
-    c["inver"] = None
-    c["dur"] = None
+    if numTracks == 1 or args.combineTracks is True:
+        return c
+    else:
+        return d
 
-    for x in csoup.body.find_all('table', attrs={'id':'statTable'}):
-        c["length"] = get_stat_val("Length", " ft", x.text)
-        c["height"] = get_stat_val("Height", " ft", x.text)
-        c["drop"]   = get_stat_val("Drop", " ft", x.text)
-        c["speed"]  = get_stat_val("Speed", " mph", x.text)
-        c["vert"]   = get_stat_val("Vertical Angle", "°", x.text)
-        c["inver"] = get_inver_val(x.text)
-        c["dur"] = get_dur_val(x.text)
+# def get_stat_val(stat, unit, text):
+#     if stat in text:
+#         substring = text.split(stat, 1)[1]
+#         substring = substring.split(unit, 1)[0]
+#         substring = substring.replace(',', '')
+#         return substring
 
-    return c
+# def get_inver_val(text):
+#     if "Inversions" in text:
+#         substring = text.split("Inversions", 1)[1][:2]
+#         substring = re.sub(r'[^\d]+', '', substring)
+#         return substring
 
-def get_stat_val(stat, unit, text):
-    if stat in text:
-        substring = text.split(stat, 1)[1]
-        substring = substring.split(unit, 1)[0]
-        substring = substring.replace(',', '')
-        return substring
-
-def get_inver_val(text):
-    if "Inversions" in text:
-        substring = text.split("Inversions", 1)[1][:2]
-        substring = re.sub(r'[^\d]+', '', substring)
-        return substring
-
-def get_dur_val(text):
-    if "Duration" in text:
-        substring = text.split("Duration", 1)[1][:5]
-        substring = re.sub(r'[^\d:]+', '', substring)
-        return substring
+# def get_dur_val(text):
+#     if "Duration" in text:
+#         substring = text.split("Duration", 1)[1][:5]
+#         substring = re.sub(r'[^\d:]+', '', substring)
+#         return substring
 
 if __name__ == "__main__": # allows us to put main at the beginning
     main()
