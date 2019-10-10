@@ -434,118 +434,124 @@ def parse_rcdb_page(url):
 
     elif "SBNO" in datestr:
         c["status"] = "SBNO"
-        for tr in csoup.find_all('table', attrs={'class':'objDemoBox'})[-1].find_all('tr'):
-            if "Former status" in tr.text:
-                td = tr.find_all('td')[-1]
-                tdates = td.find_all('time')
-                tdtext = re.split('Operate|SBN', td.text)[1:] # hacky text operations incoming
-                minopendate = None
-                maxclosedate = None
+        if not csoup.find('table', attrs={'class':'objDemoBox'}): # for Orphan Rocker
+            if args.skipnodate or args.skipwrongyear:
+                if args.verbose > 0:
+                    print("--Skipping " + name + " at " + park + " (SBNO, never operated)")
+                return None
+        else:
+            for tr in csoup.find_all('table', attrs={'class':'objDemoBox'})[-1].find_all('tr'):
+                if "Former status" in tr.text:
+                    td = tr.find_all('td')[-1]
+                    tdates = td.find_all('time')
+                    tdtext = re.split('Operate|SBN', td.text)[1:] # hacky text operations incoming
+                    minopendate = None
+                    maxclosedate = None
 
-                # check first line of "Operated from" for closing date
-                if "d" is tdtext[0][0]:
-                    if "to ?" in tdtext[0]:
-                        c["closedate"] = "?"
-                    elif "from ? to" in tdtext[0]:
-                        if " - " in tdtext[0]:
-                            c["closedate"] = tdates[0]['datetime'] + " - " + tdates[1]['datetime']
+                    # check first line of "Operated from" for closing date
+                    if "d" is tdtext[0][0]:
+                        if "to ?" in tdtext[0]:
+                            c["closedate"] = "?"
+                        elif "from ? to" in tdtext[0]:
+                            if " - " in tdtext[0]:
+                                c["closedate"] = tdates[0]['datetime'] + " - " + tdates[1]['datetime']
+                                maxclosedate = int(tdates[1]['datetime'][:4])
+                            else:
+                                if "to ≤" in tdtext[0]:
+                                    c["closedate"] = "≤ " + tdates[0]['datetime']
+                                elif "to ≥" in tdtext[0]:
+                                    c["closedate"] = "≥ " + tdates[0]['datetime']
+                                else:
+                                    c["closedate"] = tdates[0]['datetime']
+                                maxclosedate = int(tdates[0]['datetime'][:4])
+                        elif "to" in tdtext[0] and tdtext[0].count('-') > 1:
+                            c["closedate"] = tdates[2]['datetime'] + " - " + tdates[3]['datetime']
+                            maxclosedate = int(tdates[3]['datetime'][:4])
+                        elif "to" in tdtext[0] and tdtext[0].count('-') > 0:
+                            if " -  to" in tdtext[0]:
+                                if "to ≤" in tdtext[0]:
+                                    c["closedate"] = "≤ " + tdates[2]['datetime']
+                                elif "to ≥" in tdtext[0]:
+                                    c["closedate"] = "≥ " + tdates[2]['datetime']
+                                else:
+                                    c["closedate"] = tdates[2]['datetime']
+                            else:
+                                c["closedate"] = tdates[1]['datetime'] + " - " + tdates[2]['datetime']
+                            maxclosedate = int(tdates[2]['datetime'][:4])
+                        elif "to ≤" in tdtext[0]:
+                            c["closedate"] = "≤ " + tdates[1]['datetime']
                             maxclosedate = int(tdates[1]['datetime'][:4])
-                        else:
-                            if "to ≤" in tdtext[0]:
-                                c["closedate"] = "≤ " + tdates[0]['datetime']
-                            elif "to ≥" in tdtext[0]:
-                                c["closedate"] = "≥ " + tdates[0]['datetime']
-                            else:
-                                c["closedate"] = tdates[0]['datetime']
-                            maxclosedate = int(tdates[0]['datetime'][:4])
-                    elif "to" in tdtext[0] and tdtext[0].count('-') > 1:
-                        c["closedate"] = tdates[2]['datetime'] + " - " + tdates[3]['datetime']
-                        maxclosedate = int(tdates[3]['datetime'][:4])
-                    elif "to" in tdtext[0] and tdtext[0].count('-') > 0:
-                        if " -  to" in tdtext[0]:
-                            if "to ≤" in tdtext[0]:
-                                c["closedate"] = "≤ " + tdates[2]['datetime']
-                            elif "to ≥" in tdtext[0]:
-                                c["closedate"] = "≥ " + tdates[2]['datetime']
-                            else:
-                                c["closedate"] = tdates[2]['datetime']
-                        else:
-                            c["closedate"] = tdates[1]['datetime'] + " - " + tdates[2]['datetime']
-                        maxclosedate = int(tdates[2]['datetime'][:4])
-                    elif "to ≤" in tdtext[0]:
-                        c["closedate"] = "≤ " + tdates[1]['datetime']
-                        maxclosedate = int(tdates[1]['datetime'][:4])
-                    elif "to ≥" in tdtext[0]:
-                        c["closedate"] = "≥ " + tdates[1]['datetime']
-                        maxclosedate = int(tdates[1]['datetime'][:4])
-                    elif "to" in tdtext[0]:
-                        c["closedate"] = tdates[1]['datetime']
-                        maxclosedate = int(tdates[1]['datetime'][:4])
+                        elif "to ≥" in tdtext[0]:
+                            c["closedate"] = "≥ " + tdates[1]['datetime']
+                            maxclosedate = int(tdates[1]['datetime'][:4])
+                        elif "to" in tdtext[0]:
+                            c["closedate"] = tdates[1]['datetime']
+                            maxclosedate = int(tdates[1]['datetime'][:4])
 
-                # check last line of "Operated from" for opening date
-                if "d" is tdtext[-1][0]:
-                    if "from ? to" in tdtext[-1]:
-                        if args.skipnodate:
+                    # check last line of "Operated from" for opening date
+                    if "d" is tdtext[-1][0]:
+                        if "from ? to" in tdtext[-1]:
+                            if args.skipnodate:
+                                if args.verbose > 0:
+                                    print("--Skipping " + name + " at " + park + " (SBNO, '?' opening date)")
+                                return None
+                            c["opendate"] = "?"
+                        elif "from  -  to" in tdtext[-1]:
+                            if "to  - " in tdtext[-1]:
+                                c["opendate"] = tdates[-4]['datetime'] + " - " + tdates[-3]['datetime']
+                                minopendate = int(tdates[-4]['datetime'][:4])
+                            else:
+                                c["opendate"] = tdates[-3]['datetime'] + " - " + tdates[-2]['datetime']
+                                minopendate = int(tdates[-3]['datetime'][:4])
+                        elif "from ≤" in tdtext[-1]:
+                            if "to  - " in tdtext[-1]:
+                                c["opendate"] = "≤ " + tdates[-3]['datetime']
+                                minopendate = int(tdates[-3]['datetime'][:4])
+                            else:
+                                c["opendate"] = "≤ " + tdates[-2]['datetime']
+                                minopendate = int(tdates[-2]['datetime'][:4])
+                        elif "from ≥" in tdtext[-1]:
+                            if "to  - " in tdtext[-1]:
+                                c["opendate"] = "≥ " + tdates[-3]['datetime']
+                                minopendate = int(tdates[-3]['datetime'][:4])
+                            else:
+                                c["opendate"] = "≥ " + tdates[-2]['datetime']
+                                minopendate = int(tdates[-2]['datetime'][:4])
+                        elif "to" in tdtext[-1]:
+                            if "to  - " in tdtext[-1]:
+                                c["opendate"] = tdates[-3]['datetime']
+                                minopendate = int(tdates[-3]['datetime'][:4])
+                            else:
+                                c["opendate"] = tdates[-2]['datetime']
+                                minopendate = int(tdates[-2]['datetime'][:4])
+                        else:
+                            if "-" in tdtext[-1]:
+                                c["opendate"] = tdates[-2]['datetime'] + " - " + tdates[-1]['datetime']
+                                minopendate = int(tdates[-2]['datetime'][:4])
+                            else:
+                                c["opendate"] = tdates[-1]['datetime']
+                                minopendate = int(tdates[-1]['datetime'][:4])
+
+                    # determine if the ride operated in the given year (if -y arg is used)
+                    if args.skipwrongyear:
+                        if minopendate is not None and minopendate > int(args.setyear):
                             if args.verbose > 0:
-                                print("--Skipping " + name + " at " + park + " (SBNO, '?' opening date)")
+                                print("--Skipping " + name + " at " + park + " (opened after " + args.setyear + ")")
                             return None
-                        c["opendate"] = "?"
-                    elif "from  -  to" in tdtext[-1]:
-                        if "to  - " in tdtext[-1]:
-                            c["opendate"] = tdates[-4]['datetime'] + " - " + tdates[-3]['datetime']
-                            minopendate = int(tdates[-4]['datetime'][:4])
-                        else:
-                            c["opendate"] = tdates[-3]['datetime'] + " - " + tdates[-2]['datetime']
-                            minopendate = int(tdates[-3]['datetime'][:4])
-                    elif "from ≤" in tdtext[-1]:
-                        if "to  - " in tdtext[-1]:
-                            c["opendate"] = "≤ " + tdates[-3]['datetime']
-                            minopendate = int(tdates[-3]['datetime'][:4])
-                        else:
-                            c["opendate"] = "≤ " + tdates[-2]['datetime']
-                            minopendate = int(tdates[-2]['datetime'][:4])
-                    elif "from ≥" in tdtext[-1]:
-                        if "to  - " in tdtext[-1]:
-                            c["opendate"] = "≥ " + tdates[-3]['datetime']
-                            minopendate = int(tdates[-3]['datetime'][:4])
-                        else:
-                            c["opendate"] = "≥ " + tdates[-2]['datetime']
-                            minopendate = int(tdates[-2]['datetime'][:4])
-                    elif "to" in tdtext[-1]:
-                        if "to  - " in tdtext[-1]:
-                            c["opendate"] = tdates[-3]['datetime']
-                            minopendate = int(tdates[-3]['datetime'][:4])
-                        else:
-                            c["opendate"] = tdates[-2]['datetime']
-                            minopendate = int(tdates[-2]['datetime'][:4])
-                    else:
-                        if "-" in tdtext[-1]:
-                            c["opendate"] = tdates[-2]['datetime'] + " - " + tdates[-1]['datetime']
-                            minopendate = int(tdates[-2]['datetime'][:4])
-                        else:
-                            c["opendate"] = tdates[-1]['datetime']
-                            minopendate = int(tdates[-1]['datetime'][:4])
+                        if maxclosedate is not None and maxclosedate < int(args.setyear):
+                            if args.verbose > 0:
+                                print("--Skipping " + name + " at " + park + " (SBNO before " + args.setyear + ")")
+                            return None
+                        if minopendate is None:
+                            if args.verbose > 0:
+                                print("--Skipping " + name + " at " + park + " (SBNO, unknown opening year)")
+                            return None
+                        if maxclosedate is None:
+                            if args.verbose > 0:
+                                print("--Skipping " + name + " at " + park + " (SBNO, unknown closing year)")
+                            return None
 
-                # determine if the ride operated in the given year (if -y arg is used)
-                if args.skipwrongyear:
-                    if minopendate is not None and minopendate > int(args.setyear):
-                        if args.verbose > 0:
-                            print("--Skipping " + name + " at " + park + " (opened after " + args.setyear + ")")
-                        return None
-                    if maxclosedate is not None and maxclosedate < int(args.setyear):
-                        if args.verbose > 0:
-                            print("--Skipping " + name + " at " + park + " (SBNO before " + args.setyear + ")")
-                        return None
-                    if minopendate is None:
-                        if args.verbose > 0:
-                            print("--Skipping " + name + " at " + park + " (SBNO, unknown opening year)")
-                        return None
-                    if maxclosedate is None:
-                        if args.verbose > 0:
-                            print("--Skipping " + name + " at " + park + " (SBNO, unknown closing year)")
-                        return None
-
-                break
+                    break
 
     elif "In Storage" in datestr:
         c["status"] = "In Storage"
