@@ -21,9 +21,12 @@ import argparse
 import datetime
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import get_column_letter
 
 # command line arguments
-parser = argparse.ArgumentParser(description='Pull coaster info from RCDB list into .csv ballot')
+parser = argparse.ArgumentParser(description='Pull coaster info from RCDB list into .csv/.xlsx ballot')
 
 def valid_year(s):
     try:
@@ -34,10 +37,10 @@ def valid_year(s):
 
 parser.add_argument("-i", "--rcdblink", action="append", required=True,
                     help="RCDB input url (required) - can use multiple -i args")
-parser.add_argument("-o", "--outballot", default="rcdb_ballot.csv",
-                    help="specify name of output [ballot].csv file")
-parser.add_argument("-O", "--outdetails", default="rcdb_ballot_details.csv",
-                    help="specify name of output [details].csv file")
+parser.add_argument("-o", "--outballot", default="rcdb_ballot",
+                    help="specify name of output [ballot].csv/.xlsx file")
+parser.add_argument("-O", "--outdetails", default="rcdb_ballot_details",
+                    help="specify name of output [details].csv/.xlsx file")
 parser.add_argument("-s", "--sortbydate", action="store_true",
                     help="ensure RCDB pages are sorted chronologically")
 parser.add_argument("-c", "--combineTracks", action="store_true",
@@ -58,13 +61,9 @@ parser.add_argument("-v", "--verbose", action="count", default=0,
 args = parser.parse_args()
 
 # format output filenames
-if args.outballot != "rcdb_ballot.csv":
-    if args.outballot[-4:] != ".csv":
-        args.outballot += ".csv"
-    if args.outdetails == "rcdb_ballot_details.csv":
-        args.outdetails = args.outballot[:-4] + "_details.csv"
-if args.outdetails[-4:] != ".csv":
-    args.outdetails += ".csv"
+if args.outballot != "rcdb_ballot":
+    if args.outdetails == "rcdb_ballot_details":
+        args.outdetails = args.outballot + "_details"
 
 def main():
     coasters = []
@@ -95,20 +94,6 @@ def main():
                 td = tr.find_all('td')[1]
                 url = "https://rcdb.com" + td.find('a').get('href')
 
-                # name = td.text
-
-                # if args.skipunknown:
-                #     if name == "unknown":
-                #         continue
-                # park = tr.find_all('td')[2].text
-                # date = tr.find_all('td')[6].text
-
-                # c = {}
-                # c["name"] = "\"" + name + "\""
-                # c["park"] = "\"" + park + "\""
-                # c["date"] = date
-                # c["url"] = url
-
                 c = parse_rcdb_page(url)
                 if c is not None:
                     if isinstance(c, list):
@@ -138,29 +123,87 @@ def main():
         i += 1
         j = len(rcdblink)
 
-    # file = open(args.outfile, "w")
-    # file.write("Name,Park,Location,Opening Date,Length,Height,Drop,Speed,Inversions,Vertical Angle,Duration,RCDB Link\n")
+    # open .csv files
+    csvballot = open(args.outballot + ".csv", "w")
+    csvdetails = open(args.outdetails + ".csv", "w")
+    csvballot.write("Rank,Name,Local Name,Park,Location,ID\n")
+    csvdetails.write("Rank,Name,Local Name,Park,Location,ID,Country,Full City Name,State,City,Status,Opening Date,Closing Date,Type,Scale,Make,Model,Sub-Model,# of Tracks,RCDB URL\n")
 
-    # def none_to_blank(key, c, csvline):
-    #     if key not in c or c[key] is None:
-    #         return csvline + ","
-    #     else:
-    #         return csvline + c[key] + ","
+    # create Excel workbooks for .xlsx files
+    xlballot = Workbook()
+    xlballot.active.title = args.outballot
+    xldetails = Workbook()
+    xldetails.active.title = args.outdetails
+    xlballot.active.append(["Rank","Name","Local Name","Park","Location","ID"])
+    xldetails.active.append(["Rank","Name","Local Name","Park","Location","ID",
+                            "Country","Full City Name","State","City","Status",
+                            "Opening Date","Closing Date","Type","Scale","Make",
+                            "Model","Sub-Model","# of Tracks","RCDB URL"])
 
-    # for c in coasters:
-    #     csvline = c["name"] + "," + c["park"] + "," + c["location"] + ","
-    #     csvline = none_to_blank("date", c, csvline)
-    #     csvline = none_to_blank("length", c, csvline)
-    #     csvline = none_to_blank("height", c, csvline)
-    #     csvline = none_to_blank("drop", c, csvline)
-    #     csvline = none_to_blank("speed", c, csvline)
-    #     csvline = none_to_blank("inver", c, csvline)
-    #     csvline = none_to_blank("vert", c, csvline)
-    #     csvline = none_to_blank("dur", c, csvline)
-    #     csvline = csvline + c["url"] + "\n"
-    #     file.write(csvline)
+    for c in coasters:
 
-    # file.close()
+        # compose row for minimal .csv ballot
+        csvline = "0,"
+        csvline = none_to_blank(csvline, c, "name")
+        csvline = none_to_blank(csvline, c, "altname")
+        csvline = none_to_blank(csvline, c, "park")
+        csvline = none_to_blank(csvline, c, "location")
+        csvline = csvline + c["id"] + "\n"
+        csvballot.write(csvline)
+
+        # compose row for detailed .csv ballot
+        csvline = csvline[:-1] + ","
+        csvline = none_to_blank(csvline, c, "country")
+        csvline = none_to_blank(csvline, c, "fullcity")
+        csvline = none_to_blank(csvline, c, "state")
+        csvline = none_to_blank(csvline, c, "city")
+        csvline = none_to_blank(csvline, c, "status")
+        csvline = none_to_blank(csvline, c, "opendate")
+        csvline = none_to_blank(csvline, c, "closedate")
+        csvline = none_to_blank(csvline, c, "type")
+        csvline = none_to_blank(csvline, c, "scale")
+        csvline = none_to_blank(csvline, c, "make")
+        csvline = none_to_blank(csvline, c, "model")
+        csvline = none_to_blank(csvline, c, "submodel")
+        csvline = none_to_blank(csvline, c, "tracks")
+        csvline = csvline + c["url"] + "\n"
+        csvdetails.write(csvline)
+
+        # compose row for minimal .xlsx ballot
+        xlrow = ["0"]
+        xlrow.append(for_xl_output(c, "name"))
+        xlrow.append(for_xl_output(c, "altname"))
+        xlrow.append(for_xl_output(c, "park"))
+        xlrow.append(for_xl_output(c, "location"))
+        xlrow.append(for_xl_output(c, "id"))
+        xlballot.active.append(xlrow)
+
+        # compose row for detailed .xlsx ballot
+        xlrow.append(for_xl_output(c, "country"))
+        xlrow.append(for_xl_output(c, "fullcity"))
+        xlrow.append(for_xl_output(c, "state"))
+        xlrow.append(for_xl_output(c, "city"))
+        xlrow.append(for_xl_output(c, "status"))
+        xlrow.append(for_xl_output(c, "opendate"))
+        xlrow.append(for_xl_output(c, "closedate"))
+        xlrow.append(for_xl_output(c, "type"))
+        xlrow.append(for_xl_output(c, "scale"))
+        xlrow.append(for_xl_output(c, "make"))
+        xlrow.append(for_xl_output(c, "model"))
+        xlrow.append(for_xl_output(c, "submodel"))
+        xlrow.append(for_xl_output(c, "tracks"))
+        xlrow.append(for_xl_output(c, "url"))
+        xldetails.active.append(xlrow)
+
+    # close .csv files
+    csvballot.close()
+    csvdetails.close()
+
+    # write .xlsx files
+    xlballot.active.freeze_panes = xlballot.active['A2']
+    xldetails.active.freeze_panes = xldetails.active['A2']
+    xlballot.save(args.outballot + ".xlsx")
+    xldetails.save(args.outdetails + ".xlsx")
 
 def is_list_page(url):
     substring = url.split("rcdb.com/", 1)[1]
@@ -168,6 +211,21 @@ def is_list_page(url):
         return True
     else:
         return False
+
+def none_to_blank(csvline, c, key):
+    if key not in c or c[key] is None:
+        return csvline + ","
+    else:
+        return csvline + c[key] + ","
+
+def for_xl_output(c, key):
+    if key not in c or c[key] is None:
+        return ""
+    else:
+        string = c[key]
+        if string[:1] == "\"" and string[-1:] == "\"":
+            string = string[1:-1]
+        return string
 
 def parse_rcdb_page(url):
     c = {}
@@ -548,7 +606,7 @@ def parse_rcdb_page(url):
         if args.verbose > 2: # -vvv = coaster location (same line as coaster name)
             print(" - " + location, end="")
         print("")
-        if args.verbose > 3: # -vvvv = coaster status + opening/closing dates
+        if args.verbose > 3: # -vvvv = coaster status + opening/closing dates + # of tracks
             if "status" in c:
                 print("    Status: " + c["status"], end="")
                 if "opendate" in c and c["opendate"] is not None:
