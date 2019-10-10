@@ -500,6 +500,9 @@ def parse_rcdb_page(url):
                             if "to  - " in tdtext[-1]:
                                 c["opendate"] = tdates[-4]['datetime'] + " - " + tdates[-3]['datetime']
                                 minopendate = int(tdates[-4]['datetime'][:4])
+                            elif "to ?" in tdtext[-1]:
+                                c["opendate"] = tdates[-1]['datetime']
+                                minopendate = int(tdates[-1]['datetime'][:4])
                             else:
                                 c["opendate"] = tdates[-3]['datetime'] + " - " + tdates[-2]['datetime']
                                 minopendate = int(tdates[-3]['datetime'][:4])
@@ -507,6 +510,9 @@ def parse_rcdb_page(url):
                             if "to  - " in tdtext[-1]:
                                 c["opendate"] = "≤ " + tdates[-3]['datetime']
                                 minopendate = int(tdates[-3]['datetime'][:4])
+                            elif "to ?" in tdtext[-1]:
+                                c["opendate"] = tdates[-1]['datetime']
+                                minopendate = int(tdates[-1]['datetime'][:4])
                             else:
                                 c["opendate"] = "≤ " + tdates[-2]['datetime']
                                 minopendate = int(tdates[-2]['datetime'][:4])
@@ -514,6 +520,9 @@ def parse_rcdb_page(url):
                             if "to  - " in tdtext[-1]:
                                 c["opendate"] = "≥ " + tdates[-3]['datetime']
                                 minopendate = int(tdates[-3]['datetime'][:4])
+                            elif "to ?" in tdtext[-1]:
+                                c["opendate"] = tdates[-1]['datetime']
+                                minopendate = int(tdates[-1]['datetime'][:4])
                             else:
                                 c["opendate"] = "≥ " + tdates[-2]['datetime']
                                 minopendate = int(tdates[-2]['datetime'][:4])
