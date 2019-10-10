@@ -446,6 +446,18 @@ def parse_rcdb_page(url):
                 if "d" is tdtext[0][0]:
                     if "to ?" in tdtext[0]:
                         c["closedate"] = "?"
+                    elif "from ? to" in tdtext[0]:
+                        if " - " in tdtext[0]:
+                            c["closedate"] = tdates[0]['datetime'] + " - " + tdates[1]['datetime']
+                            maxclosedate = int(tdates[1]['datetime'][:4])
+                        else:
+                            if "to ≤" in tdtext[0]:
+                                c["closedate"] = "≤ " + tdates[0]['datetime']
+                            elif "to ≥" in tdtext[0]:
+                                c["closedate"] = "≥ " + tdates[0]['datetime']
+                            else:
+                                c["closedate"] = tdates[0]['datetime']
+                            maxclosedate = int(tdates[0]['datetime'][:4])
                     elif "to" in tdtext[0] and tdtext[0].count('-') > 1:
                         c["closedate"] = tdates[2]['datetime'] + " - " + tdates[3]['datetime']
                         maxclosedate = int(tdates[3]['datetime'][:4])
