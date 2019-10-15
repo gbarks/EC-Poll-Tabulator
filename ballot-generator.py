@@ -128,25 +128,27 @@ def main():
         i += 1
         j = len(rcdblink)
 
-    # sort coasters by country and park
-    coasters = sorted(coasters, key=itemgetter('country', 'park'))
+    # sort coasters by country, park, and coaster name
+    coasters = sorted(coasters, key=itemgetter('country', 'park', 'name'))
 
     # open .csv files
     csvballot = open(args.outballot + ".csv", "w")
     csvdetails = open(args.outdetails + ".csv", "w")
-    csvballot.write("Rank,Name,Local Name,Park,Location,ID\n")
-    csvdetails.write("Rank,Name,Local Name,Park,Location,ID,Country,Full City Name,State,City,Status,Opening Date,Closing Date,Type,Scale,Make,Model,Sub-Model,# of Tracks,RCDB URL\n")
+    csvballot.write("Rank,Name,Local Name,Park,Country,Location,ID\n")
+    csvdetails.write("Rank,Name,Local Name,Park,Country,Full City Name,ID," +
+                    "Full Location,State,City,Status,Opening Date,Closing Date," + 
+                    "Type,Scale,Make,Model,Sub-Model,# of Tracks,RCDB URL\n")
 
     # create Excel workbooks for .xlsx files
     xlballot = Workbook()
     xlballot.active.title = args.outballot
     xldetails = Workbook()
     xldetails.active.title = args.outdetails
-    xlballot.active.append(["Rank","Name","Local Name","Park","Location","ID"])
-    xldetails.active.append(["Rank","Name","Local Name","Park","Location","ID",
-                            "Country","Full City Name","State","City","Status",
-                            "Opening Date","Closing Date","Type","Scale","Make",
-                            "Model","Sub-Model","# of Tracks","RCDB URL"])
+    xlballot.active.append(["Rank","Name","Local Name","Park","Country","Location","ID"])
+    xldetails.active.append(["Rank","Name","Local Name","Park","Country","Full City Name",
+                            "ID","Full Location","State","City","Status","Opening Date",
+                            "Closing Date","Type","Scale","Make","Model","Sub-Model",
+                            "# of Tracks","RCDB URL"])
 
     for c in coasters:
 
@@ -155,14 +157,14 @@ def main():
         csvline = none_to_blank(csvline, c, "name")
         csvline = none_to_blank(csvline, c, "altname")
         csvline = none_to_blank(csvline, c, "park")
-        csvline = none_to_blank(csvline, c, "location")
+        csvline = none_to_blank(csvline, c, "country")
+        csvline = none_to_blank(csvline, c, "fullcity")
         csvline = csvline + c["id"] + "\n"
         csvballot.write(csvline)
 
         # compose row for detailed .csv ballot
         csvline = csvline[:-1] + ","
-        csvline = none_to_blank(csvline, c, "country")
-        csvline = none_to_blank(csvline, c, "fullcity")
+        csvline = none_to_blank(csvline, c, "location")
         csvline = none_to_blank(csvline, c, "state")
         csvline = none_to_blank(csvline, c, "city")
         csvline = none_to_blank(csvline, c, "status")
@@ -182,13 +184,13 @@ def main():
         xlrow.append(for_xl_output(c, "name"))
         xlrow.append(for_xl_output(c, "altname"))
         xlrow.append(for_xl_output(c, "park"))
-        xlrow.append(for_xl_output(c, "location"))
+        xlrow.append(for_xl_output(c, "country"))
+        xlrow.append(for_xl_output(c, "fullcity"))
         xlrow.append(for_xl_output(c, "id"))
         xlballot.active.append(xlrow)
 
         # compose row for detailed .xlsx ballot
-        xlrow.append(for_xl_output(c, "country"))
-        xlrow.append(for_xl_output(c, "fullcity"))
+        xlrow.append(for_xl_output(c, "location"))
         xlrow.append(for_xl_output(c, "state"))
         xlrow.append(for_xl_output(c, "city"))
         xlrow.append(for_xl_output(c, "status"))
