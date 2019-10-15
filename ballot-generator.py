@@ -134,9 +134,9 @@ def main():
     # open .csv files
     csvballot = open(args.outballot + ".csv", "w")
     csvdetails = open(args.outdetails + ".csv", "w")
-    csvballot.write("Rank,Name,Local Name,Park,Country,Location,ID\n")
-    csvdetails.write("Rank,Name,Local Name,Park,Country,Full City Name,ID," +
-                    "Full Location,State,City,Status,Opening Date,Closing Date," + 
+    csvballot.write("Rank,Ridden?,Name,Local Name,Park,Country,Location,ID\n")
+    csvdetails.write("Rank,Ridden?,Name,Local Name,Park,Country,Full City Name," +
+                    "ID,Full Location,State,City,Status,Opening Date,Closing Date," + 
                     "Type,Scale,Make,Model,Sub-Model,# of Tracks,RCDB URL\n")
 
     # create Excel workbooks for .xlsx files
@@ -144,16 +144,15 @@ def main():
     xlballot.active.title = args.outballot
     xldetails = Workbook()
     xldetails.active.title = args.outdetails
-    xlballot.active.append(["Rank","Name","Local Name","Park","Country","Location","ID"])
-    xldetails.active.append(["Rank","Name","Local Name","Park","Country","Full City Name",
-                            "ID","Full Location","State","City","Status","Opening Date",
-                            "Closing Date","Type","Scale","Make","Model","Sub-Model",
-                            "# of Tracks","RCDB URL"])
+    xlballot.active.append(["Rank","Ridden?","Name","Local Name","Park","Country","Location","ID"])
+    xldetails.active.append(["Rank","Ridden?","Name","Local Name","Park","Country","Full City Name",
+                            "ID","Full Location","State","City","Status","Opening Date","Closing Date",
+                            "Type","Scale","Make","Model","Sub-Model","# of Tracks","RCDB URL"])
 
     for c in coasters:
 
         # compose row for minimal .csv ballot
-        csvline = "0,"
+        csvline = "0,No,"
         csvline = none_to_blank(csvline, c, "name")
         csvline = none_to_blank(csvline, c, "altname")
         csvline = none_to_blank(csvline, c, "park")
@@ -181,12 +180,13 @@ def main():
 
         # compose row for minimal .xlsx ballot
         xlrow = ["0"]
+        xlrow.append("No")
         xlrow.append(for_xl_output(c, "name"))
         xlrow.append(for_xl_output(c, "altname"))
         xlrow.append(for_xl_output(c, "park"))
         xlrow.append(for_xl_output(c, "country"))
         xlrow.append(for_xl_output(c, "fullcity"))
-        xlrow.append(for_xl_output(c, "id"))
+        xlrow.append('=HYPERLINK("{0}", "{1}")'.format(c["url"], c["id"]))
         xlballot.active.append(xlrow)
 
         # compose row for detailed .xlsx ballot
@@ -202,8 +202,13 @@ def main():
         xlrow.append(for_xl_output(c, "model"))
         xlrow.append(for_xl_output(c, "submodel"))
         xlrow.append(for_xl_output(c, "tracks"))
-        xlrow.append(for_xl_output(c, "url"))
+        xlrow.append('=HYPERLINK("{0}", "{1}")'.format(c["url"], c["url"]))
         xldetails.active.append(xlrow)
+
+    for i in range(len(coasters)):
+        xlballot.active.cell(row=i+2, column=8).style = "Hyperlink"
+        xldetails.active.cell(row=i+2, column=8).style = "Hyperlink"
+        xldetails.active.cell(row=i+2, column=21).style = "Hyperlink"
 
     # close .csv files
     csvballot.close()
