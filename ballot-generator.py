@@ -41,20 +41,28 @@ parser.add_argument("-o", "--outballot", default="rcdb_ballot",
                     help="specify name of output [ballot].csv/.xlsx file")
 parser.add_argument("-O", "--outdetails", default="rcdb_ballot_details",
                     help="specify name of output [details].csv/.xlsx file")
-parser.add_argument("-s", "--sortbydate", action="store_true",
-                    help="ensure RCDB pages are sorted chronologically")
 parser.add_argument("-c", "--combineTracks", action="store_true",
                     help="don't make separate coaster entries for multi-tracks")
 parser.add_argument("-u", "--skipunknown", action="store_true",
                     help="skip all coasters named 'unknown'")
 parser.add_argument("-d", "--skipnodate", action="store_true",
                     help="skip all coasters with nonspecific open/close date")
+parser.add_argument("-k", "--skipkiddie", action="store_true",
+                    help="skip all kiddie coasters")
+parser.add_argument("-p", "--skippowered", action="store_true",
+                    help="skip all powered coasters")
+parser.add_argument("-a", "--skipalpine", action="store_true",
+                    help="skip all alpine coasters")
+parser.add_argument("-w", "--skipwackyworm", action="store_true",
+                    help="skip all 'Big Apple/Wacky Worm' layouts")
+parser.add_argument("-b", "--skipbutterfly", action="store_true",
+                    help="skip all Butterfly (Kiddie/Family 'U Shuttle') layouts")
+parser.add_argument("-t", "--skipnophotos", action="store_true",
+                    help="skip all RCDB entries with no photos")
 parser.add_argument("-y", "--skipwrongyear", action="store_true",
                     help="skip all coasters that did not operate in given year")
 parser.add_argument("-Y", "--setyear", default=str(datetime.datetime.now().year),
                     help="set year for -y; defaults to current year", type=valid_year)
-parser.add_argument("-k", "--skipkiddie", action="store_true",
-                    help="skip all kiddie coasters")
 parser.add_argument("-v", "--verbose", action="count", default=0,
                     help="print data as it's processed; duplicate for more detail")
 
@@ -79,10 +87,6 @@ def main():
 
         # handle pages that are lists of coasters
         if is_list_page(rcdblink[i]):
-            if args.sortbydate:
-                if rcdblink[i][-8:] != "&order=8" and rcdblink[i][-7:-1] != "&page=":
-                    rcdblink[i] += "&order=8"
-
             response = urlopen(rcdblink[i])
             html = response.read()
             soup = BeautifulSoup(html, 'lxml')
@@ -265,6 +269,12 @@ def parse_rcdb_page(url):
             city = fullcity[:fullcity.rindex(",")].strip()
             c["city"] = "\"" + city + "\""
 
+    # skip coasters with no header photo (-t arg)
+    if args.skipnophotos and not csoup.find('a', attrs={'id':'opfAnchor'}):
+        if args.verbose > 0:
+            print("--Skipping " + name + " at " + park + " (No Photos)")
+        return None
+
     # skip coasters named "Unknown" (-u arg)
     if args.skipunknown is True and name == "unknown":
         if args.verbose > 0:
@@ -275,9 +285,17 @@ def parse_rcdb_page(url):
     dates = feature.find_all('time')
     datestr = feature.text[feature.text.find(")")+1:]
     if "Mountain Coaster" in datestr:
+        if args.skipalpine:
+            if args.verbose > 0:
+                print("--Skipping " + name + " at " + park + " (Alpine Coaster)")
+            return None
         datestr = datestr[:datestr.find("Mountain Coaster")]
         c["type"] = "Mountain Coaster"
     elif "Powered Coaster" in datestr:
+        if args.skippowered:
+            if args.verbose > 0:
+                print("--Skipping " + name + " at " + park + " (Powered Coaster)")
+            return None
         datestr = datestr[:datestr.find("Powered Coaster")]
         c["type"] = "Powered Coaster"
     else:
@@ -603,9 +621,27 @@ def parse_rcdb_page(url):
                     model = model.split(" / ", 1)[0]
                 c["model"] = model
             c["make"] = make
-        elif "Model: " in makemodel:
-            print("WTF THIS DOESN'T MAKE SENSE!!!!")
-            print(c)
+
+    # get track layout
+    if "Track layout: " in feature.text:
+        layout = feature.text.split("Track layout: ", 1)[1]
+        if "Pictures" in layout:
+            layout = layout.split("Pictures", 1)[0]
+        elif "Videos" in layout:
+            layout = layout.split("Videos", 1)[0]
+        elif "Maps" in layout:
+            layout = layout.split("Maps", 1)[0]
+        if args.skipwackyworm and "Big Apple / Wacky Worm" in layout:
+            if args.verbose > 0:
+                print("--Skipping " + name + " at " + park + " (Big Apple / Wacky Worm)")
+            return None
+        if args.skipbutterfly and "U Shuttle" in layout and "scale" in c:
+            if c["scale"] == "Kiddie" or c["scale"] == "Family":
+                if args.verbose > 0:
+                    print("--Skipping " + name + " at " + park + " (Butterfly)")
+                return None
+        c["layout"] = layout
+
 
     # get number of tracks; write new tracks to separate coaster entries
     stats = csoup.body.find('table', attrs={'id':'statTable'})
@@ -658,7 +694,7 @@ def parse_rcdb_page(url):
                             if i < len(trackNames) - 1:
                                 print(", ", end="")
                     print("")
-            if args.verbose > 4: # -vvvvv = coaster scale + make/model
+            if args.verbose > 4: # -vvvvv = coaster scale + make/model + layout
                 if "scale" in c:
                     print("    Scale:  " + c["scale"])
                 if "make" in c:
@@ -668,6 +704,8 @@ def parse_rcdb_page(url):
                         print("    Model:  " + c["model"] + " / " + c["submodel"])
                     else:
                         print("    Model:  " + c["model"])
+                if "layout" in c:
+                    print("    Layout: " + c["layout"])
 
     if numTracks == 1 or args.combineTracks is True:
         return c
