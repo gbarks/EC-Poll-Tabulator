@@ -205,10 +205,42 @@ def main():
         xlrow.append('=HYPERLINK("{0}", "{1}")'.format(c["url"], c["url"]))
         xldetails.active.append(xlrow)
 
+    # apply hyperlink styles
     for i in range(len(coasters)):
         xlballot.active.cell(row=i+2, column=8).style = "Hyperlink"
         xldetails.active.cell(row=i+2, column=8).style = "Hyperlink"
         xldetails.active.cell(row=i+2, column=21).style = "Hyperlink"
+
+    # adjust column widths
+    xlballot.active.column_dimensions['A'].width = 4.83
+    xlballot.active.column_dimensions['B'].width = 6.83
+    xlballot.active.column_dimensions['C'].width = 24.83
+    xlballot.active.column_dimensions['D'].width = 12.83
+    xlballot.active.column_dimensions['E'].width = 24.83
+    xlballot.active.column_dimensions['F'].width = 12.83
+    xlballot.active.column_dimensions['G'].width = 27.83
+    xlballot.active.column_dimensions['H'].width = 6.83
+    xldetails.active.column_dimensions['A'].width = 4.83
+    xldetails.active.column_dimensions['B'].width = 6.83
+    xldetails.active.column_dimensions['C'].width = 24.83
+    xldetails.active.column_dimensions['D'].width = 12.83
+    xldetails.active.column_dimensions['E'].width = 24.83
+    xldetails.active.column_dimensions['F'].width = 12.83
+    xldetails.active.column_dimensions['G'].width = 27.83
+    xldetails.active.column_dimensions['H'].width = 6.83
+    xldetails.active.column_dimensions['I'].width = 10.83
+    xldetails.active.column_dimensions['J'].width = 10.83
+    xldetails.active.column_dimensions['K'].width = 10.83
+    xldetails.active.column_dimensions['L'].width = 8.83
+    xldetails.active.column_dimensions['M'].width = 10.83
+    xldetails.active.column_dimensions['N'].width = 10.83
+    xldetails.active.column_dimensions['O'].width = 12.83
+    xldetails.active.column_dimensions['P'].width = 7.83
+    xldetails.active.column_dimensions['Q'].width = 26.83
+    xldetails.active.column_dimensions['R'].width = 10.83
+    xldetails.active.column_dimensions['S'].width = 10.83
+    xldetails.active.column_dimensions['T'].width = 8.83
+    xldetails.active.column_dimensions['U'].width = 24.83
 
     # close .csv files
     csvballot.close()
