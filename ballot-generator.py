@@ -21,6 +21,7 @@ import argparse
 import datetime
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from operator import itemgetter
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -126,6 +127,9 @@ def main():
         # increment while loop counter
         i += 1
         j = len(rcdblink)
+
+    # sort coasters by country and park
+    coasters = sorted(coasters, key=itemgetter('country', 'park'))
 
     # open .csv files
     csvballot = open(args.outballot + ".csv", "w")
