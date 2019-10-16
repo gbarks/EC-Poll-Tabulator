@@ -495,12 +495,7 @@ def parse_rcdb_page(url):
 
     elif "SBNO" in datestr:
         c["status"] = "SBNO"
-        if not csoup.find('table', attrs={'class':'objDemoBox'}): # for Orphan Rocker
-            if args.skipnodate or args.skipwrongyear:
-                if args.verbose > 0:
-                    print("--Skipping " + name + " at " + park + " (SBNO, never operated)")
-                return None
-        else:
+        if csoup.find('table', attrs={'class':'objDemoBox'}):
             for tr in csoup.find_all('table', attrs={'class':'objDemoBox'})[-1].find_all('tr'):
                 if "Former status" in tr.text:
                     td = tr.find_all('td')[-1]
@@ -625,6 +620,8 @@ def parse_rcdb_page(url):
                             return None
 
                     break
+
+        # edge case for Orphan Rocker and other SBNO rides that never operated
         if c["opendate"] == None and c["closedate"] == None:
             if args.skipnodate or args.skipwrongyear:
                 if args.verbose > 0:
