@@ -625,6 +625,12 @@ def parse_rcdb_page(url):
                             return None
 
                     break
+        if c["opendate"] == None and c["closedate"] == None:
+            if args.skipnodate or args.skipwrongyear:
+                if args.verbose > 0:
+                    print("--Skipping " + name + " at " + park + " (SBNO, never operated)")
+                return None
+
 
     elif "In Storage" in datestr:
         c["status"] = "In Storage"
