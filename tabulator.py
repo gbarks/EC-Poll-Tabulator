@@ -33,7 +33,7 @@ except:
 # essential local imports
 try:
     from coaster import Coaster
-    from dballot import read_detailed_ballot
+    from ballotreader import read_detailed_ballot, read_voter_ballot
 except:
     print('Could not find "coaster.py" and/or "dballot.py"; exiting...')
     sys.exit()
@@ -126,8 +126,8 @@ def main():
             coasterdesignerws.cell(row=i, column=1).fill = designers[""]
         coasterdesignerws.column_dimensions['A'].width = 30.83
 
-    # # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
-    # winLossMatrix = createMatrix(coasterDict)
+    # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
+    winLossMatrix = createMatrix(coasterDict)
 
     # processAllBallots(xlout, coasterDict, winLossMatrix)
 
@@ -205,18 +205,11 @@ def writeMasterlist(masterlistws, coasterDict, locSortList):
 # ==================================================
 
 def getBallotFilepaths():
-    print("Getting the filepaths of submitted ballots...", end=" ")
-    if useSpinner:
-        spinner = Spinner()
-        spinner.start()
-
     ballotList = []
     for file in os.listdir(args.ballotFolder):
         if file.endswith(".txt"):
             ballotList.append(os.path.join(args.ballotFolder, file))
 
-    if useSpinner:
-        spinner.stop()
     print("{0} ballots submitted.".format(len(ballotList)))
     return ballotList
 
@@ -227,7 +220,6 @@ def getBallotFilepaths():
 # ==================================================
 
 def createMatrix(coasterDict):
-    print("Creating the win/loss matrix...", end=" ")
     if useSpinner:
         spinner = Spinner()
         spinner.start()
@@ -247,7 +239,7 @@ def createMatrix(coasterDict):
 
     if useSpinner:
         spinner.stop()
-    print("{0} pairings.".format(len(winLossMatrix)))
+    print("{0} coaster matchups to compare.".format(len(winLossMatrix)))
     return winLossMatrix
 
 
