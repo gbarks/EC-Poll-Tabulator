@@ -18,6 +18,7 @@ if sys.version_info[0] < 3:
 
 import os
 import argparse
+import operator
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -32,19 +33,15 @@ except:
 # essential local imports
 try:
     from coaster import Coaster
+    from dballot import read_detailed_ballot
 except:
-    print('Could not find "coaster.py"; exiting...')
+    print('Could not find "coaster.py" and/or "dballot.py"; exiting...')
     sys.exit()
-
-# global strings for parsing ballots
-commentStr = "* "
-blankUserField = "-Replace "
-startLine = "! DO NOT CHANGE OR DELETE THIS LINE !"
 
 # command line arguments
 parser = argparse.ArgumentParser(description='Process Mitch Hawker-style coaster poll.')
 
-parser.add_argument("-b", "--blankBallot", default="blankballot2019.txt",
+parser.add_argument("-b", "--blankBallot", default="2019_wood_ballot_details.xlsx",
                     help="specify blank ballot file")
 parser.add_argument("-f", "--ballotFolder", default="ballots2019",
                     help="specify folder containing filled ballots")
@@ -53,13 +50,11 @@ parser.add_argument("-m", "--minRiders", type=int, default=10,
 parser.add_argument("-o", "--outfile", default="Poll Results.xlsx",
                     help="specify name of output .xlsx file")
 parser.add_argument("-c", "--colorize", action="store_true",
-                    help="color coaster designers in spreadsheet (requires -r)")
+                    help="color coaster designers in spreadsheet")
 parser.add_argument("-d", "--designset", default="wood",
                     help="specify design/manufacturer dictionary (wood or steel)")
 parser.add_argument("-i", "--includeExtraInfo", action="count", default=0,
                     help="include voter data/misc info; duplicate for more info")
-parser.add_argument("-r", "--botherRCDB", action="store_true",
-                    help="bother RCDB to grab metadata from links in blankBallot")
 parser.add_argument("-v", "--verbose", action="count", default=0,
                     help="print data as it's processed; duplicate for more info")
 
@@ -84,15 +79,14 @@ if args.designset.lower() == "wood":
         print('Could not find "wood.py"; exiting...')
         sys.exit()
 elif args.designset.lower() == "steel":
-    print("Steel poll functionality hasn't been implemented yet; sorry...")
-    sys.exit()
+    try:
+        from steel import designers
+    except:
+        print('Could not find "wood.py"; exiting...')
+        sys.exit()
 else:
     print("Wood and steel are the only valid design/manufacturer dictionaries; exiting...")
     sys.exit()
-
-# colorizing coasters by designer requires fetching RCDB data
-if args.colorize and not args.botherRCDB:
-    args.colorize = False
 
 
 
@@ -108,39 +102,45 @@ def main():
     # preferred fixed-width font
     menlo = Font(name="Menlo")
 
-    # list of tuples of the form (fullCoasterName, abbreviatedCoasterName)
-    coasterDict = getCoasterDict(xlout.active, menlo)
+    # read the detailed ballot into a dictionary of coasters and write the Masterlist
+    coasterDict = read_detailed_ballot(args.blankBallot)
+    # print(vars(coasterDict['r377']))
+    locSortFun = lambda x: (coasterDict[x].country, coasterDict[x].park, coasterDict[x].name)
+    locSortList = sorted(coasterDict, key=locSortFun)
+    # for x in locSortList:
+    #     print(coasterDict[x].country + ", " + coasterDict[x].park + ", " + coasterDict[x].name)
+    writeMasterlist(xlout.active, coasterDict, locSortList)
 
-    # create color key for designers
-    if args.colorize:
-        coasterdesignerws = xlout.create_sheet("Coaster Designer Color Key")
-        i = 1
-        for designer in sorted(designers.keys()):
-            if designer != "" and designer != "Other Known Manufacturer":
-                coasterdesignerws.append([designer])
-                coasterdesignerws.cell(row=i, column=1).fill = designers[designer]
-                i += 1
-        if "Other Known Manufacturer" in designers.keys():
-            coasterdesignerws.append(["Other Known Manufacturer"])
-            coasterdesignerws.cell(row=i, column=1).fill = designers["Other Known Manufacturer"]
-            i += 1
-        if "" in designers.keys():
-            coasterdesignerws.append(["Other [Unknown]"])
-            coasterdesignerws.cell(row=i, column=1).fill = designers[""]
-        coasterdesignerws.column_dimensions['A'].width = 30.83
+    # # create color key for designers
+    # if args.colorize:
+    #     coasterdesignerws = xlout.create_sheet("Coaster Designer Color Key")
+    #     i = 1
+    #     for designer in sorted(designers.keys()):
+    #         if designer != "" and designer != "Other Known Manufacturer":
+    #             coasterdesignerws.append([designer])
+    #             coasterdesignerws.cell(row=i, column=1).fill = designers[designer]
+    #             i += 1
+    #     if "Other Known Manufacturer" in designers.keys():
+    #         coasterdesignerws.append(["Other Known Manufacturer"])
+    #         coasterdesignerws.cell(row=i, column=1).fill = designers["Other Known Manufacturer"]
+    #         i += 1
+    #     if "" in designers.keys():
+    #         coasterdesignerws.append(["Other [Unknown]"])
+    #         coasterdesignerws.cell(row=i, column=1).fill = designers[""]
+    #     coasterdesignerws.column_dimensions['A'].width = 30.83
 
-    # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
-    winLossMatrix = createMatrix(coasterDict)
+    # # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
+    # winLossMatrix = createMatrix(coasterDict)
 
-    processAllBallots(xlout, coasterDict, winLossMatrix)
+    # processAllBallots(xlout, coasterDict, winLossMatrix)
 
-    calculateResults(coasterDict, winLossMatrix)
+    # calculateResults(coasterDict, winLossMatrix)
 
-    # sorted lists of tuples of the form (rankedCoaster, relevantNumbers)
-    finalResults, finalPairs = sortedLists(coasterDict, winLossMatrix)
+    # # sorted lists of tuples of the form (rankedCoaster, relevantNumbers)
+    # finalResults, finalPairs = sortedLists(coasterDict, winLossMatrix)
 
-    # write worksheets related to finalResults, finalPairs, and winLossMatrix
-    printToFile(xlout, finalResults, finalPairs, winLossMatrix, coasterDict, menlo, designers)
+    # # write worksheets related to finalResults, finalPairs, and winLossMatrix
+    # printToFile(xlout, finalResults, finalPairs, winLossMatrix, coasterDict, menlo, designers)
 
     # save the Excel file
     print("Saving...", end=" ")
@@ -158,12 +158,12 @@ def main():
 #  function for getting manufacturer's color
 # ==================================================
 
-def colorizeRow(worksheet, rowNum, colList, coasterDict, coaster, colorDict):
+def colorizeRow(worksheet, rowNum, colList, coasterDict, coaster, colorDict=designers):
     if args.colorize:
-        if coasterDict[coaster].designer:
-            if coasterDict[coaster].designer in colorDict.keys():
+        if coasterDict[coaster].make:
+            if coasterDict[coaster].make in colorDict.keys():
                 for l in colList:
-                    worksheet.cell(row=rowNum, column=l).fill = colorDict[coasterDict[coaster].designer]
+                    worksheet.cell(row=rowNum, column=l).fill = colorDict[coasterDict[coaster].make]
             else:
                 for l in colList:
                     worksheet.cell(row=rowNum, column=l).fill = colorDict["Other Known Manufacturer"]
@@ -174,99 +174,33 @@ def colorizeRow(worksheet, rowNum, colList, coasterDict, coaster, colorDict):
 
 
 # ==================================================
-#  populate dictionary of coasters in the poll
+#  write the Coaster Masterlist worksheet
 # ==================================================
 
-def getCoasterDict(masterlistws, preferredFixedWidthFont):
-    if not args.botherRCDB:
-        print("Creating list of every coaster on the ballot...", end=" ")
-        if useSpinner:
-            spinner = Spinner()
-            spinner.start()
-
-    # set up Coaster Masterlist worksheet
-    headerRow = ["Full Coaster ID", "Abbrev.", "Name", "Park", "Loc."]
-    if args.botherRCDB:
-        headerRow.extend(["RCDB Link", "Designer/Manufacturer", "Year"])
+def writeMasterlist(masterlistws, coasterDict, locSortList):
+    headerRow = ["Name", "Local Name", "Park", "Country", "Location", "ID", "Make", "Year"]
     masterlistws.append(headerRow)
-    masterlistws.column_dimensions['A'].width = 45.83
+    masterlistws.column_dimensions['A'].width = 24.83
     masterlistws.column_dimensions['B'].width = 12.83
-    masterlistws.column_dimensions['C'].width = 25.83
-    masterlistws.column_dimensions['D'].width = 25.83
-    masterlistws.column_dimensions['E'].width = 6.83
-    masterlistws['B1'].font = preferredFixedWidthFont
-    masterlistws['E1'].font = preferredFixedWidthFont
-    if args.botherRCDB:
-        masterlistws.column_dimensions['F'].width = 16.83
-        masterlistws.column_dimensions['G'].width = 25.83
-        masterlistws.column_dimensions['H'].width = 4.83
+    masterlistws.column_dimensions['C'].width = 24.83
+    masterlistws.column_dimensions['D'].width = 12.83
+    masterlistws.column_dimensions['E'].width = 27.83
+    masterlistws.column_dimensions['F'].width = 6.83
+    masterlistws.column_dimensions['G'].width = 25.83
+    masterlistws.column_dimensions['H'].width = 4.83
 
-    coasterDict = {} # return value
+    for i in range(0, len(locSortList)):
+        c = coasterDict[locSortList[i]]
+        rowVals = [c.name, c.altname, c.park, c.country, c.fullcity]
+        rowVals.append('=HYPERLINK("{0}", "{1}")'.format(c.url, c.id))
+        rowVals.extend([c.make, c.year])
+        masterlistws.append(rowVals)
+        masterlistws.cell(row=i+2, column=6).style = "Hyperlink"
 
-    #open the blank ballot file
-    with open(args.blankBallot) as f:
-        lineNum = 0
-        startProcessing = False
-
-        # begin going through the blank ballot line by line
-        for line in f:
-
-            sline = line.strip() # strip whitespace from start and end of line
-            lineNum += 1
-
-            # skip down the file to the coasters
-            if startProcessing == False and sline == startLine:
-                startProcessing = True
-
-            # add the coasters to coasterDict and the masterlist worksheet
-            elif startProcessing == True:
-
-                if commentStr in sline: # skip comment lines (begin with "* ")
-                    continue
-
-                elif sline == "": # skip blank lines
-                    continue
-
-                else:
-                    # break the line into its components: rank, full coaster name, abbreviation
-                    words = [x.strip() for x in sline.split(',')]
-
-                    # make sure there are at least 3 'words' in each line (rank, fullName, abbrName)
-                    if len(words) < 3:
-                        print("Error in {0}, Line {1}: {2}".format(args.blankBallot, lineNum, line))
-
-                    else:
-                        if len(words) > 3 and args.botherRCDB:
-                            c = Coaster(words[1], words[2], words[3], designers.keys())
-                        else:
-                            c = Coaster(words[1], words[2])
-
-                        # list of strings that will form a row in the spreadsheet
-                        rowVals = [c.uniqueID, c.abbr, c.name, c.park, c.location]
-
-                        # add RCDB-pulled info to spreadsheet row and print it
-                        if len(words) > 3 and args.botherRCDB:
-                            rowVals.append('=HYPERLINK("{0}", "{1}")'.format(c.rcdb, c.rcdb[8:]))
-                            rowVals.extend([c.designer, c.year])
-                            print("{0},   \t{1},\t{2}".format(c.abbr, c.year, c.designer))
-
-                        # append the row values and set styles
-                        masterlistws.append(rowVals)
-                        masterlistws.cell(row=len(coasterDict)+1, column=5).font = preferredFixedWidthFont
-                        masterlistws.cell(row=len(coasterDict)+1, column=2).font = preferredFixedWidthFont
-                        if c.rcdb:
-                            masterlistws.cell(row=len(coasterDict)+1, column=6).style = "Hyperlink"
-
-                        # add the coaster to the dictionary of coasters on the ballot
-                        coasterDict[c.uniqueID] = c
-
-                        colorizeRow(masterlistws, len(coasterDict)+1, [1,2,7], coasterDict, c.uniqueID, designers)
+        colorizeRow(masterlistws, i+2, [1,2,7], coasterDict, c.id)
 
     masterlistws.freeze_panes = masterlistws['A2']
-    if useSpinner and not args.botherRCDB:
-        spinner.stop()
     print("{0} coasters on the ballot.".format(len(coasterDict)))
-    return coasterDict
 
 
 

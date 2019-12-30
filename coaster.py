@@ -7,20 +7,33 @@
 #  Requires Python 3 for webpage crawling
 # ==========================================================
 
-import sys
-import lxml
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
+# import sys
+# import lxml
+# from bs4 import BeautifulSoup
+# from urllib.request import urlopen
+import re
 
 class Coaster:
-    name = ""
-    park = ""
-    location = ""
-
-    rcdb = ""
-    designer = ""
-    # descolor = "ffffff"
-    year = ""
+    # url = ""
+    # name = ""
+    # altname = ""
+    # park = ""
+    # country = ""
+    # fullcity = ""
+    # rcid = ""
+    # location = ""
+    # state = ""
+    # city = ""
+    # status = ""
+    # opendate = ""
+    # closedate = ""
+    # rctype = ""
+    # scale = ""
+    # make = ""
+    # model = ""
+    # submodel = ""
+    # tracks = ""
+    # layout = ""
 
     riders = 0
     totalWins = 0
@@ -34,72 +47,140 @@ class Coaster:
     overallRank = 0
     tiedCoasters = []
 
-    def __init__(self, fullName, abbrName, rcdblink=None, designerSet=None):
-        self.uniqueID = fullName
-        self.abbr = abbrName
+    def __init__(self,  rcid,
+                        name,
+                        park,
+                        url=None,
+                        altname=None,
+                        country=None,
+                        fullcity=None,
+                        location=None,
+                        state=None,
+                        city=None,
+                        status="Operating",
+                        opendate=None,
+                        closedate=None,
+                        rctype="Roller Coaster",
+                        scale=None,
+                        make=None,
+                        model=None,
+                        submodel=None,
+                        tracks=None,
+                        layout=None):
+        self.id = rcid
+        self.name = name
+        self.park = park
+        self.url = url
+        self.altname = altname
+        self.country = country
+        self.fullcity = fullcity
+        self.location = location
+        self.state = state
+        self.city = city
+        self.status = status
+        self.opendate = opendate
+        self.closedate = closedate
+        self.type = rctype
+        self.scale = scale
+        self.make = make
+        self.model = model
+        self.submodel = submodel
+        self.tracks = tracks
+        self.layout = layout
+        if opendate is not None and re.search('\d{4}', opendate):
+            self.year = re.search('\d{4}', opendate).group()
+        else:
+            self.year = None
 
-        # extract park and state/country information from fullUniqueCoasterName
-        subwords = [x.strip() for x in fullName.split('-')]
-        if len(subwords) == 3:
-            self.name = subwords[0]
-            self.park = subwords[1]
-            self.location = subwords[2]
 
-        # open URL if rcdblink is provided (time consuming)
-        if rcdblink is not None and designerSet is not None:
-            self.rcdb = rcdblink
+#everything after this needs to be fixed
+    # name = ""
+    # park = ""
+    # location = ""
 
-            # these HTML tools don't work in Python 2.x; return with default values
-            if sys.version_info < (3,0):
-                return
+    # rcdb = ""
+    # designer = ""
+    # # descolor = "ffffff"
+    # year = ""
 
-            response = urlopen(rcdblink)
-            html = response.read()
-            soup = BeautifulSoup(html, 'lxml')
+    # riders = 0
+    # totalWins = 0
+    # totalLosses = 0
+    # totalTies = 0
+    # totalWinPercentage = 0.0
+    # pairwiseWins = 0
+    # pairwiseLosses = 0
+    # pairwiseTies = 0
+    # pairwiseWinPercentage = 0.0
+    # overallRank = 0
+    # tiedCoasters = []
 
-            # scan page for a "Make" field, usually at the top
-            for x in soup.body.findAll('div', attrs={'class':'scroll'}):
-                if "Make: " in x.text:
-                    subtext = x.text.split("Make: ", 1)[1]
+    # def __init__(self, fullName, abbrName, rcdblink=None, designerSet=None):
+    #     self.uniqueID = fullName
+    #     self.abbr = abbrName
 
-                    # strip out the "Model" field from the string, if neccessary
-                    if "Model: " in subtext:
-                        subtext = subtext.split("Model: ", 1)[0]
-                    self.designer = subtext
-                    break
+    #     # extract park and state/country information from fullUniqueCoasterName
+    #     subwords = [x.strip() for x in fullName.split('-')]
+    #     if len(subwords) == 3:
+    #         self.name = subwords[0]
+    #         self.park = subwords[1]
+    #         self.location = subwords[2]
 
-            # if the "Make" field didn't exist or used an unknown manufacturer, try "Designer" field
-            if self.designer == "" or self.designer not in designerSet:
-                for x in soup.body.findAll('table', attrs={'class':'objDemoBox'}):
-                    if "Designer:" in x.text:
-                        subtext = x.text.split("Designer:", 1)[1]
+    #     # open URL if rcdblink is provided (time consuming)
+    #     if rcdblink is not None and designerSet is not None:
+    #         self.rcdb = rcdblink
 
-                        # strip out other fields from the string, if neccessary
-                        if "Installer:" in subtext:
-                            subtext = subtext.split("Installer:", 1)[0]
-                        if "Musical Score:" in subtext:
-                            subtext = subtext.split("Musical Score:", 1)[0]
-                        if "Construction Supervisor:" in subtext:
-                            subtext = subtext.split("Construction Supervisor:", 1)[0]
+    #         # these HTML tools don't work in Python 2.x; return with default values
+    #         if sys.version_info < (3,0):
+    #             return
 
-                        # if a known manufacturer is a substring of subtext, use that
-                        alreadyKnownManu = next((y for y in designerSet if y in subtext), False)
-                        if alreadyKnownManu:
-                            self.designer = alreadyKnownManu
+    #         response = urlopen(rcdblink)
+    #         html = response.read()
+    #         soup = BeautifulSoup(html, 'lxml')
 
-                        # otherwise, use the provided "Designer"
-                        elif self.designer == "" and subtext != "":
-                            self.designer = subtext
-                        break
+    #         # scan page for a "Make" field, usually at the top
+    #         for x in soup.body.findAll('div', attrs={'class':'scroll'}):
+    #             if "Make: " in x.text:
+    #                 subtext = x.text.split("Make: ", 1)[1]
 
-            # exception for Gravity Group, who has two names on RCDB for some reason
-            if self.designer == "Gravitykraft Corporation":
-                self.designer = "The Gravity Group, LLC"
+    #                 # strip out the "Model" field from the string, if neccessary
+    #                 if "Model: " in subtext:
+    #                     subtext = subtext.split("Model: ", 1)[0]
+    #                 self.designer = subtext
+    #                 break
 
-            # find an opening year if available
-            d = soup.body.find('time')
-            if d.has_attr('datetime'):
-                self.year = d['datetime'][:4]
+    #         # if the "Make" field didn't exist or used an unknown manufacturer, try "Designer" field
+    #         if self.designer == "" or self.designer not in designerSet:
+    #             for x in soup.body.findAll('table', attrs={'class':'objDemoBox'}):
+    #                 if "Designer:" in x.text:
+    #                     subtext = x.text.split("Designer:", 1)[1]
+
+    #                     # strip out other fields from the string, if neccessary
+    #                     if "Installer:" in subtext:
+    #                         subtext = subtext.split("Installer:", 1)[0]
+    #                     if "Musical Score:" in subtext:
+    #                         subtext = subtext.split("Musical Score:", 1)[0]
+    #                     if "Construction Supervisor:" in subtext:
+    #                         subtext = subtext.split("Construction Supervisor:", 1)[0]
+
+    #                     # if a known manufacturer is a substring of subtext, use that
+    #                     alreadyKnownManu = next((y for y in designerSet if y in subtext), False)
+    #                     if alreadyKnownManu:
+    #                         self.designer = alreadyKnownManu
+
+    #                     # otherwise, use the provided "Designer"
+    #                     elif self.designer == "" and subtext != "":
+    #                         self.designer = subtext
+    #                     break
+
+    #         # exception for Gravity Group, who has two names on RCDB for some reason
+    #         if self.designer == "Gravitykraft Corporation":
+    #             self.designer = "The Gravity Group, LLC"
+
+    #         # find an opening year if available
+    #         d = soup.body.find('time')
+    #         if d.has_attr('datetime'):
+    #             self.year = d['datetime'][:4]
                 # if "Operating since " in x.text:
                 #     subtext = x.text.split("Operating since ", 1)[1][:10].split('/')[-1][:4]
                 #     print(x.text)
