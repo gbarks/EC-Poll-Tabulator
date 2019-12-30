@@ -104,30 +104,27 @@ def main():
 
     # read the detailed ballot into a dictionary of coasters and write the Masterlist
     coasterDict = read_detailed_ballot(args.blankBallot)
-    # print(vars(coasterDict['r377']))
     locSortFun = lambda x: (coasterDict[x].country, coasterDict[x].park, coasterDict[x].name)
     locSortList = sorted(coasterDict, key=locSortFun)
-    # for x in locSortList:
-    #     print(coasterDict[x].country + ", " + coasterDict[x].park + ", " + coasterDict[x].name)
     writeMasterlist(xlout.active, coasterDict, locSortList)
 
-    # # create color key for designers
-    # if args.colorize:
-    #     coasterdesignerws = xlout.create_sheet("Coaster Designer Color Key")
-    #     i = 1
-    #     for designer in sorted(designers.keys()):
-    #         if designer != "" and designer != "Other Known Manufacturer":
-    #             coasterdesignerws.append([designer])
-    #             coasterdesignerws.cell(row=i, column=1).fill = designers[designer]
-    #             i += 1
-    #     if "Other Known Manufacturer" in designers.keys():
-    #         coasterdesignerws.append(["Other Known Manufacturer"])
-    #         coasterdesignerws.cell(row=i, column=1).fill = designers["Other Known Manufacturer"]
-    #         i += 1
-    #     if "" in designers.keys():
-    #         coasterdesignerws.append(["Other [Unknown]"])
-    #         coasterdesignerws.cell(row=i, column=1).fill = designers[""]
-    #     coasterdesignerws.column_dimensions['A'].width = 30.83
+    # write the designers' color key worksheet
+    if args.colorize:
+        coasterdesignerws = xlout.create_sheet("Coaster Designer Color Key")
+        i = 1
+        for designer in sorted(designers.keys()):
+            if designer != "" and designer != "Other Known Manufacturer":
+                coasterdesignerws.append([designer])
+                coasterdesignerws.cell(row=i, column=1).fill = designers[designer]
+                i += 1
+        if "Other Known Manufacturer" in designers.keys():
+            coasterdesignerws.append(["Other Known Manufacturer"])
+            coasterdesignerws.cell(row=i, column=1).fill = designers["Other Known Manufacturer"]
+            i += 1
+        if "" in designers.keys():
+            coasterdesignerws.append(["Other [Unknown]"])
+            coasterdesignerws.cell(row=i, column=1).fill = designers[""]
+        coasterdesignerws.column_dimensions['A'].width = 30.83
 
     # # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
     # winLossMatrix = createMatrix(coasterDict)
@@ -196,7 +193,6 @@ def writeMasterlist(masterlistws, coasterDict, locSortList):
         rowVals.extend([c.make, c.year])
         masterlistws.append(rowVals)
         masterlistws.cell(row=i+2, column=6).style = "Hyperlink"
-
         colorizeRow(masterlistws, i+2, [1,2,7], coasterDict, c.id)
 
     masterlistws.freeze_panes = masterlistws['A2']
