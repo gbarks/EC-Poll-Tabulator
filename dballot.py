@@ -27,9 +27,18 @@ def read_detailed_ballot(filepath, id_col=7, name_col=2, park_col=4):
             rcid = row[id_col].value[:-2].split('"')[-1]
             url = row[id_col].value.split('"')[1]
 
+        name = row[name_col].value
+        park = row[park_col].value
+
+        # silly exception for Gravity Group coasters listed under M&V on RCDB
+        designer = blank_to_none(row[16].value)
+        if designer == "Martin & Vleminckx":
+            if name != "Coastersaurus" and park != "Legoland Florida":
+                designer = "The Gravity Group, LLC"
+
         c = Coaster(rcid,                         #rcid
-                    row[name_col].value,          #name
-                    row[park_col].value,          #park
+                    name,                         #name
+                    park,                         #park
                     url,                          #url
                     blank_to_none(row[3].value),  #altname
                     blank_to_none(row[5].value),  #country
@@ -42,7 +51,7 @@ def read_detailed_ballot(filepath, id_col=7, name_col=2, park_col=4):
                     blank_to_none(row[13].value), #closedate
                     blank_to_none(row[14].value), #rctype
                     blank_to_none(row[15].value), #scale
-                    blank_to_none(row[16].value), #make
+                    designer                    , #make
                     blank_to_none(row[17].value), #model
                     blank_to_none(row[18].value), #submodel
                     blank_to_none(row[19].value)) #tracks
