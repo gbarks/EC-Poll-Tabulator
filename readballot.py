@@ -36,6 +36,15 @@ def read_detailed_ballot(filepath, id_col=7, name_col=2, park_col=4):
             if name != "Coastersaurus" and park != "Legoland Florida":
                 designer = "The Gravity Group, LLC"
 
+        # silly exception for two notable Schwarzkopf coasters in Sweden
+        # https://rcdb.com/1061.htm and https://rcdb.com/1062.htm
+        if rcid == "r1061" or rcid == "r1062":
+            designer = "Schwarzkopf"
+
+        # silly exception for Powder Keg at Silver Dollar City
+        if rcid == "r1903":
+            designer = "S&S Sansei Technologies"
+
         c = Coaster(rcid,                         #rcid
                     name,                         #name
                     park,                         #park
