@@ -134,10 +134,10 @@ def main():
     calculateResults(coasterDict, winLossMatrix)
 
     # sorted lists of tuples of the form (rankedCoaster, relevantNumbers)
-    # finalResults, finalPairs = sortedLists(coasterDict, winLossMatrix)
+    finalResults, finalPairs = sortedLists(coasterDict, winLossMatrix)
 
-    # # write worksheets related to finalResults, finalPairs, and winLossMatrix
-    # printToFile(xlout, finalResults, finalPairs, winLossMatrix, coasterDict, menlo, designers)
+    # write worksheets related to finalResults, finalPairs, and winLossMatrix
+    printToFile(xlout, finalResults, finalPairs, winLossMatrix, coasterDict, menlo)
 
     # save the Excel file
     print("Saving...", end=" ")
@@ -261,6 +261,7 @@ def processBallot(filepath, coasterDict, winLossMatrix):
         if c not in coasterDict.keys():
             print("Error in {0}: '{1}' not a valid coaster ID".format(filename, c))
             return {}
+        coasterDict[c].riders += 1
 
     # cycle through each pair of coasters this voter ranked
     for coasterA in coasterAndRank.keys():
@@ -538,7 +539,7 @@ def sortedLists(coasterDict, winLossMatrix):
 #  print everything to a file
 # ==================================================
 
-def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWidthFont, manuColors):
+def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWidthFont):
     print("Writing the results...", end=" ")
     if useSpinner:
         spinner = Spinner()
@@ -565,7 +566,8 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     resultws.column_dimensions['M'].width = 8.83
     i = 2
     for x in results:
-        resultws.append([coasterDict[x[0]].overallRank, x[0],
+        resultws.append([coasterDict[x[0]].overallRank,
+                         coasterDict[x[0]].name + " – " + coasterDict[x[0]].park,
                          coasterDict[x[0]].totalWinPercentage,
                          coasterDict[x[0]].pairwiseWinPercentage,
                          coasterDict[x[0]].totalWins,
@@ -575,16 +577,16 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                          coasterDict[x[0]].pairwiseLosses,
                          coasterDict[x[0]].pairwiseTies,
                          coasterDict[x[0]].riders,
-                         coasterDict[x[0]].designer,
+                         coasterDict[x[0]].make,
                          coasterDict[x[0]].year])
-        colorizeRow(resultws, i, [2,12], coasterDict, x[0], manuColors)
+        colorizeRow(resultws, i, [2,12], coasterDict, x[0])
         i += 1
     resultws.freeze_panes = resultws['A2']
 
     # append coasters that weren't ranked to the bottom of results worksheet
     for x in coasterDict.keys():
         if x not in [y[0] for y in results] and coasterDict[x].riders > 0:
-            resultws.append(["N/A", x,
+            resultws.append(["N/A", coasterDict[x].name + " – " + coasterDict[x].park,
                              "Insufficient Riders, {0}".format(coasterDict[x].totalWinPercentage),
                              "Insufficient Riders, {0}".format(coasterDict[x].pairwiseWinPercentage),
                              coasterDict[x].totalWins,
@@ -594,15 +596,16 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                              coasterDict[x].pairwiseLosses,
                              coasterDict[x].pairwiseTies,
                              coasterDict[x].riders,
-                             coasterDict[x].designer,
+                             coasterDict[x].make,
                              coasterDict[x].year])
-            colorizeRow(resultws, i, [2,12], coasterDict, x, manuColors)
+            colorizeRow(resultws, i, [2,12], coasterDict, x)
             i += 1
 
     # append coasters that weren't ridden to the bottom of results worksheet
     for x in coasterDict.keys():
         if x not in [y[0] for y in results] and coasterDict[x].riders == 0:
-            resultws.append(["N/A", x, "No Riders", "No Riders",
+            resultws.append(["N/A", coasterDict[x].name + " – " + coasterDict[x].park,
+                             "No Riders", "No Riders",
                              coasterDict[x].totalWins,
                              coasterDict[x].totalLosses,
                              coasterDict[x].totalTies,
@@ -612,7 +615,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                              coasterDict[x].riders,
                              coasterDict[x].make,
                              coasterDict[x].year])
-            colorizeRow(resultws, i, [2,12], coasterDict, x, manuColors)
+            colorizeRow(resultws, i, [2,12], coasterDict, x)
             i += 1
 
     # create and write pairwise result worksheet
@@ -627,13 +630,15 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     pairws.column_dimensions['G'].width = 3.83
     i = 2
     for x in pairs:
-        pairws.append([winLossMatrix[x[0][0], x[0][1]]["Pairwise Rank"], x[0][0], x[0][1],
+        pairws.append([winLossMatrix[x[0][0], x[0][1]]["Pairwise Rank"], 
+                       coasterDict[x[0][0]].name + " – " + coasterDict[x[0][0]].park,
+                       coasterDict[x[0][1]].name + " – " + coasterDict[x[0][1]].park,
                        winLossMatrix[x[0][0], x[0][1]]["Win Percentage"],
                        winLossMatrix[x[0][0], x[0][1]]["Wins"],
                        winLossMatrix[x[0][0], x[0][1]]["Losses"],
                        winLossMatrix[x[0][0], x[0][1]]["Ties"]])
-        colorizeRow(pairws, i, [2], coasterDict, x[0][0], manuColors)
-        colorizeRow(pairws, i, [3], coasterDict, x[0][1], manuColors)
+        colorizeRow(pairws, i, [2], coasterDict, x[0][0])
+        colorizeRow(pairws, i, [3], coasterDict, x[0][1])
         i += 1
     pairws.freeze_panes = pairws['A2']
 
@@ -641,15 +646,16 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     hawkerWLTws = xl.create_sheet("Coaster vs Coaster Win-Loss-Tie")
     headerRow = ["Rank",""]
     for coaster in results:
-        headerRow.append(coasterDict[coaster[0]].abbr)
+        headerRow.append(coasterDict[coaster[0]].name) #abbr needed
     hawkerWLTws.append(headerRow)
     hawkerWLTws.column_dimensions['A'].width = 4.83
     hawkerWLTws.column_dimensions['B'].width = 45.83
     for col in range(3, len(results)+3):
         hawkerWLTws.column_dimensions[get_column_letter(col)].width = 12.83
-        colorizeRow(hawkerWLTws, 1, [col], coasterDict, results[col-3][0], manuColors)
+        colorizeRow(hawkerWLTws, 1, [col], coasterDict, results[col-3][0])
     for i in range(0, len(results)):
-        resultRow = [coasterDict[results[i][0]].overallRank, results[i][0]]
+        comboname = coasterDict[results[i][0]].name + " – " + coasterDict[results[i][0]].park
+        resultRow = [coasterDict[results[i][0]].overallRank, comboname]
         winCount = 0
         loseCount = 0
         tieCount = 0
@@ -674,7 +680,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
         hawkerPct = ((winCount + (tieCount/float(2))/float(len(results)-1))* 100)
         resultRow.append(hawkerPct)
         hawkerWLTws.append(resultRow)
-        colorizeRow(hawkerWLTws, i+2, [2], coasterDict, results[i][0], manuColors)
+        colorizeRow(hawkerWLTws, i+2, [2], coasterDict, results[i][0])
     hawkerWLTws.freeze_panes = hawkerWLTws['C2']
     for col in hawkerWLTws.iter_cols(min_col=3):
         for cell in col:
@@ -687,7 +693,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     if args.verbose > 0:
         print(" ")
     for x in resortedResults:
-        headerRow.append(coasterDict[x[0]].abbr)
+        headerRow.append(coasterDict[x[0]].name) #abbr needed
         if args.verbose > 0:
             print("Rank: {0},\tVal: {1},  \tCoaster: {2}".format(coasterDict[x[0]].overallRank, x[2], x[0]))
     hawkerWLT2.append(headerRow)
@@ -695,9 +701,10 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     hawkerWLT2.column_dimensions['B'].width = 45.83
     for col in range(3, len(resortedResults)+3):
         hawkerWLT2.column_dimensions[get_column_letter(col)].width = 12.83
-        colorizeRow(hawkerWLT2, 1, [col], coasterDict, resortedResults[col-3][0], manuColors)
+        colorizeRow(hawkerWLT2, 1, [col], coasterDict, resortedResults[col-3][0])
     for i in range(0, len(resortedResults)):
-        resultRow = [coasterDict[resortedResults[i][0]].overallRank, resortedResults[i][0]]
+        comboname = coasterDict[resortedResults[i][0]].name + " – " + coasterDict[resortedResults[i][0]].park
+        resultRow = [coasterDict[resortedResults[i][0]].overallRank, comboname]
         for j in range(0, len(resortedResults)):
             coasterA = resortedResults[i][0]
             coasterB = resortedResults[j][0]
@@ -714,7 +721,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                 cellStr += str(winLossMatrix[coasterA, coasterB]["Ties"])
             resultRow.append(cellStr)
         hawkerWLT2.append(resultRow)
-        colorizeRow(hawkerWLT2, i+2, [2], coasterDict, resortedResults[i][0], manuColors)
+        colorizeRow(hawkerWLT2, i+2, [2], coasterDict, resortedResults[i][0])
     hawkerWLT2.freeze_panes = hawkerWLT2['C2']
     for col in hawkerWLT2.iter_cols(min_col=3):
         for cell in col:
@@ -728,13 +735,14 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     comparisonws.column_dimensions['C'].width = 12.83
     for i in range(0, len(resortedResults)):
         coaster = resortedResults[i][0]
+        comboname = coasterDict[coaster].name + " – " + coasterDict[coaster].park
         oldRank = coasterDict[coaster].overallRank
         newRank = i+1
         diff = oldRank - newRank
         if diff == 0:
-            comparisonws.append([coaster, oldRank, newRank, ""])
+            comparisonws.append([comboname, oldRank, newRank, ""])
         else:
-            comparisonws.append([coaster, oldRank, newRank, diff])
+            comparisonws.append([comboname, oldRank, newRank, diff])
             if diff <= -16:
                 diffColor = "ff0000" # maximum red
             elif diff < 0:
@@ -744,7 +752,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
             else:
                 diffColor = "00ff00" # maximum green
             comparisonws.cell(row=i+2, column=4).fill = PatternFill("solid", fgColor=diffColor)
-        colorizeRow(comparisonws, i+2, [1], coasterDict, coaster, manuColors)
+        colorizeRow(comparisonws, i+2, [1], coasterDict, coaster)
     comparisonws.freeze_panes = comparisonws['A2']
 
     if useSpinner:

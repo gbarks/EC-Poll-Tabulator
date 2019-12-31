@@ -113,12 +113,14 @@ def read_xlsx_ballot(wb, filepath):
                         if is_rcid(cell.value):
                             rcid = cell.value
                     if rcid is None:
-                        print("Error: " + filepath + " has misaligned/missing columns")
-                        return {}
+                        continue
                 if "HYPERLINK" in rcid:
                     rcid = rcid[:-2].split('"')[-1]
                 rank = row[0].value
                 voter_rankings[rcid] = rank
+    if len(voter_rankings) < 1:
+        print("Error: " + filepath + " has misaligned/missing columns")
+        return {}
     return voter_rankings
 
 def isnum(numstring):
@@ -148,10 +150,12 @@ def read_csv_ballot(filepath):
                         if is_rcid(cell):
                             rcid = cell
                     if rcid is None:
-                        print("Error: " + filepath + " has misaligned/missing columns")
-                        return {}
+                        continue
                 rank = float(row[0])
                 voter_rankings[rcid] = rank
+    if len(voter_rankings) < 1:
+        print("Error: " + filepath + " has misaligned/missing columns")
+        return {}
     return voter_rankings
 
 def read_voter_ballot(filepath, i=False):
