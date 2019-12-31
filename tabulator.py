@@ -294,6 +294,7 @@ def processBallot(filepath, coasterDict, winLossMatrix):
 # ==================================================
 
 def processAllBallots(xl, coasterDict, winLossMatrix):
+    print("Reading the ballots...")
 
     # include spreadsheet containing identifying voter info, if requested
     if args.includeExtraInfo > 0:
@@ -618,29 +619,30 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
             colorizeRow(resultws, i, [2,12], coasterDict, x)
             i += 1
 
-    # create and write pairwise result worksheet
-    pairws = xl.create_sheet("Ranked Pairs")
-    pairws.append(["Rank","Primary Coaster","Rival Coaster","Win Percentage","Wins","Losses","Ties"])
-    pairws.column_dimensions['A'].width = 4.83
-    pairws.column_dimensions['B'].width = 45.83
-    pairws.column_dimensions['C'].width = 45.83
-    pairws.column_dimensions['D'].width = 12.83
-    pairws.column_dimensions['E'].width = 4.5
-    pairws.column_dimensions['F'].width = 5.5
-    pairws.column_dimensions['G'].width = 3.83
-    i = 2
-    for x in pairs:
-        pairws.append([winLossMatrix[x[0][0], x[0][1]]["Pairwise Rank"], 
-                       coasterDict[x[0][0]].name + " – " + coasterDict[x[0][0]].park,
-                       coasterDict[x[0][1]].name + " – " + coasterDict[x[0][1]].park,
-                       winLossMatrix[x[0][0], x[0][1]]["Win Percentage"],
-                       winLossMatrix[x[0][0], x[0][1]]["Wins"],
-                       winLossMatrix[x[0][0], x[0][1]]["Losses"],
-                       winLossMatrix[x[0][0], x[0][1]]["Ties"]])
-        colorizeRow(pairws, i, [2], coasterDict, x[0][0])
-        colorizeRow(pairws, i, [3], coasterDict, x[0][1])
-        i += 1
-    pairws.freeze_panes = pairws['A2']
+    # create and write pairwise result worksheet; .xlsx row limit is 1,048,576 rows
+    if len(winLossMatrix) < 1048576:
+        pairws = xl.create_sheet("Ranked Pairs")
+        pairws.append(["Rank","Primary Coaster","Rival Coaster","Win Percentage","Wins","Losses","Ties"])
+        pairws.column_dimensions['A'].width = 4.83
+        pairws.column_dimensions['B'].width = 45.83
+        pairws.column_dimensions['C'].width = 45.83
+        pairws.column_dimensions['D'].width = 12.83
+        pairws.column_dimensions['E'].width = 4.5
+        pairws.column_dimensions['F'].width = 5.5
+        pairws.column_dimensions['G'].width = 3.83
+        i = 2
+        for x in pairs:
+            pairws.append([winLossMatrix[x[0][0], x[0][1]]["Pairwise Rank"], 
+                           coasterDict[x[0][0]].name + " – " + coasterDict[x[0][0]].park,
+                           coasterDict[x[0][1]].name + " – " + coasterDict[x[0][1]].park,
+                           winLossMatrix[x[0][0], x[0][1]]["Win Percentage"],
+                           winLossMatrix[x[0][0], x[0][1]]["Wins"],
+                           winLossMatrix[x[0][0], x[0][1]]["Losses"],
+                           winLossMatrix[x[0][0], x[0][1]]["Ties"]])
+            colorizeRow(pairws, i, [2], coasterDict, x[0][0])
+            colorizeRow(pairws, i, [3], coasterDict, x[0][1])
+            i += 1
+        pairws.freeze_panes = pairws['A2']
 
     # create and write Mitch Hawker-style mutual rider comparison worksheet
     hawkerWLTws = xl.create_sheet("Coaster vs Coaster Win-Loss-Tie")
