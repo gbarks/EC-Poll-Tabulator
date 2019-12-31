@@ -59,17 +59,25 @@ def read_detailed_ballot(filepath, id_col=7, name_col=2, park_col=4):
 
     return coasters
 
+def is_rcid(string):
+    if isinstance(string, str):
+        if "HYPERLINK" in string:
+            return is_rcid(string[:-2].split('"')[-1])
+        if len(string) < 7 and string[1:].isdecimal():
+            return string
+    return False
+
 ### ========================================================================
-###  xls support gracefully copied from the helpful users at StackOverflow
+###  xls support copied/modified from these helpful users at StackOverflow
 ###  https://stackoverflow.com/questions/9918646/how-to-convert-xls-to-xlsx
 ### ========================================================================
 import xlrd
 from openpyxl.workbook import Workbook
-from openpyxl.reader.excel import load_workbook, InvalidFileException
+from openpyxl.reader.excel import InvalidFileException
 
-def open_xls_as_xlsx(filename):
+def open_xls_as_xlsx(filepath):
     # first open using xlrd
-    book = xlrd.open_workbook(filename)
+    book = xlrd.open_workbook(filepath)
     index = 0
     nrows, ncols = 0, 0
     while nrows * ncols == 0:
@@ -80,14 +88,78 @@ def open_xls_as_xlsx(filename):
 
     # prepare a xlsx sheet
     book1 = Workbook()
-    sheet1 = book1.get_active_sheet()
+    sheet1 = book1.active
 
-    for row in xrange(0, nrows):
-        for col in xrange(0, ncols):
-            sheet1.cell(row=row, column=col).value = sheet.cell_value(row, col)
+    for row in range(0, nrows):
+        for col in range(0, ncols):
+            sheet1.cell(row=row+1, column=col+1).value = sheet.cell_value(row, col)
 
     return book1
 ### ========================================================================
 
-def read_voter_ballot(filepath):
+def read_xlsx_ballot(wb, filepath):
+    voter_rankings = {}
+    ws = wb.worksheets[0]
+    for row in ws.iter_rows():
+        if isinstance(row[0].value, int) or isinstance(row[0].value, float):
+            if row[0].value > 0 and row[1].value != "No":
+                try:
+                    rcid = row[7].value
+                except IndexError:
+                    rcid = None
+                if not is_rcid(rcid):
+                    rcid = None
+                    for cell in row:
+                        if is_rcid(cell.value):
+                            rcid = cell.value
+                    if rcid is None:
+                        print("Error: " + filepath + " has misaligned/missing columns")
+                        return {}
+                if "HYPERLINK" in rcid:
+                    rcid = rcid[:-2].split('"')[-1]
+                rank = row[0].value
+                voter_rankings[rcid] = rank
+    return voter_rankings
 
+def isnum(numstring):
+    if numstring.isdecimal():
+        return True
+    try:
+        float(numstring)
+        return True
+    except ValueError:
+        return False
+
+import csv
+
+def read_csv_ballot(filepath):
+    voter_rankings = {}
+    with open(filepath) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            if isnum(row[0]) and int(row[0]) > 0 and row[1] != "No":
+                try:
+                    rcid = row[7]
+                except IndexError:
+                    rcid = None
+                if not is_rcid(rcid):
+                    rcid = None
+                    for cell in row:
+                        if is_rcid(cell):
+                            rcid = cell
+                    if rcid is None:
+                        print("Error: " + filepath + " has misaligned/missing columns")
+                        return {}
+                rank = float(row[0])
+                voter_rankings[rcid] = rank
+    return voter_rankings
+
+def read_voter_ballot(filepath, i=False):
+    if filepath[-4:] == ".csv":
+        return read_csv_ballot(filepath)
+    if filepath[-4:] == ".xls":
+        return read_xlsx_ballot(open_xls_as_xlsx(filepath), filepath)
+    if filepath[-5:] == ".xlsx":
+        return read_xlsx_ballot(load_workbook(filepath), filepath)
+    print("Error: " + filepath + " is not a valid .csv/.xls/.xlsx file")
+    return None

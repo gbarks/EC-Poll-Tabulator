@@ -33,9 +33,9 @@ except:
 # essential local imports
 try:
     from coaster import Coaster
-    from ballotreader import read_detailed_ballot, read_voter_ballot
+    from readballot import read_detailed_ballot, read_voter_ballot
 except:
-    print('Could not find "coaster.py" and/or "dballot.py"; exiting...')
+    print('Could not find "coaster.py" and/or "readballot.py"; exiting...')
     sys.exit()
 
 # command line arguments
@@ -129,11 +129,11 @@ def main():
     # for each pair of coasters, a list of numbers of the form [wins, losses, ties, winPercent]
     winLossMatrix = createMatrix(coasterDict)
 
-    # processAllBallots(xlout, coasterDict, winLossMatrix)
+    processAllBallots(xlout, coasterDict, winLossMatrix)
 
-    # calculateResults(coasterDict, winLossMatrix)
+    calculateResults(coasterDict, winLossMatrix)
 
-    # # sorted lists of tuples of the form (rankedCoaster, relevantNumbers)
+    # sorted lists of tuples of the form (rankedCoaster, relevantNumbers)
     # finalResults, finalPairs = sortedLists(coasterDict, winLossMatrix)
 
     # # write worksheets related to finalResults, finalPairs, and winLossMatrix
@@ -206,12 +206,12 @@ def writeMasterlist(masterlistws, coasterDict, locSortList):
 
 def getBallotFilepaths():
     ballotList = []
-    for file in os.listdir(args.ballotFolder):
-        if file.endswith(".txt"):
-            ballotList.append(os.path.join(args.ballotFolder, file))
+    for f in os.listdir(args.ballotFolder):
+        if f.endswith(".csv") or f.endswith(".xls") or f.endswith(".xlsx"):
+            ballotList.append(os.path.join(args.ballotFolder, f))
 
     print("{0} ballots submitted.".format(len(ballotList)))
-    return ballotList
+    return sorted(ballotList)
 
 
 
@@ -246,7 +246,6 @@ def createMatrix(coasterDict):
 
 # ================================================================
 #  read a ballot (just ONE ballot)
-#
 #  you need a loop to call this function for each ballot filename
 # ================================================================
 
@@ -255,88 +254,13 @@ def processBallot(filepath, coasterDict, winLossMatrix):
     if args.verbose > 0:
         print("Processing ballot: {0}".format(filename))
 
-    voterInfo = [filename, "", "", "", "", ""] # return item 1
-    coasterAndRank = {} # return item 2
-    creditNum = 0
-    error = False
+    coasterAndRank = read_voter_ballot(filepath)
 
-    # open the ballot file
-    with open(filepath) as f:
-        infoField = 1
-        lineNum = 0
-        startProcessing = False
-
-        for line in f:
-            sline = line.strip()
-            lineNum += 1
-
-            # begin at top of ballot and get the voter's info first
-            if startProcessing == False and infoField <= 5 and not commentStr in sline and len(sline) != 0:
-
-                # if the line begins with "-Replace" then record a non-answer
-                if blankUserField in sline:
-                    voterInfo[infoField] = ""
-                    infoField += 1
-                elif not startLine in sline:
-                    voterInfo[infoField] = sline.strip('-').strip()
-                    infoField += 1
-
-            # skip down the file to the coasters
-            if startProcessing == False and sline == startLine:
-                startProcessing = True
-
-            elif startProcessing == True:
-
-                # break the line into its components: rank, name
-                words = [x.strip() for x in sline.split(',')]
-
-                if commentStr in sline: # skip comment lines (begin with "* ")
-                    continue
-
-                elif sline == "": # skip blank lines
-                    continue
-
-                # make sure there are at least 2 'words' in each line
-                elif len(words) < 2:
-                    if args.verbose == 0:
-                        print("Processing ballot: {0}".format(filename))
-                    print("Error in {0}, Line {1}: {2}".format(args.blankBallot, lineNum, line))
-
-                # make sure the ranking is a number
-                elif not words[0].isdigit():
-                    if args.verbose == 0:
-                        print("Processing ballot: {0}".format(filename))
-                    print("Error in reading {0}, Line {1}: Rank must be an int.".format(filename, lineNum))
-                    error = True
-
-                else:
-                    coasterName = words[1]
-                    coasterRank = int(words[0])
-
-                    # skip coasters ranked zero or less (those weren't ridden)
-                    if coasterRank <= 0:
-                        continue
-
-                    # check to make sure the coaster on the ballot is legit
-                    if coasterName  in coasterDict.keys():
-                        creditNum += 1
-                        coasterDict[coasterName].riders += 1
-
-                        # add this voter's ranking of the coaster
-                        coasterAndRank[coasterName] = coasterRank
-
-                    else: # it's not a legit coaster!
-                        if args.verbose == 0:
-                            print("Processing ballot: {0}".format(filename))
-                        print("Error in reading {0}, Line {1}: Unknown coaster {2}".format(filename, lineNum, coasterName))
-                        error = True
-
-    # don't tally the ballot if there were any errors, don't return voter info
-    if error:
-        if args.verbose == 0:
-            print("Processing ballot: {0}".format(filename))
-        print("Error encountered. File {0} not added.".format(filename))
-        return [], {}
+    # check that each coaster ID is valid
+    for c in coasterAndRank.keys():
+        if c not in coasterDict.keys():
+            print("Error in {0}: '{1}' not a valid coaster ID".format(filename, c))
+            return {}
 
     # cycle through each pair of coasters this voter ranked
     for coasterA in coasterAndRank.keys():
@@ -360,18 +284,7 @@ def processBallot(filepath, coasterDict, winLossMatrix):
                     winLossMatrix[coasterA, coasterB]["Losses"] += 1
                     coasterDict[coasterA].totalLosses += 1
 
-    if args.verbose > 0:
-        print(" ->", end=" ")
-
-        for i in range(1,len(voterInfo)):
-            if voterInfo[i] != "":
-                print("{0},".format(voterInfo[i]), end=" ")
-
-        print("CC: {0}".format(creditNum))
-
-    voterInfo.append(creditNum)
-
-    return voterInfo, coasterAndRank
+    return coasterAndRank
 
 
 
@@ -383,15 +296,12 @@ def processAllBallots(xl, coasterDict, winLossMatrix):
 
     # include spreadsheet containing identifying voter info, if requested
     if args.includeExtraInfo > 0:
-        voterinfows = xl.create_sheet("Voter Info (SENSITIVE)")
-        voterinfows.append(["Ballot Filename","Name","Email","City","State/Province","Country","Coasters Ridden"])
+        voterinfows = xl.create_sheet("Voter Coaster Counts")
+        voterinfows.append(["Ballot Filename","Coasters Ridden"])
         voterinfows.column_dimensions['A'].width = 24.83
-        voterinfows.column_dimensions['B'].width = 16.83
-        voterinfows.column_dimensions['C'].width = 24.83
-        for col in ['D','E','F','G']:
-            voterinfows.column_dimensions[col].width = 12.83
+        voterinfows.column_dimensions['B'].width = 12.83
 
-        # include spreadsheet containing individual ballots, if requested
+        # include spreadsheets containing individual ballots, if requested
         if args.includeExtraInfo > 1:
 
             # includes each coaster's rank in a separate column
@@ -419,12 +329,16 @@ def processAllBallots(xl, coasterDict, winLossMatrix):
 
     # loop over ballots, processing each and saving requested info
     for filepath in getBallotFilepaths():
-        voterInfo, ballotRanks = processBallot(filepath, coasterDict, winLossMatrix)
-        if args.includeExtraInfo > 0 and voterInfo:
-            voterinfows.append(voterInfo)
+        filename = os.path.basename(filepath)
+        ballotRanks = processBallot(filepath, coasterDict, winLossMatrix)
+        if len(ballotRanks) < 2:
+            print("Warning: {0} had zero coasters; likely improperly formatted".format(filename))
+            continue
+        if args.includeExtraInfo > 0:
+            voterinfows.append([filename, len(ballotRanks)])
             if args.includeExtraInfo > 1 and ballotRanks:
-                rowVals1 = [voterInfo[0]]
-                rowVals2 = [voterInfo[0]]
+                rowVals1 = [filename]
+                rowVals2 = [filename]
                 for coasterAndRank in sorted(ballotRanks.items(), key=lambda x: x[1]):
                     if args.verbose > 2:
                         print("{0}.\t{1}".format(coasterAndRank[1], coasterAndRank[0]))
@@ -501,7 +415,7 @@ def calculateResults(coasterDict, winLossMatrix):
             # print singular results with just a '-v' flag
             if args.verbose > 0:
                 print("{0},\tWins:{1},{2}\tTies:{3},{4}\t#Con:{5},{6}\tWin%: {7}, \tPairWin%: {8}".format(
-                    coasterDict[x].abbr, totalWins, pairWins, totalTies, pairTies, totalContests, pairContests,
+                    coasterDict[x].id, totalWins, pairWins, totalTies, pairTies, totalContests, pairContests,
                     round(coasterDict[x].totalWinPercentage, 3), round(coasterDict[x].pairwiseWinPercentage, 3)))
 
     if useSpinner:
@@ -634,9 +548,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     resultws = xl.create_sheet("Ranked Results")
     headerRow = ["Rank","Coaster","Total Win Percentage","Pairwise Win Percentage",
                  "Total Wins","Total Losses","Total Ties","Pair Wins","Pair Losses",
-                 "Pair Ties","Number of Riders"]
-    if args.botherRCDB:
-        headerRow.extend(["Designer/Manufacturer", "Year"])
+                 "Pair Ties","Number of Riders","Designer/Manufacturer", "Year"]
     resultws.append(headerRow)
     resultws.column_dimensions['A'].width = 4.83
     resultws.column_dimensions['B'].width = 45.83
@@ -649,9 +561,8 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
     resultws.column_dimensions['I'].width = 9.33
     resultws.column_dimensions['J'].width = 7.33
     resultws.column_dimensions['K'].width = 13.83
-    if args.botherRCDB:
-        resultws.column_dimensions['L'].width = 23.83
-        resultws.column_dimensions['M'].width = 8.83
+    resultws.column_dimensions['L'].width = 23.83
+    resultws.column_dimensions['M'].width = 8.83
     i = 2
     for x in results:
         resultws.append([coasterDict[x[0]].overallRank, x[0],
@@ -699,7 +610,7 @@ def printToFile(xl, results, pairs, winLossMatrix, coasterDict, preferredFixedWi
                              coasterDict[x].pairwiseLosses,
                              coasterDict[x].pairwiseTies,
                              coasterDict[x].riders,
-                             coasterDict[x].designer,
+                             coasterDict[x].make,
                              coasterDict[x].year])
             colorizeRow(resultws, i, [2,12], coasterDict, x, manuColors)
             i += 1
