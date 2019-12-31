@@ -8,3 +8,4 @@
 *.pyc
 *.txt
 !blankballot20*.txt
+!20*_ballot_details.xlsx
